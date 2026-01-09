@@ -130,7 +130,7 @@ public class Drivetrain extends SubsystemBase {
     private boolean fieldOriented = true;
     private double fieldOffset = 0;
     // FIXME not for permanent use!!
-    private SparkFlex[] driveMotors = new SparkFlex[] { null, null, null, null };
+    private SparkMax[] driveMotors = new SparkMax[] { null, null, null, null };
     private SparkMax[] turnMotors = new SparkMax[] { null, null, null, null };
     private CANcoder[] turnEncoders = new CANcoder[] { null, null, null, null };
     private final SparkClosedLoopController[] turnPidControllers = new SparkClosedLoopController[] {null, null, null, null};
@@ -239,22 +239,22 @@ public class Drivetrain extends SubsystemBase {
 
 
             moduleFL = new SwerveModule(Constants.Drivetrainc.swerveConfig, SwerveModule.ModuleType.FL, 
-                driveMotors[0] = MotorControllerFactory.createSparkFlex(driveFrontLeftPort), 
+                driveMotors[0] = MotorControllerFactory.createSparkMax(driveFrontLeftPort, MotorConfig.NEO), 
                 turnMotors[0] = MotorControllerFactory.createSparkMax(turnFrontLeftPort, MotorConfig.NEO), 
                 turnEncoders[0] = SensorFactory.createCANCoder(Constants.Drivetrainc.canCoderPortFL), 0, pitchSupplier, rollSupplier);
             //SmartDashboard.putNumber("FL Motor Val", turnMotors[0].getEncoder().getPosition());
             moduleFR = new SwerveModule(Constants.Drivetrainc.swerveConfig, SwerveModule.ModuleType.FR, 
-                driveMotors[1] = MotorControllerFactory.createSparkFlex(driveFrontRightPort), 
+                driveMotors[1] = MotorControllerFactory.createSparkMax(driveFrontRightPort, MotorConfig.NEO), 
                 turnMotors[1] = MotorControllerFactory.createSparkMax(turnFrontRightPort, MotorConfig.NEO), 
                 turnEncoders[1] = SensorFactory.createCANCoder(Constants.Drivetrainc.canCoderPortFR), 1, pitchSupplier, rollSupplier);
 
             moduleBL = new SwerveModule(Constants.Drivetrainc.swerveConfig, SwerveModule.ModuleType.BL, 
-                driveMotors[2] = MotorControllerFactory.createSparkFlex(driveBackLeftPort), 
+                driveMotors[2] = MotorControllerFactory.createSparkMax(driveBackLeftPort, MotorConfig.NEO), 
                 turnMotors[2] = MotorControllerFactory.createSparkMax(turnBackLeftPort, MotorConfig.NEO), 
                 turnEncoders[2] = SensorFactory.createCANCoder(Constants.Drivetrainc.canCoderPortBL), 2, pitchSupplier, rollSupplier);
 
             moduleBR = new SwerveModule(Constants.Drivetrainc.swerveConfig, SwerveModule.ModuleType.BR, 
-                driveMotors[3] = MotorControllerFactory.createSparkFlex(driveBackRightPort), 
+                driveMotors[3] = MotorControllerFactory.createSparkMax(driveBackRightPort, MotorConfig.NEO), 
                 turnMotors[3] = MotorControllerFactory.createSparkMax(turnBackRightPort, MotorConfig.NEO),
                 turnEncoders[3] = SensorFactory.createCANCoder(Constants.Drivetrainc.canCoderPortBR), 3, pitchSupplier, rollSupplier);
             modules = new SwerveModule[] { moduleFL, moduleFR, moduleBL, moduleBR };
@@ -283,7 +283,7 @@ public class Drivetrain extends SubsystemBase {
             driveConfig.encoder.uvwMeasurementPeriod(16);
             driveConfig.smartCurrentLimit(MotorConfig.NEO.currentLimitAmps);
 
-            for (SparkFlex driveMotor : driveMotors) {
+            for (SparkMax driveMotor : driveMotors) {
                 driveMotor.configure(driveConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
             }
             SparkMaxConfig turnConfig = new SparkMaxConfig();
@@ -407,7 +407,7 @@ public class Drivetrain extends SubsystemBase {
             config.idleMode(mode);
             turnMotor.configure(config, SparkBase.ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);      
         }
-        for (SparkFlex driveMotor : driveMotors) {
+        for (SparkMax driveMotor : driveMotors) {
             SparkMaxConfig config = new SparkMaxConfig();
             config.idleMode(mode);
             driveMotor.configure(config, SparkBase.ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);     
@@ -986,7 +986,7 @@ public class Drivetrain extends SubsystemBase {
             defaultSysIdConfig,
             new SysIdRoutine.Mechanism(
                     (Voltage volts) -> {
-                        for (SparkFlex dm : driveMotors) {
+                        for (SparkMax dm : driveMotors) {
                             dm.setVoltage(volts.in(Volts));
                         }
                     },
