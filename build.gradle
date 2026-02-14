@@ -86,7 +86,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    implementation "com.github.DeepBlueRobotics:lib199:2026-SNAPSHOT" //FIXME: change to a release when 2026 gets merged
+    implementation "com.github.DeepBlueRobotics:lib199:6.1.1" 
 }
 
 test {
