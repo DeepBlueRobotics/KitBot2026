@@ -10,6 +10,9 @@ import org.carlmontrobotics.subsystems.*;
 
 
 import org.carlmontrobotics.commands.DriveCommands.TeleopDrive;
+import org.carlmontrobotics.commands.ManipulatorCommands.IntakeBalls;
+import org.carlmontrobotics.commands.ManipulatorCommands.RunConveyer;
+import org.carlmontrobotics.commands.ManipulatorCommands.ShootBalls;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,10 +56,11 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-//constats
+//constants
 import org.carlmontrobotics.Constants.OI;
 import org.carlmontrobotics.Constants.OI.Driver;
 import org.carlmontrobotics.Constants.OI.Manipulator;
+import org.carlmontrobotics.Constants.OuttakeC;
 import org.carlmontrobotics.Constants.Drivetrainc.Autoc;
 
 //smartdashboard/elastic
@@ -73,6 +77,9 @@ public class RobotContainer {
 
     public final Limelight limelight = new Limelight();
     public final Drivetrain drivetrain =  new Drivetrain(limelight);
+
+    public final Intake intake = new Intake();
+    public final Outtake outtake = new Outtake(OuttakeC.OUTTAKE_KP, OuttakeC.OUTTAKE_KI, OuttakeC.OUTTAKE_KD);
 
 
     private SendableChooser<Command> autoChooser = new SendableChooser<>();   
@@ -116,7 +123,14 @@ public class RobotContainer {
             .onFalse(new InstantCommand(() -> drivetrain.setExtraSpeedMult(0)));        
     }
 
-    private void setBindingsManipulator() {}
+    private void setBindingsManipulator() {
+      new JoystickButton(manipulatorController, Manipulator.INTAKE_BUTTON)
+      .whileTrue(new IntakeBalls(intake));
+      new JoystickButton(manipulatorController, Manipulator.CONVEYER_BUTTON)
+      .whileTrue(new RunConveyer(intake)); //could be toggle mode instead
+      new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
+      .whileTrue(new ShootBalls(outtake));
+    }
     //#endregion
     //#region AutoMaking
     private void RegisterAutoCommands() {}
