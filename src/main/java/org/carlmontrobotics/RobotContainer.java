@@ -11,7 +11,7 @@ import org.carlmontrobotics.subsystems.*;
 
 import org.carlmontrobotics.commands.DriveCommands.TeleopDrive;
 import org.carlmontrobotics.commands.ManipulatorCommands.IntakeBalls;
-import org.carlmontrobotics.commands.ManipulatorCommands.RunConveyer;
+import org.carlmontrobotics.commands.ManipulatorCommands.RunConveyor;
 import org.carlmontrobotics.commands.ManipulatorCommands.ShootBalls;
 
 import java.util.ArrayList;
@@ -127,7 +127,7 @@ public class RobotContainer {
       new JoystickButton(manipulatorController, Manipulator.INTAKE_CONVEYOR_BUTTON)
       .whileTrue(new IntakeBalls(intake));
       new JoystickButton(manipulatorController, Manipulator.INTAKE_CONVEYOR_BUTTON)
-      .whileTrue(new RunConveyer(intake)); //could be toggle mode instead
+      .whileTrue(new RunConveyor(intake)); //could be toggle mode instead
       new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
       .whileTrue(new ShootBalls(outtake));
     }
