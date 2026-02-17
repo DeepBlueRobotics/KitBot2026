@@ -79,7 +79,7 @@ public class RobotContainer {
     public final Drivetrain drivetrain =  new Drivetrain(limelight);
 
     public final Intake intake = new Intake();
-    public final Outtake outtake = new Outtake(OuttakeC.OUTTAKE_KP, OuttakeC.OUTTAKE_KI, OuttakeC.OUTTAKE_KD);
+    public final Outtake outtake = new Outtake();
 
 
     private SendableChooser<Command> autoChooser = new SendableChooser<>();   
@@ -124,9 +124,9 @@ public class RobotContainer {
     }
 
     private void setBindingsManipulator() {
-      new JoystickButton(manipulatorController, Manipulator.INTAKE_BUTTON)
+      new JoystickButton(manipulatorController, Manipulator.INTAKE_CONVEYOR_BUTTON)
       .whileTrue(new IntakeBalls(intake));
-      new JoystickButton(manipulatorController, Manipulator.CONVEYER_BUTTON)
+      new JoystickButton(manipulatorController, Manipulator.INTAKE_CONVEYOR_BUTTON)
       .whileTrue(new RunConveyer(intake)); //could be toggle mode instead
       new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
       .whileTrue(new ShootBalls(outtake));

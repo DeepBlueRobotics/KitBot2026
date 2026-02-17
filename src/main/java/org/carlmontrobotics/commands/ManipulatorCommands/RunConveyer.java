@@ -21,7 +21,7 @@ public class RunConveyer extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    conveyer.spinConveyer(IntakeC.CONVEYER_SPEED);
+    conveyer.spinConveyor(IntakeC.CONVEYOR_SPEED);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -31,7 +31,7 @@ public class RunConveyer extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    conveyer.spinConveyer(0);
+    conveyer.spinConveyor(0);
   }
 
   // Returns true when the command should end.

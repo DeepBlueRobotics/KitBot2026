@@ -15,45 +15,39 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import static org.carlmontrobotics.Constants.OuttakeC;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Outtake extends SubsystemBase {
-  SparkFlex outtake;
+  SparkFlex outtakeMaster;
   SparkFlex outtakeFollower;
   SparkFlex outtakeFeeder;
   private SparkFlexConfig outtakeFollowerConfig;
   private SparkFlexConfig outtakeConfig;
   private SparkFlexConfig outtakeFeederConfig;
-  private double kP;
-  private double kI;
-  private double kD;
   private SparkClosedLoopController pidController;
   /** Creates a new Outtake. */
-  public Outtake(double kP, double kI, double kD) {
-    this.kP = kP;
-    this.kI = kI;
-    this.kD = kD;
+  public Outtake() {
 
-    outtake = MotorControllerFactory.createSparkFlex(OuttakeC.OUTTAKE_ID);
+    outtakeMaster = MotorControllerFactory.createSparkFlex(OuttakeC.OUTTAKE_ID);
     outtakeFollower = MotorControllerFactory.createSparkFlex(OuttakeC.OUTTAKE_FOLLOWER_ID);
     outtakeFeeder = MotorControllerFactory.createSparkFlex(OuttakeC.OUTTAKE_FEEDER_ID);
 
-    pidController = outtake.getClosedLoopController();
+    pidController = outtakeMaster.getClosedLoopController();
 
     outtakeConfig = new SparkFlexConfig();
     outtakeConfig.idleMode(IdleMode.kCoast);
-    outtakeConfig.closedLoop.pid(kP,kI,kD).feedbackSensor(FeedbackSensor.kPrimaryEncoder);
-    outtake.configure(outtakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    outtakeConfig.closedLoop.pid(OuttakeC.kP, OuttakeC.kI, OuttakeC.kD);
+    outtakeMaster.configure(outtakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
     outtakeFollowerConfig = new SparkFlexConfig();
     outtakeFollowerConfig.apply(outtakeConfig)
-                          .follow(OuttakeC.OUTTAKE_ID);
-    outtakeFollowerConfig.inverted(true); // may need to be false and swap outtake to true
+                          .follow(OuttakeC.OUTTAKE_ID, true); // may need to be false and swap outtake to true
     outtakeFollower.configure(outtakeFeederConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
     outtakeFeederConfig = new SparkFlexConfig();
-    outtakeFeederConfig.idleMode(IdleMode.kCoast);
     outtakeFeeder.configure(outtakeFeederConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
 
@@ -62,6 +56,15 @@ public class Outtake extends SubsystemBase {
     outtakeFeeder.set(feederSpeed);
   }
 
+  public void stopOuttake(){
+    pidController.setSetpoint(0, ControlType.kDutyCycle);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder){
+    super.initSendable(builder);
+    builder.addDoubleProperty("Outtake Speed perc", () -> outtakeMaster.getAppliedOutput(), null);
+  }
   @Override
   public void periodic() {}
     // This method will be called once per scheduler run
