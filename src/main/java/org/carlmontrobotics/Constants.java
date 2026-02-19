@@ -291,7 +291,7 @@ public final class Constants {
 		public static final double kI = 0;
 		public static final double kD = 0;
 		public static final double OUTTAKE_FEEDER_VOLT_PERC = 0.7;
-		public static final double W_WAIT_TIME = 0.01;
+		public static final double OUTTAKE_ESTIMATE_OFFSET = 0; //+- range for atGoal
 	}
 }
 //#endregion

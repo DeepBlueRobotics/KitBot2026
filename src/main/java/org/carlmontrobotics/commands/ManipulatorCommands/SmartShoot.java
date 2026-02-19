@@ -36,7 +36,7 @@ public class SmartShoot extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(timer.hasElapsed(W_WAIT_TIME)){
+    if(outtake.atGoal(OUTTAKE_ESTIMATE_OFFSET)){
       outtake.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC);
       intake.spinConveyor(CONVEYOR_SPEED);
     }

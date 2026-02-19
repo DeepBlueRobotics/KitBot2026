@@ -8,6 +8,7 @@ import static org.carlmontrobotics.Constants.OuttakeC.*;
 
 import org.carlmontrobotics.lib199.MotorControllerFactory;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -25,6 +26,7 @@ public class Outtake extends SubsystemBase {
   private SparkBaseConfig outtakeConfig;
   private SparkBaseConfig outtakeFeederConfig;
   private SparkClosedLoopController pidController;
+  RelativeEncoder outtakeMasterEncoder;
   /** Creates a new Outtake. */
   public Outtake() {
 
@@ -34,6 +36,8 @@ public class Outtake extends SubsystemBase {
     outtakeFeeder = MotorControllerFactory.createSpark(OUTTAKE_FEEDER_ID, OUTTAKE_FEEDER_MOTOR_CONFIG, outtakeFeederConfig);
 
     pidController = outtakeMaster.getClosedLoopController();
+
+    outtakeMasterEncoder = outtakeMaster.getEncoder();
 
   }
 
@@ -60,6 +64,10 @@ public class Outtake extends SubsystemBase {
   public void stopOuttake(){
     pidController.setSetpoint(0, ControlType.kDutyCycle);
   }
+
+  public boolean atGoal(double estimateOffset){
+    return Math.abs(pidController.getSetpoint() - outtakeMasterEncoder.getPosition()) < estimateOffset;
+    }
 
   @Override
   public void initSendable(SendableBuilder builder){
