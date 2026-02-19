@@ -9,15 +9,14 @@ import org.carlmontrobotics.lib199.MotorControllerFactory;
 
 import org.carlmontrobotics.Constants.IntakeC;
 
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.spark.SparkFlex;
 
 public class Intake extends SubsystemBase {
   SparkFlex intake;
-  SparkFlex conveyer;
+  SparkFlex conveyor;
   /** Creates a new Intake. */
   public Intake() {
     SparkFlex intake = MotorControllerFactory.createSparkFlex(IntakeC.INTAKE_ID);
@@ -29,18 +28,13 @@ public class Intake extends SubsystemBase {
   }
 
   public void spinConveyor(double conveyorSpeed) {
-    conveyer.set(conveyorSpeed);
-  }
-
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    super.initSendable(builder);
-    builder.addDoubleProperty("Intake speed perc", () ->intake.getAppliedOutput(), null);
+    conveyor.set(conveyorSpeed);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Intake Speed", intake.get());
+    SmartDashboard.putNumber("Conveyor Speed", conveyor.get());
   }
-
 }

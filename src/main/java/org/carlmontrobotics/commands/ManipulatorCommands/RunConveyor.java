@@ -10,18 +10,18 @@ import org.carlmontrobotics.subsystems.Intake;
 import org.carlmontrobotics.Constants.IntakeC;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class RunConveyer extends Command {
-  Intake conveyer;
-  /** Creates a new RunConveyer. */
-  public RunConveyer(Intake conveyer) {
-    this.conveyer = conveyer;
+public class RunConveyor extends Command {
+  Intake conveyor;
+  /** Creates a new RunConveyor. */
+  public RunConveyor(Intake conveyor) {
+    this.conveyor = conveyor;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    conveyer.spinConveyor(IntakeC.CONVEYOR_SPEED);
+    conveyor.spinConveyor(IntakeC.CONVEYOR_SPEED);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -31,7 +31,7 @@ public class RunConveyer extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    conveyer.spinConveyor(0);
+    conveyor.spinConveyor(0);
   }
 
   // Returns true when the command should end.
