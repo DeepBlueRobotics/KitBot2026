@@ -19,11 +19,22 @@ public class SmartShoot extends Command {
   Timer timer;
   Outtake outtake;
   Intake intake;
+  boolean timed;
+  double time;
   /** Creates a new SmartShoot. */
   public SmartShoot(Outtake outtake, Intake intake) {
     // Use addRequirements() here to declare subsystem dependencies.
     timer = new Timer();
     addRequirements(outtake, intake);
+  }
+
+  public SmartShoot(Outtake outtake, Intake intake, double time) {
+    // Use addRequirements() here to declare subsystem dependencies.
+    timer = new Timer();
+    timed = true;
+    this.timer = timer;
+    addRequirements(outtake, intake);
+
   }
 
   // Called when the command is initially scheduled.
@@ -52,6 +63,6 @@ public class SmartShoot extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return timed && timer.hasElapsed(time);
   }
 }
