@@ -4,16 +4,16 @@
 
 package org.carlmontrobotics.commands.ManipulatorCommands;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import org.carlmontrobotics.Constants.OuttakeC;
+import static org.carlmontrobotics.Constants.OuttakeC.*;
+
 import org.carlmontrobotics.subsystems.Outtake;
+
+import edu.wpi.first.wpilibj2.command.Command;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ShootBalls extends Command {
   Outtake outtake;
 
-
-  
   /** Creates a new ShootBalls. */
   public ShootBalls(Outtake outtake) {
     this.outtake = outtake;
@@ -23,7 +23,9 @@ public class ShootBalls extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    outtake.spinOuttake(OUTTAKE_FEEDER_VOLT_PERC);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override

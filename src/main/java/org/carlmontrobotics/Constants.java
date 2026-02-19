@@ -5,6 +5,7 @@
 package org.carlmontrobotics;
 
 import org.carlmontrobotics.lib199.swerve.SwerveConfig;
+import org.carlmontrobotics.lib199.MotorConfig;
 
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
@@ -282,11 +283,15 @@ public final class Constants {
 		public static final int OUTTAKE_ID = 14;
 		public static final int OUTTAKE_FOLLOWER_ID = 6;
 		public static final int OUTTAKE_FEEDER_ID = 7;
+		public static final MotorConfig OUTTAKE_MASTER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
+		public static final MotorConfig OUTTAKE_FOLLOWER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
+		public static final MotorConfig OUTTAKE_FEEDER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 		public static final double OUTTAKE_RPM = 60;
 		public static final double kP = 0.01;
 		public static final double kI = 0;
 		public static final double kD = 0;
 		public static final double OUTTAKE_FEEDER_VOLT_PERC = 0.7;
+		public static final double W_WAIT_TIME = 0.01;
 	}
 }
 //#endregion

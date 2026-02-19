@@ -90,7 +90,6 @@ public class RobotContainer {
     public static int intakeCounter;
 
     public RobotContainer() {
-        intakeCounter = 0;
         //#region AutoRegistration
         RegisterAutoCommands();
         autoChooser = AutoBuilder.buildAutoChooser();

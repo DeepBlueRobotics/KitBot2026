@@ -4,12 +4,14 @@
 
 package org.carlmontrobotics.commands.ManipulatorCommands;
 
+import static org.carlmontrobotics.Constants.IntakeC.*;
+import static org.carlmontrobotics.Constants.OuttakeC.*;
+
+import org.carlmontrobotics.subsystems.Intake;
+import org.carlmontrobotics.subsystems.Outtake;
+
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import org.carlmontrobotics.subsystems.Outtake;
-import org.carlmontrobotics.subsystems.Intake;
-import static org.carlmontrobotics.Constants.OuttakeC;
-import static org.carlmontrobotics.Constants.IntakeC;
 
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -28,19 +30,15 @@ public class SmartShoot extends Command {
   @Override
   public void initialize() {
     timer.restart();
-    outtake.spinOuttake(OuttakeC.OUTTAKE_RPM);
+    outtake.spinOuttake(OUTTAKE_RPM);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    
-    
-    if(timer.hasElapsed(1)){
-
-      outtake.spinOuttakeFeeder(OuttakeC.OUTTAKE_FEEDER_VOLT_PERC);
-      intake.spinConveyor(IntakeC.CONVEYOR_SPEED);
-
+    if(timer.hasElapsed(W_WAIT_TIME)){
+      outtake.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC);
+      intake.spinConveyor(CONVEYOR_SPEED);
     }
   }
 

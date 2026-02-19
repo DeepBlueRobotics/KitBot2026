@@ -4,47 +4,50 @@
 
 package org.carlmontrobotics.subsystems;
 
+import org.carlmontrobotics.Constants.IntakeC;
 import org.carlmontrobotics.lib199.MotorConfig;
 import org.carlmontrobotics.lib199.MotorControllerFactory;
 
-import org.carlmontrobotics.Constants.IntakeC;
+import com.revrobotics.spark.SparkBase;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import com.revrobotics.spark.SparkFlex;
-
 public class Intake extends SubsystemBase {
+  SparkBase intakeMotor;
+  SparkBase conveyorMotor;
   
-  SparkFlex intake;
-  SparkFlex conveyor;
   /** Creates a new Intake. */
   public Intake() {
-    SparkFlex intake = MotorControllerFactory.createSparkFlex(IntakeC.INTAKE_ID);
-    SparkFlex conveyor = MotorControllerFactory.createSparkFlex(IntakeC.CONVEYOR_ID);
-
+    intakeMotor = MotorControllerFactory.createSpark(IntakeC.INTAKE_ID, MotorConfig.NEO_VORTEX);
+    conveyorMotor = MotorControllerFactory.createSpark(IntakeC.CONVEYOR_ID, MotorConfig.NEO_VORTEX);
   }
 
   public void spinIntake(double intakeSpeed) {
-    intake.set(intakeSpeed);
+    intakeMotor.set(intakeSpeed);
   }
 
   public void spinConveyor(double conveyorSpeed) {
-    conveyor.set(conveyorSpeed);
+    conveyorMotor.set(conveyorSpeed);
   }
 
   public void stopIntake(){
-    intake.set(0);
+    intakeMotor.set(0);
   }
 
   public void stopConveyor(){
-    conveyor.set(0);
+    conveyorMotor.set(0);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder){
+    super.initSendable(builder);
+    builder.addDoubleProperty("Intake Speed perc", () -> intakeMotor.get(), this::spinIntake);
+    builder.addDoubleProperty("Conveyor Speed perc", () -> conveyorMotor.get(), this::spinConveyor);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("Intake Speed", intake.get());
-    SmartDashboard.putNumber("Conveyor Speed", conveyor.get());
   }
 }

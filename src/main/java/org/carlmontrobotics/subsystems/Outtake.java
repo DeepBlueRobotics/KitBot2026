@@ -4,51 +4,49 @@
 
 package org.carlmontrobotics.subsystems;
 
-import org.carlmontrobotics.Constants.OuttakeC;
+import static org.carlmontrobotics.Constants.OuttakeC.*;
+
 import org.carlmontrobotics.lib199.MotorControllerFactory;
 
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.FeedbackSensor;
+import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkFlexConfig;
-import static org.carlmontrobotics.Constants.OuttakeC;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Outtake extends SubsystemBase {
-  SparkFlex outtakeMaster;
-  SparkFlex outtakeFollower;
-  SparkFlex outtakeFeeder;
-  private SparkFlexConfig outtakeFollowerConfig;
-  private SparkFlexConfig outtakeConfig;
-  private SparkFlexConfig outtakeFeederConfig;
+  SparkBase outtakeMaster;
+  SparkBase outtakeFollower;
+  SparkBase outtakeFeeder;
+  private SparkBaseConfig outtakeFollowerConfig;
+  private SparkBaseConfig outtakeConfig;
+  private SparkBaseConfig outtakeFeederConfig;
   private SparkClosedLoopController pidController;
   /** Creates a new Outtake. */
   public Outtake() {
 
-    outtakeMaster = MotorControllerFactory.createSparkFlex(OuttakeC.OUTTAKE_ID);
-    outtakeFollower = MotorControllerFactory.createSparkFlex(OuttakeC.OUTTAKE_FOLLOWER_ID);
-    outtakeFeeder = MotorControllerFactory.createSparkFlex(OuttakeC.OUTTAKE_FEEDER_ID);
+    configureMotors();
+    outtakeMaster = MotorControllerFactory.createSpark(OUTTAKE_ID, OUTTAKE_MASTER_MOTOR_CONFIG, outtakeConfig);
+    outtakeFollower = MotorControllerFactory.createSpark(OUTTAKE_FOLLOWER_ID, OUTTAKE_FOLLOWER_MOTOR_CONFIG, outtakeFollowerConfig);
+    outtakeFeeder = MotorControllerFactory.createSpark(OUTTAKE_FEEDER_ID, OUTTAKE_FEEDER_MOTOR_CONFIG, outtakeFeederConfig);
 
     pidController = outtakeMaster.getClosedLoopController();
 
-    outtakeConfig = new SparkFlexConfig();
-    outtakeConfig.idleMode(IdleMode.kCoast);
-    outtakeConfig.closedLoop.pid(OuttakeC.kP, OuttakeC.kI, OuttakeC.kD);
-    outtakeMaster.configure(outtakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+  }
 
-    outtakeFollowerConfig = new SparkFlexConfig();
+  public void configureMotors(){
+    outtakeConfig = MotorControllerFactory.sparkConfig(OUTTAKE_MASTER_MOTOR_CONFIG);
+    outtakeConfig.idleMode(IdleMode.kCoast)
+                  .closedLoop.pid(kP, kI, kD);
+
+    outtakeFollowerConfig = MotorControllerFactory.sparkConfig(OUTTAKE_FOLLOWER_MOTOR_CONFIG);
     outtakeFollowerConfig.apply(outtakeConfig)
-                          .follow(OuttakeC.OUTTAKE_ID, true); // may need to be false and swap outtake to true
-    outtakeFollower.configure(outtakeFeederConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+                          .follow(OUTTAKE_ID, true); // may need to be false and swap outtake to true
 
-    outtakeFeederConfig = new SparkFlexConfig();
-    outtakeFeeder.configure(outtakeFeederConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    outtakeFeederConfig = MotorControllerFactory.sparkConfig(OUTTAKE_FEEDER_MOTOR_CONFIG);
   }
 
   public void spinOuttake(double input) {
@@ -61,13 +59,16 @@ public class Outtake extends SubsystemBase {
 
   public void stopOuttake(){
     pidController.setSetpoint(0, ControlType.kDutyCycle);
-    outtakeFeeder.set(0);
   }
 
   @Override
   public void initSendable(SendableBuilder builder){
     super.initSendable(builder);
-    builder.addDoubleProperty("Outtake Speed perc", () -> outtakeMaster.getAppliedOutput(), null);
+    builder.addDoubleProperty("Outtake master Speed perc", () -> outtakeMaster.getAppliedOutput(), null);
+    builder.addDoubleProperty("Outtake master Velocity", () -> outtakeMaster.getEncoder().getVelocity(), null);
+    builder.addDoubleProperty("Outtake master setpoint", () -> pidController.getSetpoint(), this::spinOuttake);
+
+    builder.addDoubleProperty("Outtake Feeder Speed perc", () -> outtakeFeeder.getAppliedOutput(), this::spinOuttakeFeeder);
   }
   @Override
   public void periodic() {}
