@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 import org.carlmontrobotics.subsystems.Intake;
 import org.carlmontrobotics.Constants.IntakeC;
+import org.carlmontrobotics.RobotContainer;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class IntakeBalls extends Command {
@@ -21,12 +22,21 @@ public class IntakeBalls extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    RobotContainer.intakeCounter++;
     intake.spinIntake(IntakeC.INTAKE_SPEED);
+    
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    if(RobotContainer.intakeCounter % 2 == 1){
+      intake.spinIntake(IntakeC.INTAKE_SPEED);
+    }
+    else{
+      intake.spinIntake(0);
+    }
+  }
 
   // Called once the command ends or is interrupted.
   @Override
