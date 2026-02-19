@@ -53,6 +53,7 @@ public final class Constants {
 			public static final int Y = Button.kY.value;
 			public static final int INTAKE_CONVEYOR_BUTTON = Button.kA.value; //get real buttons later
             public static final int OUTTAKE_BUTTON = Button.kB.value; 
+			public static final int SMART_SHOOT_BUTTON = Button.kX.value;
         }
 
 		public static final double JOY_THRESH = 0.13;

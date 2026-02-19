@@ -51,13 +51,13 @@ public class Outtake extends SubsystemBase {
     outtakeFeeder.configure(outtakeFeederConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
 
-  public void spinOuttake(double input, double feederSpeed) {
+  public void spinOuttake(double input) {
     pidController.setSetpoint(input, ControlType.kVelocity);
-    outtakeFeeder.set(feederSpeed);
   }
 
   public void stopOuttake(){
     pidController.setSetpoint(0, ControlType.kDutyCycle);
+    outtakeFeeder.set(0);
   }
 
   @Override

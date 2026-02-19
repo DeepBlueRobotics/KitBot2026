@@ -130,6 +130,8 @@ public class RobotContainer {
       .whileTrue(new RunConveyer(intake)); //could be toggle mode instead
       new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
       .whileTrue(new ShootBalls(outtake));
+      new JoystickButton(manipulatorController, Manipulator.SMART_SHOOT_BUTTON)
+      .whileTrue(new SmartShoot(outtake, intake))
     }
     //#endregion
     //#region AutoMaking
