@@ -55,6 +55,10 @@ public class Outtake extends SubsystemBase {
     pidController.setSetpoint(input, ControlType.kVelocity);
   }
 
+  public void spinOuttakeFeeder(double feederSpeed){
+    outtakeFeeder.set(feederSpeed);
+  }
+
   public void stopOuttake(){
     pidController.setSetpoint(0, ControlType.kDutyCycle);
     outtakeFeeder.set(0);

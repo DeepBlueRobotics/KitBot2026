@@ -15,12 +15,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkFlex;
 
 public class Intake extends SubsystemBase {
+  
   SparkFlex intake;
   SparkFlex conveyor;
   /** Creates a new Intake. */
   public Intake() {
     SparkFlex intake = MotorControllerFactory.createSparkFlex(IntakeC.INTAKE_ID);
     SparkFlex conveyor = MotorControllerFactory.createSparkFlex(IntakeC.CONVEYOR_ID);
+
   }
 
   public void spinIntake(double intakeSpeed) {
@@ -29,6 +31,14 @@ public class Intake extends SubsystemBase {
 
   public void spinConveyor(double conveyorSpeed) {
     conveyor.set(conveyorSpeed);
+  }
+
+  public void stopIntake(){
+    intake.set(0);
+  }
+
+  public void stopConveyor(){
+    conveyor.set(0);
   }
 
   @Override

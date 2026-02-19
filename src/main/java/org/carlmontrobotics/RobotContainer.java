@@ -13,6 +13,7 @@ import org.carlmontrobotics.commands.DriveCommands.TeleopDrive;
 import org.carlmontrobotics.commands.ManipulatorCommands.IntakeBalls;
 import org.carlmontrobotics.commands.ManipulatorCommands.RunConveyor;
 import org.carlmontrobotics.commands.ManipulatorCommands.ShootBalls;
+import org.carlmontrobotics.commands.ManipulatorCommands.SmartShoot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +87,10 @@ public class RobotContainer {
     public boolean alignOverride = true;
     public boolean autoScoring = true;
 
+    public static int intakeCounter;
+
     public RobotContainer() {
+        intakeCounter = 0;
         //#region AutoRegistration
         RegisterAutoCommands();
         autoChooser = AutoBuilder.buildAutoChooser();
@@ -125,13 +129,12 @@ public class RobotContainer {
 
     private void setBindingsManipulator() {
       new JoystickButton(manipulatorController, Manipulator.INTAKE_CONVEYOR_BUTTON)
-      .whileTrue(new IntakeBalls(intake));
-      new JoystickButton(manipulatorController, Manipulator.INTAKE_CONVEYOR_BUTTON)
       .whileTrue(new RunConveyor(intake)); //could be toggle mode instead
+
       new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
       .whileTrue(new ShootBalls(outtake));
       new JoystickButton(manipulatorController, Manipulator.SMART_SHOOT_BUTTON)
-      .whileTrue(new SmartShoot(outtake, intake))
+      .whileTrue(new SmartShoot(outtake, intake));
     }
     //#endregion
     //#region AutoMaking
