@@ -10,6 +10,10 @@ import org.carlmontrobotics.subsystems.*;
 
 
 import org.carlmontrobotics.commands.DriveCommands.TeleopDrive;
+import org.carlmontrobotics.commands.ManipulatorCommands.IntakeBalls;
+import org.carlmontrobotics.commands.ManipulatorCommands.RunConveyor;
+import org.carlmontrobotics.commands.ManipulatorCommands.ShootBalls;
+import org.carlmontrobotics.commands.ManipulatorCommands.SmartShoot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,10 +57,11 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-//constats
+//constants
 import org.carlmontrobotics.Constants.OI;
 import org.carlmontrobotics.Constants.OI.Driver;
 import org.carlmontrobotics.Constants.OI.Manipulator;
+import org.carlmontrobotics.Constants.OuttakeC;
 import org.carlmontrobotics.Constants.Drivetrainc.Autoc;
 
 //smartdashboard/elastic
@@ -74,10 +79,15 @@ public class RobotContainer {
     public final Limelight limelight = new Limelight();
     public final Drivetrain drivetrain =  new Drivetrain(limelight);
 
+    public final Intake intake = new Intake();
+    public final Outtake outtake = new Outtake();
+
 
     private SendableChooser<Command> autoChooser = new SendableChooser<>();   
     public boolean alignOverride = true;
     public boolean autoScoring = true;
+
+    public static int intakeCounter;
 
     public RobotContainer() {
         //#region AutoRegistration
@@ -116,7 +126,15 @@ public class RobotContainer {
             .onFalse(new InstantCommand(() -> drivetrain.setExtraSpeedMult(0)));        
     }
 
-    private void setBindingsManipulator() {}
+    private void setBindingsManipulator() {
+      new JoystickButton(manipulatorController, Manipulator.INTAKE_CONVEYOR_BUTTON)
+      .whileTrue(new RunConveyor(intake)); //could be toggle mode instead
+
+      new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
+      .whileTrue(new ShootBalls(outtake));
+      new JoystickButton(manipulatorController, Manipulator.SMART_SHOOT_BUTTON)
+      .whileTrue(new SmartShoot(outtake, intake));
+    }
     //#endregion
     //#region AutoMaking
     private void RegisterAutoCommands() {}
