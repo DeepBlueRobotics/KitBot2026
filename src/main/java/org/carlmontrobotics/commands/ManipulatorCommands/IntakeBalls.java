@@ -8,14 +8,30 @@ import static org.carlmontrobotics.Constants.IntakeC.*;
 
 import org.carlmontrobotics.subsystems.Intake;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class IntakeBalls extends Command {
   Intake intake;
+  Timer timer;
+  boolean timed;
+  double time;
+
   /** Creates a new IntakeBalls. */
   public IntakeBalls(Intake intake) {
     this.intake = intake;
+    timer = new Timer();
+    timed = false;
+    addRequirements(intake);
+    // Use addRequirements() here to declare subsystem dependencies.
+  }
+
+  public IntakeBalls(Intake intake, double time) {
+    this.intake = intake;
+    this.time = time;
+    timer = new Timer();
+    timed = true;
     addRequirements(intake);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -24,6 +40,7 @@ public class IntakeBalls extends Command {
   @Override
   public void initialize() {
     intake.spinIntake(INTAKE_SPEED);
+    timer.restart();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -39,6 +56,6 @@ public class IntakeBalls extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return timed && timer.hasElapsed(time);
   }
 }
