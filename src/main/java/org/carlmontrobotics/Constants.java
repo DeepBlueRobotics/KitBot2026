@@ -11,6 +11,10 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathConstraints;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -292,6 +296,22 @@ public final class Constants {
 		public static final double kD = 0;
 		public static final double OUTTAKE_FEEDER_VOLT_PERC = 0.7;
 		public static final double OUTTAKE_ESTIMATE_OFFSET = 0; //+- range for atGoal
+	}
+//#endregion
+//#region Shoot On the Fly
+	public static final class ShootOnFlyc {
+		public static final double launchAngleRad = 1.41656236619;
+		public static final double wheelRadiusMeters = Units.inchesToMeters(4);
+		public static final double passiveVelocity = 100; //TODO consult with senac how much power can be constantly diverted to shooter while attempting to shoot
+		public static final double thetaAlignP = 1; //TODO tune it
+		public static final double toleranceRad = Math.PI/90; //Looks right
+		public static final double maxRPM = 6784;
+
+		//Poses
+		public static final Pose2d centerOfRedGoal2d = new Pose2d(11.918, 4.025, new Rotation2d()); 
+		public static final Pose2d centerOfBlueGoal2d = new Pose2d(4.631, 4.025, new Rotation2d());
+		public static final Pose3d centerOfRedGoal3d = new Pose3d(11.918, 4.025, Units.inchesToMeters(72), new Rotation3d());
+		public static final Pose3d centerOfBlueGoal3d = new Pose3d(4.631, 4.025, Units.inchesToMeters(72), new Rotation3d());
 	}
 }
 //#endregion

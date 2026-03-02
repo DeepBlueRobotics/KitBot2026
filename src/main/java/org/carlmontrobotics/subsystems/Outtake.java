@@ -67,7 +67,11 @@ public class Outtake extends SubsystemBase {
 
   public boolean atGoal(double estimateOffset){
     return Math.abs(pidController.getSetpoint() - outtakeMasterEncoder.getPosition()) < estimateOffset;
-    }
+  }
+
+  public double getVelocity() {
+    return outtakeMasterEncoder.getVelocity();
+  }
 
   @Override
   public void initSendable(SendableBuilder builder){

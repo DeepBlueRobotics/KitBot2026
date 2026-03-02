@@ -531,6 +531,9 @@ public class Drivetrain extends SubsystemBase {
         SmartDashboard.putNumber("front right encoder", moduleFR.getModuleAngle());
         SmartDashboard.putNumber("back left encoder", moduleBL.getModuleAngle());
         SmartDashboard.putNumber("back right encoder", moduleBR.getModuleAngle());
+
+        updateVelocity(); //Do not remove
+
     }
 
     @Override
@@ -1326,5 +1329,40 @@ public class Drivetrain extends SubsystemBase {
      */
     public double getGyroRate() {
         return gyro.getRate();
+    }
+
+
+    public Pose2d getDrivetrainPosition() {
+        return poseEstimator.getEstimatedPosition();
+    }
+
+    public double[] getDrivetrainVelocity() {
+        double [] info = {drivetrainVX, drivetrainVY, drivetrainVR};
+        return info;
+    }
+
+    Pose2d lastPose;
+    double lastTime;
+    /** X direction velocity: m/s*/
+    private double drivetrainVX;
+    /** Y direction velocity: m/s */
+    private double drivetrainVY;
+    /** Rotation velocity: rad/s */
+    private double drivetrainVR;
+
+    private void updateVelocity() {
+        Pose2d currentPose = poseEstimator.getEstimatedPosition();
+        double now = Timer.getFPGATimestamp();
+
+        double dt = now - lastTime;
+        Translation2d delta = currentPose.getTranslation().minus(lastPose.getTranslation());
+
+        drivetrainVX = delta.getX() / dt;
+        drivetrainVY = delta.getY() / dt;
+
+        drivetrainVR = currentPose.getRotation().minus(lastPose.getRotation()).getRadians() / dt;
+
+        lastPose = currentPose;
+        lastTime = now;
     }
 }
