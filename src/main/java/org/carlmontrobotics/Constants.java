@@ -74,6 +74,9 @@ public final class Constants {
 		public static final int turnFrontRightPort = 12;
 		public static final int turnBackLeftPort = 13;
 		public static final int turnBackRightPort = 14;
+
+		public static final MotorConfig driveMotorConfig = CONFIG.isVortexDrive() ? MotorConfig.NEO_VORTEX : MotorConfig.NEO;
+		public static final MotorConfig turnMotorConfig = MotorConfig.NEO;
 		//TODO: set hammerhead can coder ports the same as kitbot
 		public static final int canCoderPortFL = CONFIG.isHammerHead() ? 0 : 1; 
 		public static final int canCoderPortFR = CONFIG.isHammerHead() ? 1 : 2; 
@@ -102,9 +105,9 @@ public final class Constants {
 		public static final double[] drivekP = {1, 1, 1, 1};
 		public static final double[] drivekI = {0, 0, 0, 0};
 		public static final double[] drivekD = CONFIG.isHammerHead()? new double[] { 0, 0, 0, 0 }:
-																				new double[] { 0,0,0,0 };
+																		new double[] { 0,0,0,0 };
 		public static final double[] turnkP = CONFIG.isHammerHead() ? new double[] {50, 50, 50, 50} : 
-																				new double[] {0,0,0,0};
+																		new double[] {0,0,0,0};
 		public static final double[] turnkI = {0, 0, 0, 0};
 		public static final double[] turnkD = {0, 0, 0, 0};
 		public static final double[] turnkS = {1, 1, 1, 1};

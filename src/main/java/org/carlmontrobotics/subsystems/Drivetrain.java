@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 //lib199
-import org.carlmontrobotics.lib199.MotorConfig;
 import org.carlmontrobotics.lib199.MotorControllerFactory;
 import org.carlmontrobotics.lib199.SensorFactory;
 import org.carlmontrobotics.lib199.swerve.SwerveModule;
@@ -69,13 +68,11 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
@@ -126,8 +123,8 @@ public class Drivetrain extends SubsystemBase {
     private boolean fieldOriented = true;
     private double fieldOffset = 0;
     // FIXME not for permanent use!!
-    private SparkMax[] driveMotors = new SparkMax[] { null, null, null, null };
-    private SparkMax[] turnMotors = new SparkMax[] { null, null, null, null };
+    private SparkBase[] driveMotors = new SparkBase[] { null, null, null, null };
+    private SparkBase[] turnMotors = new SparkBase[] { null, null, null, null };
     private CANcoder[] turnEncoders = new CANcoder[] { null, null, null, null };
     private final SparkClosedLoopController[] turnPidControllers = new SparkClosedLoopController[] {null, null, null, null};
     public final float initPitch;
@@ -220,22 +217,22 @@ public class Drivetrain extends SubsystemBase {
 
 
             moduleFL = new SwerveModule(Constants.Drivetrainc.swerveConfig, SwerveModule.ModuleType.FL, 
-                driveMotors[0] = MotorControllerFactory.createSparkMax(driveFrontLeftPort, MotorConfig.NEO), 
-                turnMotors[0] = MotorControllerFactory.createSparkMax(turnFrontLeftPort, MotorConfig.NEO), 
+                driveMotors[0] = MotorControllerFactory.createSpark(driveFrontLeftPort, driveMotorConfig), 
+                turnMotors[0] = MotorControllerFactory.createSpark(turnFrontLeftPort, turnMotorConfig), 
                 turnEncoders[0] = SensorFactory.createCANCoder(Constants.Drivetrainc.canCoderPortFL), 0, pitchSupplier, rollSupplier);
             moduleFR = new SwerveModule(Constants.Drivetrainc.swerveConfig, SwerveModule.ModuleType.FR, 
-                driveMotors[1] = MotorControllerFactory.createSparkMax(driveFrontRightPort, MotorConfig.NEO), 
-                turnMotors[1] = MotorControllerFactory.createSparkMax(turnFrontRightPort, MotorConfig.NEO), 
+                driveMotors[1] = MotorControllerFactory.createSpark(driveFrontRightPort, driveMotorConfig), 
+                turnMotors[1] = MotorControllerFactory.createSpark(turnFrontRightPort, turnMotorConfig), 
                 turnEncoders[1] = SensorFactory.createCANCoder(Constants.Drivetrainc.canCoderPortFR), 1, pitchSupplier, rollSupplier);
 
             moduleBL = new SwerveModule(Constants.Drivetrainc.swerveConfig, SwerveModule.ModuleType.BL, 
-                driveMotors[2] = MotorControllerFactory.createSparkMax(driveBackLeftPort, MotorConfig.NEO), 
-                turnMotors[2] = MotorControllerFactory.createSparkMax(turnBackLeftPort, MotorConfig.NEO), 
+                driveMotors[2] = MotorControllerFactory.createSpark(driveBackLeftPort, driveMotorConfig), 
+                turnMotors[2] = MotorControllerFactory.createSpark(turnBackLeftPort, turnMotorConfig), 
                 turnEncoders[2] = SensorFactory.createCANCoder(Constants.Drivetrainc.canCoderPortBL), 2, pitchSupplier, rollSupplier);
 
             moduleBR = new SwerveModule(Constants.Drivetrainc.swerveConfig, SwerveModule.ModuleType.BR, 
-                driveMotors[3] = MotorControllerFactory.createSparkMax(driveBackRightPort, MotorConfig.NEO), 
-                turnMotors[3] = MotorControllerFactory.createSparkMax(turnBackRightPort, MotorConfig.NEO),
+                driveMotors[3] = MotorControllerFactory.createSpark(driveBackRightPort, driveMotorConfig), 
+                turnMotors[3] = MotorControllerFactory.createSpark(turnBackRightPort, turnMotorConfig),
                 turnEncoders[3] = SensorFactory.createCANCoder(Constants.Drivetrainc.canCoderPortBR), 3, pitchSupplier, rollSupplier);
             modules = new SwerveModule[] { moduleFL, moduleFR, moduleBL, moduleBR };
             turnPidControllers[0] = turnMotors[0].getClosedLoopController();
@@ -248,25 +245,24 @@ public class Drivetrain extends SubsystemBase {
                 };
                 gyroYawSim = new SimDeviceSim("navX-Sensor[0]").getDouble("Yaw");
             }
-            SparkMaxConfig driveConfig = new SparkMaxConfig();
+            SparkBaseConfig driveConfig = MotorControllerFactory.sparkConfig(driveMotorConfig);
             driveConfig.openLoopRampRate(secsPer12Volts);
             driveConfig.encoder.positionConversionFactor(wheelDiameterMeters * Math.PI / driveGearing);
             driveConfig.encoder.velocityConversionFactor(wheelDiameterMeters * Math.PI / driveGearing / 60);
             driveConfig.encoder.uvwAverageDepth(2);
             driveConfig.encoder.uvwMeasurementPeriod(16);
-            driveConfig.smartCurrentLimit(MotorConfig.NEO.currentLimitAmps);
 
-            for (SparkMax driveMotor : driveMotors) {
+            for (SparkBase driveMotor : driveMotors) {
                 driveMotor.configure(driveConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
             }
-            SparkMaxConfig turnConfig = new SparkMaxConfig();
+            SparkBaseConfig turnConfig = MotorControllerFactory.sparkConfig(turnMotorConfig);
             turnConfig.encoder.positionConversionFactor(360/turnGearing);
             turnConfig.encoder.velocityConversionFactor(360/turnGearing/60);
             turnConfig.encoder.uvwAverageDepth(2);
             turnConfig.encoder.uvwMeasurementPeriod(16);
 
             //turnConfig.closedLoop.pid(kP, kI, kD).feedbackSensor(FeedbackSensor.kPrimaryEncoder);
-            for (SparkMax turnMotor : turnMotors) {
+            for (SparkBase turnMotor : turnMotors) {
                 turnMotor.configure(turnConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
             }
 
@@ -279,9 +275,6 @@ public class Drivetrain extends SubsystemBase {
             accelX = gyro.getWorldLinearAccelX(); // Acceleration along the X-axis
             accelY = gyro.getWorldLinearAccelY(); // Acceleration along the Y-axis
             accelXY = Math.sqrt(gyro.getWorldLinearAccelX() * gyro.getWorldLinearAccelX() + gyro.getWorldLinearAccelY() * gyro.getWorldLinearAccelY());
-
-            // for(SparkMax driveMotor : driveMotors)
-            // driveMotor.setSmartCurrentLimit(80);
 
             // Must call this method for SysId to run
             if (CONFIG.isSysIdTesting()) {
@@ -365,13 +358,13 @@ public class Drivetrain extends SubsystemBase {
         else {
             mode = IdleMode.kCoast;
         }
-        for (SparkMax turnMotor : turnMotors) {
-            SparkMaxConfig config = new SparkMaxConfig();
+        for (SparkBase turnMotor : turnMotors) {
+            SparkBaseConfig config = MotorControllerFactory.createConfig(turnMotorConfig.controllerType);
             config.idleMode(mode);
             turnMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);      
         }
-        for (SparkMax driveMotor : driveMotors) {
-            SparkMaxConfig config = new SparkMaxConfig();
+        for (SparkBase driveMotor : driveMotors) {
+            SparkBaseConfig config = MotorControllerFactory.createConfig(driveMotorConfig.controllerType);
             config.idleMode(mode);
             driveMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);     
         }
@@ -877,7 +870,7 @@ public class Drivetrain extends SubsystemBase {
             defaultSysIdConfig,
             new SysIdRoutine.Mechanism(
                     (Voltage volts) -> {
-                        for (SparkMax dm : driveMotors) {
+                        for (SparkBase dm : driveMotors) {
                             dm.setVoltage(volts.in(Volts));
                         }
                     },
