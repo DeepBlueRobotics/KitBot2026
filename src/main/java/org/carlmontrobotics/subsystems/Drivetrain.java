@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
@@ -118,8 +117,7 @@ import static org.carlmontrobotics.Constants.LimeLightc.*;
 public class Drivetrain extends SubsystemBase {
 
     private final AHRS gyro = new AHRS(NavXComType.kMXP_SPI);
-    private Pose2d autoGyroOffset = new Pose2d(0., 0., new Rotation2d(0.));
-    // ^used by PathPlanner for chaining paths
+    private Pose2d autoGyroOffset = new Pose2d(0., 0., new Rotation2d(0.)); //used by PathPlanner for chaining paths
     private SwerveDriveKinematics kinematics = null;
     // private SwerveDriveOdometry odometry = null;
     private SwerveDrivePoseEstimator poseEstimator = null;
@@ -163,9 +161,6 @@ public class Drivetrain extends SubsystemBase {
     public double extraSpeedMult = 0;
 
     private double lastSetX = 0, lastSetY = 0, lastSetTheta = 0;
-    double kP = 0;
-    double kI = 0;
-    double kD = 0;
     public enum Mode {
     coast,
     brake,
@@ -176,19 +171,7 @@ public class Drivetrain extends SubsystemBase {
     public Drivetrain(Limelight ll) {
         this.ll = ll;
         AutoBuilder();
-        //SmartDashboard.putNumber("Goal Velocity", 0);
-        //SmartDashboard.putNumber("kP", 0);
-        //SmartDashboard.putNumber("kI", 0);
-        //SmartDashboard.putNumber("kD", 0);
 
-        // SmartDashboard.putNumber("Pose Estimator t x (m)", lastSetX);
-        // SmartDashboard.putNumber("Pose Estimator set y (m)", lastSetY);
-        // SmartDashboard.putNumber("Pose Estimator set rotation (deg)",
-        // lastSetTheta);
-
-        // SmartDashboard.putNumber("pose estimator std dev x", STD_DEV_X_METERS);
-        // SmartDashboard.putNumber("pose estimator std dev y", STD_DEV_Y_METERS);
-        //SmartDashboard.putNumber("GoalPos", 0);
         // Calibrate Gyro
         {
 
@@ -240,7 +223,6 @@ public class Drivetrain extends SubsystemBase {
                 driveMotors[0] = MotorControllerFactory.createSparkMax(driveFrontLeftPort, MotorConfig.NEO), 
                 turnMotors[0] = MotorControllerFactory.createSparkMax(turnFrontLeftPort, MotorConfig.NEO), 
                 turnEncoders[0] = SensorFactory.createCANCoder(Constants.Drivetrainc.canCoderPortFL), 0, pitchSupplier, rollSupplier);
-            //SmartDashboard.putNumber("FL Motor Val", turnMotors[0].getEncoder().getPosition());
             moduleFR = new SwerveModule(Constants.Drivetrainc.swerveConfig, SwerveModule.ModuleType.FR, 
                 driveMotors[1] = MotorControllerFactory.createSparkMax(driveFrontRightPort, MotorConfig.NEO), 
                 turnMotors[1] = MotorControllerFactory.createSparkMax(turnFrontRightPort, MotorConfig.NEO), 
@@ -266,13 +248,6 @@ public class Drivetrain extends SubsystemBase {
                 };
                 gyroYawSim = new SimDeviceSim("navX-Sensor[0]").getDouble("Yaw");
             }
-            SmartDashboard.putData("Module FL",moduleFL);
-            SmartDashboard.putData("Module FR",moduleFR);
-            SmartDashboard.putData("Module BL",moduleBL);
-            SmartDashboard.putData("Module BR",moduleBR);
-            
-            SmartDashboard.putNumber("bigoal", 0);
-
             SparkMaxConfig driveConfig = new SparkMaxConfig();
             driveConfig.openLoopRampRate(secsPer12Volts);
             driveConfig.encoder.positionConversionFactor(wheelDiameterMeters * Math.PI / driveGearing);
@@ -301,10 +276,6 @@ public class Drivetrain extends SubsystemBase {
                 coder.getVelocity().setUpdateFrequency(500);
             }
            
-            //SmartDashboard.putData("Field", field);
-            //SmartDashboard.putData("Odometry Field", odometryField);
-            //martDashboard.putData("Pose with Limelight Field", poseWithLimelightField);
-
             accelX = gyro.getWorldLinearAccelX(); // Acceleration along the X-axis
             accelY = gyro.getWorldLinearAccelY(); // Acceleration along the Y-axis
             accelXY = Math.sqrt(gyro.getWorldLinearAccelX() * gyro.getWorldLinearAccelX() + gyro.getWorldLinearAccelY() * gyro.getWorldLinearAccelY());
@@ -330,12 +301,6 @@ public class Drivetrain extends SubsystemBase {
 
         // Setup autopath builder
         //configurePPLAutoBuilder();
-        // SmartDashboard.putNumber("chassis speeds x", 0);
-        //                 SmartDashboard.putNumber("chassis speeds y", 0);
-
-        //                             SmartDashboard.putNumber("chassis speeds theta", 0);
-        SmartDashboard.putData(this); // For seeing drivetrain data in SmartDashboard
-
     }
 
 
@@ -417,18 +382,8 @@ public class Drivetrain extends SubsystemBase {
         detectCollision(); //This does nothing
         PathPlannerLogging.logCurrentPose(getPose());
 
-        //maybe add the field with the position of the robot with only limelight and the field with the position of the robot with only odometry?
-        //We can compare the two fields to see if odometry is causing the pose to be inaccurate when it hits the reef.
 
-        // SmartDashboard.getNumber("GoalPos", turnEncoders[0].getVelocity().getValueAsDouble());
-        // SmartDashboard.putNumber("FL Motor Val", turnMotors[0].getEncoder().getPosition());
-        // double goal = SmartDashboard.getNumber("GoalPos", 0);
-        // PIDController pid = new PIDController(kP, kI, kD);
-        // kP = SmartDashboard.getNumber("kP", 0);
-        // kI = SmartDashboard.getNumber("kI", 0);
-        // kD = SmartDashboard.getNumber("kD", 0);
         //pid.setIZone(20);
-        //SmartDashboard.putBoolean("atgoal", pid.atSetpoint());
         // SparkMaxConfig config = new SparkMaxConfig();
         
         //config.closedLoop.feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder);
@@ -437,11 +392,6 @@ public class Drivetrain extends SubsystemBase {
         // config.encoder.positionConversionFactor(360/Constants.Drivetrainc.turnGearing);
         // turnMotors[0].configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
         // //moduleFL.move(0.0000001, 180);
-        //moduleFL.move(0.01, 180);
-        // moduleFR.move(0.000000001, 0);
-        // moduleBR.move(0.0000001, 0);
-        // moduleFL.move(0.000001, 0);
-        // moduleBL.move(0.000001, 0);
         // turnPidControllers[0].setReference(goal
 
         // , ControlType.kPosition, ClosedLoopSlot.kSlot0);
@@ -463,18 +413,10 @@ public class Drivetrain extends SubsystemBase {
         //     i++;
         // }
         // lobotomized to prevent ucontrollabe swerve behavior
-        // turnMotors[2].setVoltage(SmartDashboard.getNumber("kS", 0));
         // moduleFL.periodic();
         // moduleFR.periodic();
         // moduleBL.periodic();
         // moduleBR.periodic();
-        double goal = SmartDashboard.getNumber("bigoal", 0);
-        for (SwerveModule module : modules) {
-          // module.turnPeriodic();
-          // module.turnPeriodic();
-          module.move(0.00000000001, goal);
-          module.periodic();
-        }
 
         // field.setRobotPose(odometry.getPoseMeters());
 
@@ -488,13 +430,6 @@ public class Drivetrain extends SubsystemBase {
 
         // updateMT2PoseEstimator();
 
-        // double currSetX =
-        // SmartDashboard.getNumber("Pose Estimator set x (m)", lastSetX);
-        // double currSetY =
-        // SmartDashboard.getNumber("Pose Estimator set y (m)", lastSetY);
-        // double currSetTheta = SmartDashboard
-        // .getNumber("Pose Estimator set rotation (deg)", lastSetTheta);
-
         // if (lastSetX != currSetX || lastSetY != currSetY
         // || lastSetTheta != currSetTheta) {
         // setPose(new Pose2d(currSetX, currSetY,
@@ -506,66 +441,37 @@ public class Drivetrain extends SubsystemBase {
         // Rotation2d.fromDegrees(getHeading())));
 
 
-        // SmartDashboard.putNumber("X position with limelight", getPoseWithLimelight().getX());
-        // SmartDashboard.putNumber("Y position with limelight", getPoseWithLimelight().getY());
-        SmartDashboard.putNumber("X position with gyro", getPose().getX());
-        SmartDashboard.putNumber("Y position with gyro", getPose().getY());
-        SmartDashboard.putData(CONFIG);
-        
-        //For finding acceleration of drivetrain for collision detector
-        SmartDashboard.putNumber("Accel X", accelX);
-        SmartDashboard.putNumber("Accel Y", accelY);
-        SmartDashboard.putNumber("2D Acceleration ", accelXY);
-
-        // // // SmartDashboard.putNumber("Pitch", gyro.getPitch());
-        // // // SmartDashboard.putNumber("Roll", gyro.getRoll());
-        // SmartDashboard.putNumber("Raw gyro angle", gyro.getAngle());
-        // SmartDashboard.putNumber("Robot Heading", getHeading());
-        // // // SmartDashboard.putNumber("AdjRoll", gyro.getPitch() - initPitch);
-        // // // SmartDashboard.putNumber("AdjPitch", gyro.getRoll() - initRoll);
-        // SmartDashboard.putBoolean("Field Oriented", fieldOriented);
-        // SmartDashboard.putNumber("Gyro Compass Heading", gyro.getCompassHeading());
-        // SmartDashboard.putNumber("Compass Offset", compassOffset);
-        // SmartDashboard.putBoolean("Current Magnetic Field Disturbance", gyro.isMagneticDisturbance());
-        SmartDashboard.putNumber("front left encoder", moduleFL.getModuleAngle());
-        SmartDashboard.putNumber("front right encoder", moduleFR.getModuleAngle());
-        SmartDashboard.putNumber("back left encoder", moduleBL.getModuleAngle());
-        SmartDashboard.putNumber("back right encoder", moduleBR.getModuleAngle());
     }
 
     @Override
     public void initSendable(SendableBuilder builder) {
         super.initSendable(builder);
 
-        for (SwerveModule module : modules)
+        for (SwerveModule module : modules){
             SendableRegistry.addChild(this, module);
-        
-        builder.addBooleanProperty("Magnetic Field Disturbance",
-        gyro::isMagneticDisturbance, null);
+        }
+        String moduleNames[] = {"FL", "FR", "BL", "BR"};
+        for (int i = 0; i < 4; i++) {
+            final int j = i; //make java happy
+            builder.addDoubleProperty(moduleNames[j] + "Turn Encoder (Deg)", () -> modules[j].getModuleAngle(), null);
+        }
+        SendableRegistry.addChild(this, CONFIG);
+        builder.addBooleanProperty("Magnetic Field Disturbance", gyro::isMagneticDisturbance, null);
         builder.addBooleanProperty("Gyro Calibrating", gyro::isCalibrating, null);
-        builder.addBooleanProperty("Field Oriented", () -> fieldOriented,
-        fieldOriented -> this.fieldOriented = fieldOriented);
-        builder.addDoubleProperty("Pose Estimator X", () -> getPose().getX(),
-                null);
-        builder.addDoubleProperty("Pose Estimator Y", () -> getPose().getY(),
-                null);
-        builder.addDoubleProperty("Pose Estimator Theta",
-                () ->
-        getPose().getRotation().getDegrees(), null);
+        builder.addBooleanProperty("Field Oriented", () -> fieldOriented, fieldOriented -> this.fieldOriented = fieldOriented);
+        builder.addDoubleProperty("Pose Estimator X", () -> getPose().getX(), null);
+        builder.addDoubleProperty("Pose Estimator Y", () -> getPose().getY(),null);
+        builder.addDoubleProperty("Pose Estimator Theta", () -> getPose().getRotation().getDegrees(), null);
+        builder.addDoubleProperty("X position with gyro", () -> getPose().getX(), null);
+        builder.addDoubleProperty("Y position with gyro", () -> getPose().getY(), null);
         builder.addDoubleProperty("Robot Heading", () -> getHeading(), null);
         builder.addDoubleProperty("Raw Gyro Angle", gyro::getAngle, null);
         builder.addDoubleProperty("Pitch", gyro::getPitch, null);
         builder.addDoubleProperty("Roll", gyro::getRoll, null);
-        builder.addDoubleProperty("Field Offset", () -> fieldOffset, fieldOffset ->
-        this.fieldOffset = fieldOffset);
-        builder.addDoubleProperty("FL Turn Encoder (Deg)",
-                () -> moduleFL.getModuleAngle(), null);
-        builder.addDoubleProperty("FR Turn Encoder (Deg)",
-                () -> moduleFR.getModuleAngle(), null);
-        builder.addDoubleProperty("BL Turn Encoder (Deg)",
-                () -> moduleBL.getModuleAngle(), null);
-        builder.addDoubleProperty("BR Turn Encoder (Deg)",
-                () -> moduleBR.getModuleAngle(), null);
+        builder.addDoubleProperty("Accel X", () -> accelX, null);
+        builder.addDoubleProperty("Accel Y", () -> accelY, null);
+        builder.addDoubleProperty("2D Acceleration ", () -> accelXY, null);
+        builder.addDoubleProperty("Field Offset", () -> fieldOffset, fieldOffset -> this.fieldOffset = fieldOffset);
     }
 
 
@@ -602,9 +508,7 @@ public class Drivetrain extends SubsystemBase {
         double max = maxSpeed;
         SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, max);
         for (int i = 0; i < 4; i++) {
-            // SmartDashboard.putNumber("moduleIn" + Integer.toString(i), moduleStates[i].angle.getDegrees());
             moduleStates[i].optimize(Rotation2d.fromDegrees(modules[i].getModuleAngle()));
-            // SmartDashboard.putNumber("moduleOT" + Integer.toString(i), moduleStates[i].angle.getDegrees());
             modules[i].move(moduleStates[i].speedMetersPerSecond, moduleStates[i].angle.getDegrees());
         }
     }
@@ -788,15 +692,6 @@ public class Drivetrain extends SubsystemBase {
         return accelXY > COLLISION_ACCELERATION_THRESHOLD; // return true if collision detected
     }
 
-    /**
-     * @deprecated Use {@link #resetFieldOrientation()} instead
-     */
-    @Deprecated
-    public void resetHeading() {
-        gyro.reset();
-        
-    }
-
     public double getPitch() {
         return gyro.getPitch();
     }
@@ -894,8 +789,6 @@ public class Drivetrain extends SubsystemBase {
         for (SwerveModule module : modules)
             module.coast();
     }
-
-
 
     // #region SysId Code
 
@@ -1111,11 +1004,6 @@ public class Drivetrain extends SubsystemBase {
             
             // sysIdTab.add("Dynamic Backward", sysIdDynamic(SysIdRoutine.Direction.kReverse)).withSize(2, 1);
             // sysIdTab.add("Dynamic Forward", sysIdDynamic(SysIdRoutine.Direction.kForward)).withSize(2, 1);
-            // SmartDashboard.putData("Quackson Backward", sysIdQuasistatic(SysIdRoutine.Direction.kReverse));//.withSize(2, 1);
-            // SmartDashboard.putData("Quackson Forward", sysIdQuasistatic(SysIdRoutine.Direction.kForward));//.withSize(2, 1);
-
-            // SmartDashboard.putData("Dyanmic forward", sysIdDynamic(SysIdRoutine.Direction.kForward));//.withSize(2, 1);
-            // SmartDashboard.putData("Dyanmic backward", sysIdDynamic(SysIdRoutine.Direction.kReverse));//.withSize(2, 1);
             //sysIdTab.add(this);
 
             for (int i = 0; i < 8; i++) {// first four are drive, next 4 are turn motors
@@ -1129,9 +1017,6 @@ public class Drivetrain extends SubsystemBase {
                 m_revs_vel[i] = RotationsPerSecond.mutable(0);
             }
 
-            // SmartDashboard.putNumber("Desired Angle", 0);
-
-            // SmartDashboard.putNumber("kS", 0);
         }
     }
 
