@@ -57,7 +57,7 @@ public class BetterTeleopDrive extends Command {
    */
   public BetterTeleopDrive(Drivetrain drivetrain, Outtake outtake, DoubleSupplier fwd, DoubleSupplier str, DoubleSupplier rcw,
       BooleanSupplier slow, BooleanSupplier babyModeSupplier, BooleanSupplier shootOnFly) {
-    addRequirements(this.dt = drivetrain, this.outtake = outtake);
+    addRequirements(dt = drivetrain, this.outtake = outtake);
     this.fwd = fwd;
     this.str = str;
     this.rcw = rcw;
