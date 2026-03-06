@@ -1,4 +1,4 @@
-package org.carlmontrobotics.commands.ManipulatorCommands.ShootOnFlyLib;
+package org.carlmontrobotics.ShootOnFlyLib;
 
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;

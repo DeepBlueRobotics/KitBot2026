@@ -1,9 +1,8 @@
-package org.carlmontrobotics.commands.ManipulatorCommands.ShootOnFlyLib;
+package org.carlmontrobotics.ShootOnFlyLib;
 
 import static org.carlmontrobotics.Constants.ShootOnFlyc.*;
 
 public class ShotCalculator {
-    private static double clearanceSafety = 0.1651;           // extra margin (m)
 
     public static class ShotResult {
         public double requiredRPM;
@@ -22,7 +21,6 @@ public class ShotCalculator {
     ) {
 
         ShotResult result = new ShotResult();
-        double g = 9.81;
 
         double x = Math.hypot(dx, dy);
         double cos = Math.cos(launchAngleRad);
@@ -80,10 +78,9 @@ public class ShotCalculator {
 
                 double s = obstacleDistances[i];
 
-                double z =
-                    s * Math.tan(launchAngleRad)
-                    - (g * s * s) /
-                      (2.0 * vField * vField * cos * cos);
+                double z = launchHeightMeters
+                    + s * Math.tan(launchAngleRad)
+                    - (g * s * s) / (2.0 * vField * vField * cos * cos);
 
                 double marginClear = z - obstacleHeights[i];
                 result.clearanceMargins[i] = marginClear;

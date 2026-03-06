@@ -304,8 +304,12 @@ public final class Constants {
 		public static final double wheelRadiusMeters = Units.inchesToMeters(4);
 		public static final double passiveVelocity = 100; //TODO consult with senac how much power can be constantly diverted to shooter while attempting to shoot
 		public static final double thetaAlignP = 1; //TODO tune it
-		public static final double toleranceRad = Math.PI/90; //Looks right
-		public static final double maxRPM = 6784;
+		public static final double toleranceRad = Math.PI/90; //Looks good, like 2 degrees is good?
+		public static final double maxRPM = 6784; //RPM
+		public static final double g = 9.81; //m/s^2
+		public static final double launchHeightMeters = 1; //TODO
+		public static final double clearanceSafety = 0.1651; // extra margin (m)
+
 
 		//Poses
 		public static final Pose2d centerOfRedGoal2d = new Pose2d(11.918, 4.025, new Rotation2d()); 

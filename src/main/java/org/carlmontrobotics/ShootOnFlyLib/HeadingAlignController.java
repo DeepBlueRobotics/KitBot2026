@@ -1,7 +1,8 @@
-package org.carlmontrobotics.commands.ManipulatorCommands.ShootOnFlyLib;
+package org.carlmontrobotics.ShootOnFlyLib;
 
 import static org.carlmontrobotics.Constants.ShootOnFlyc.*;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 
 public class HeadingAlignController {
@@ -10,7 +11,7 @@ public class HeadingAlignController {
      * Returns rotational speed (rad/s scaled by kP) needed to face target.
      *
      * @param currentPose robot pose (with rotation)
-     * @param targetPose pose representing the point to face (rotation ignored)
+     * @param targetPose  pose representing the point to face (rotation ignored)
      */
     public static double calculateOmega(Pose2d currentPose, Pose2d targetPose) {
         double dx = targetPose.getX() - currentPose.getX();
@@ -19,7 +20,7 @@ public class HeadingAlignController {
         double desiredAngle = Math.atan2(dy, dx);
         double currentAngle = currentPose.getRotation().getRadians();
 
-        double error = wrapAngle(desiredAngle - currentAngle);
+        double error = MathUtil.angleModulus(desiredAngle - currentAngle);
 
         return thetaAlignP * error;
     }
@@ -34,19 +35,9 @@ public class HeadingAlignController {
         double desiredAngle = Math.atan2(dy, dx);
         double currentAngle = currentPose.getRotation().getRadians();
 
-        double error = wrapAngle(desiredAngle - currentAngle);
+        double error = MathUtil.angleModulus(desiredAngle - currentAngle);
 
         return Math.abs(error) <= toleranceRad;
     }
 
-    /**
-     * Wrap angle to [-pi, pi]
-     */
-    private static double wrapAngle(double angle) {
-        angle %= Math.PI;
-        if (angle > Math.PI) {
-            angle -= 2.0 * Math.PI;
-        }
-        return angle;
-    }
 }

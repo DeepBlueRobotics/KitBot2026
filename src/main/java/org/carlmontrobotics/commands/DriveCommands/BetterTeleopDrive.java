@@ -18,9 +18,9 @@ import java.util.function.DoubleSupplier;
 
 import org.carlmontrobotics.Constants;
 import org.carlmontrobotics.Robot;
-import org.carlmontrobotics.commands.ManipulatorCommands.ShootOnFlyLib.HeadingAlignController;
-import org.carlmontrobotics.commands.ManipulatorCommands.ShootOnFlyLib.HexClosest;
-import org.carlmontrobotics.commands.ManipulatorCommands.ShootOnFlyLib.ShotCalculator;
+import org.carlmontrobotics.ShootOnFlyLib.HeadingAlignController;
+import org.carlmontrobotics.ShootOnFlyLib.HexClosest;
+import org.carlmontrobotics.ShootOnFlyLib.ShotCalculator;
 import org.carlmontrobotics.subsystems.Drivetrain;
 import org.carlmontrobotics.subsystems.Outtake;
 
@@ -87,7 +87,7 @@ public class BetterTeleopDrive extends Command {
     double[] speeds = getRequestedSpeeds();
     prevTimestamp = currentTime;
     if (shootOnFly.getAsBoolean()) {
-      Pose2d currentPose2d = dt.getDrivetrainPosition();
+      Pose2d currentPose2d = dt.getPose();
       double rotation = calculateRotationToAlign(currentPose2d);
       boolean alignedForShot = calculateAlignmentValid(currentPose2d);
       if (alignedForShot) {
@@ -170,7 +170,7 @@ public class BetterTeleopDrive extends Command {
 
   private ShotCalculator.ShotResult calculateShotVelocity() {
     Pose3d goalPose = isRed ? new Pose3d(11.916, 4.038, 1.8237877672, new Rotation3d()) : new Pose3d(4.618, 4.038, 1.8237877672, new Rotation3d());
-    Pose2d current2dPose = dt.getDrivetrainPosition();
+    Pose2d current2dPose = dt.getPose();
     Pose3d current3dPose = new Pose3d(current2dPose);
     double[] velocityVectors = dt.getDrivetrainVelocity();
     double shooterVelocity = outtake.getVelocity();

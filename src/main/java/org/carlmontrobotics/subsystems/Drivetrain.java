@@ -1332,10 +1332,6 @@ public class Drivetrain extends SubsystemBase {
     }
 
 
-    public Pose2d getDrivetrainPosition() {
-        return poseEstimator.getEstimatedPosition();
-    }
-
     public double[] getDrivetrainVelocity() {
         double [] info = {drivetrainVX, drivetrainVY, drivetrainVR};
         return info;
