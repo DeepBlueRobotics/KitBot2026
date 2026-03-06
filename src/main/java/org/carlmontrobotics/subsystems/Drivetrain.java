@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 import org.carlmontrobotics.Constants;
 import org.carlmontrobotics.commands.DriveCommands.RotateToFieldRelativeAngle;
 import org.carlmontrobotics.commands.DriveCommands.TeleopDrive;
+import org.carlmontrobotics.lib199.Limelight;
 import org.carlmontrobotics.lib199.MotorControllerFactory;
 import org.carlmontrobotics.lib199.SensorFactory;
 import org.carlmontrobotics.lib199.swerve.SwerveModule;
@@ -88,11 +89,6 @@ public class Drivetrain extends SubsystemBase {
     public double extraSpeedMult = 0;
 
     private double lastSetX = 0, lastSetY = 0, lastSetTheta = 0;
-    public enum Mode {
-    coast,
-    brake,
-    toggle
-    }
 
     public final Limelight ll;
     public Drivetrain(Limelight ll) {
@@ -146,7 +142,7 @@ public class Drivetrain extends SubsystemBase {
             // Supplier<Float> pitchSupplier = () -> gyro.getPitch();
             // Supplier<Float> rollSupplier = () -> gyro.getRoll();
 
-            SparkBaseConfig driveConfig = MotorControllerFactory.sparkConfig(driveMotorConfig);
+                SparkBaseConfig driveConfig = MotorControllerFactory.sparkConfig(driveMotorConfig);
             driveConfig.openLoopRampRate(secsPer12Volts)
                         .encoder.positionConversionFactor(wheelDiameterMeters * Math.PI / driveGearing)
                                 .velocityConversionFactor(wheelDiameterMeters * Math.PI / driveGearing / 60)
@@ -160,10 +156,11 @@ public class Drivetrain extends SubsystemBase {
                                 .uvwMeasurementPeriod(16);
 
             for (int i = 0; i < modules.length; i++) {
-                modules[i] = new SwerveModule(swerveConfig, SwerveModule.ModuleType.values()[i], 
-                    driveMotors[i] = MotorControllerFactory.createSpark(drivePorts[i], driveMotorConfig, driveConfig), 
-                    turnMotors[i] = MotorControllerFactory.createSpark(turnPorts[i], turnMotorConfig, turnConfig), 
-                    turnEncoders[i] = SensorFactory.createCANCoder(canCoderPorts[i]), i, pitchSupplier, rollSupplier);
+                modules[i] = new SwerveModule(swerveConfig, SwerveModule.ModuleType.values()[i],
+                    driveMotors[i] = MotorControllerFactory.createSpark(drivePorts[i], driveMotorConfig, driveConfig),
+                    turnMotors[i] = MotorControllerFactory.createSpark(turnPorts[i], turnMotorConfig, turnConfig),
+                    turnEncoders[i] = SensorFactory.createCANCoder(canCoderPorts[i]),
+                    i, pitchSupplier, rollSupplier);
             }
 
             moduleFL = modules[0];
@@ -232,7 +229,11 @@ public class Drivetrain extends SubsystemBase {
         // Subtract the offset computed the last time setPose() was called because odometry.update() adds it back.
         newAngleDeg -= simGyroOffset.getDegrees();
         newAngleDeg *= (isGyroReversed ? -1.0 : 1.0);
-        gyroYawSim.set(newAngleDeg);
+        if (gyroYawSim == null) {
+            gyroYawSim = new SimDeviceSim("navX-Sensor[0]").getDouble("Yaw");
+        }else{
+            gyroYawSim.set(newAngleDeg);
+        }
     }
 
     /**
@@ -568,22 +569,7 @@ public class Drivetrain extends SubsystemBase {
                 .toArray(SwerveModuleState[]::new));
     }
 
-    public void setMode(Mode mode) {
-        for (SwerveModule module : modules){
-            switch (mode) {
-                case coast:
-                    module.coast();
-                    break;
-                case brake:
-                    module.brake();
-                    break;
-                case toggle:
-                    module.toggleMode();
-                    break;
-            }
-        }
-    }
-    /**
+        /**
      * Changes between IdleModes
      */
     public void toggleMode() {
@@ -600,6 +586,7 @@ public class Drivetrain extends SubsystemBase {
         for (SwerveModule module : modules)
             module.coast();
     }
+
 
     /**
      * Sets all SwerveModules to point in a certain angle
