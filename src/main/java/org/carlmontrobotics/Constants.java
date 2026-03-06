@@ -65,6 +65,7 @@ public final class Constants {
     //#region Drivetrain
 	public static final class Drivetrainc {
 		//general drivetrain constants
+
 		public static final int driveFrontLeftPort = 1;
 		public static final int driveFrontRightPort = 2;
 		public static final int driveBackLeftPort = 3;
@@ -82,6 +83,10 @@ public final class Constants {
 		public static final int canCoderPortFR = CONFIG.isHammerHead() ? 1 : 2; 
 		public static final int canCoderPortBL = CONFIG.isHammerHead() ? 3 : 3;
 		public static final int canCoderPortBR = CONFIG.isHammerHead() ? 2 : 0; 
+
+		public static final int drivePorts[] = { driveFrontLeftPort, driveFrontRightPort, driveBackLeftPort, driveBackRightPort };
+		public static final int turnPorts[] = { turnFrontLeftPort, turnFrontRightPort, turnBackLeftPort, turnBackRightPort };
+		public static final int canCoderPorts[] = { canCoderPortFL, canCoderPortFR, canCoderPortBL, canCoderPortBR };
 
 		// swerve config constants
 		public static final double wheelBase = CONFIG.isHammerHead() ? Units.inchesToMeters(16.750003) : 

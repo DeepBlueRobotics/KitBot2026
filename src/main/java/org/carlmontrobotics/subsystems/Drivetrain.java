@@ -137,6 +137,7 @@ public class Drivetrain extends SubsystemBase {
         this.ll = ll;
         AutoBuilder();
 
+        modules = new SwerveModule[4];
         // Calibrate Gyro
         {
 
@@ -183,53 +184,36 @@ public class Drivetrain extends SubsystemBase {
             // Supplier<Float> pitchSupplier = () -> gyro.getPitch();
             // Supplier<Float> rollSupplier = () -> gyro.getRoll();
 
+            SparkBaseConfig driveConfig = MotorControllerFactory.sparkConfig(driveMotorConfig);
+            driveConfig.openLoopRampRate(secsPer12Volts)
+                        .encoder.positionConversionFactor(wheelDiameterMeters * Math.PI / driveGearing)
+                                .velocityConversionFactor(wheelDiameterMeters * Math.PI / driveGearing / 60)
+                                .uvwAverageDepth(2)
+                                .uvwMeasurementPeriod(16);
 
-            moduleFL = new SwerveModule(Constants.Drivetrainc.swerveConfig, SwerveModule.ModuleType.FL, 
-                driveMotors[0] = MotorControllerFactory.createSpark(driveFrontLeftPort, driveMotorConfig), 
-                turnMotors[0] = MotorControllerFactory.createSpark(turnFrontLeftPort, turnMotorConfig), 
-                turnEncoders[0] = SensorFactory.createCANCoder(Constants.Drivetrainc.canCoderPortFL), 0, pitchSupplier, rollSupplier);
-            
-            moduleFR = new SwerveModule(Constants.Drivetrainc.swerveConfig, SwerveModule.ModuleType.FR, 
-                driveMotors[1] = MotorControllerFactory.createSpark(driveFrontRightPort, driveMotorConfig), 
-                turnMotors[1] = MotorControllerFactory.createSpark(turnFrontRightPort, turnMotorConfig), 
-                turnEncoders[1] = SensorFactory.createCANCoder(Constants.Drivetrainc.canCoderPortFR), 1, pitchSupplier, rollSupplier);
+            SparkBaseConfig turnConfig = MotorControllerFactory.sparkConfig(turnMotorConfig);
+            turnConfig.encoder.positionConversionFactor(360/turnGearing)
+                                .velocityConversionFactor(360/turnGearing/60)
+                                .uvwAverageDepth(2)
+                                .uvwMeasurementPeriod(16);
 
-            moduleBL = new SwerveModule(Constants.Drivetrainc.swerveConfig, SwerveModule.ModuleType.BL, 
-                driveMotors[2] = MotorControllerFactory.createSpark(driveBackLeftPort, driveMotorConfig), 
-                turnMotors[2] = MotorControllerFactory.createSpark(turnBackLeftPort, turnMotorConfig), 
-                turnEncoders[2] = SensorFactory.createCANCoder(Constants.Drivetrainc.canCoderPortBL), 2, pitchSupplier, rollSupplier);
+            for (int i = 0; i < modules.length; i++) {
+                modules[i] = new SwerveModule(swerveConfig, SwerveModule.ModuleType.values()[i], 
+                    driveMotors[i] = MotorControllerFactory.createSpark(drivePorts[i], driveMotorConfig, driveConfig), 
+                    turnMotors[i] = MotorControllerFactory.createSpark(turnPorts[i], turnMotorConfig, turnConfig), 
+                    turnEncoders[i] = SensorFactory.createCANCoder(canCoderPorts[i]), i, pitchSupplier, rollSupplier);
+            }
 
-            moduleBR = new SwerveModule(Constants.Drivetrainc.swerveConfig, SwerveModule.ModuleType.BR, 
-                driveMotors[3] = MotorControllerFactory.createSpark(driveBackRightPort, driveMotorConfig), 
-                turnMotors[3] = MotorControllerFactory.createSpark(turnBackRightPort, turnMotorConfig),
-                turnEncoders[3] = SensorFactory.createCANCoder(Constants.Drivetrainc.canCoderPortBR), 3, pitchSupplier, rollSupplier);
-                
-            modules = new SwerveModule[] { moduleFL, moduleFR, moduleBL, moduleBR };
+            moduleFL = modules[0];
+            moduleFR = modules[1];
+            moduleBL = modules[2];
+            moduleBR = modules[3];
 
             if (RobotBase.isSimulation()) {
                 moduleSims = new SwerveModuleSim[] {
                     moduleFL.createSim(), moduleFR.createSim(), moduleBL.createSim(), moduleBR.createSim() //FIXME this is with values based off of hammerhead
                 };
                 gyroYawSim = new SimDeviceSim("navX-Sensor[0]").getDouble("Yaw");
-            }
-            SparkBaseConfig driveConfig = MotorControllerFactory.sparkConfig(driveMotorConfig);
-            driveConfig.openLoopRampRate(secsPer12Volts);
-            driveConfig.encoder.positionConversionFactor(wheelDiameterMeters * Math.PI / driveGearing);
-            driveConfig.encoder.velocityConversionFactor(wheelDiameterMeters * Math.PI / driveGearing / 60);
-            driveConfig.encoder.uvwAverageDepth(2);
-            driveConfig.encoder.uvwMeasurementPeriod(16);
-
-            for (SparkBase driveMotor : driveMotors) {
-                driveMotor.configure(driveConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-            }
-            SparkBaseConfig turnConfig = MotorControllerFactory.sparkConfig(turnMotorConfig);
-            turnConfig.encoder.positionConversionFactor(360/turnGearing);
-            turnConfig.encoder.velocityConversionFactor(360/turnGearing/60);
-            turnConfig.encoder.uvwAverageDepth(2);
-            turnConfig.encoder.uvwMeasurementPeriod(16);
-
-            for (SparkBase turnMotor : turnMotors) {
-                turnMotor.configure(turnConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
             }
 
             for (CANcoder coder : turnEncoders) {
@@ -253,8 +237,6 @@ public class Drivetrain extends SubsystemBase {
         // Setup autopath builder
         //configurePPLAutoBuilder();
     }
-
-
 
     public boolean isAtAngle(double desiredAngleDeg, double toleranceDeg){
         for (SwerveModule module : modules) { 
