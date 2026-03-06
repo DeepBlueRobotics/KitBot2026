@@ -1,69 +1,67 @@
 package org.carlmontrobotics.ShootOnFlyLib;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
- * JUnit 4 tests for {@link ShotCalculator}.
+ * JUnit 5 tests for {@link ShotCalculator}.
  *
  * <p>Constants assumed from {@code Constants.ShootOnFlyc}:
  * <ul>
- *   <li>{@code launchAngleRad}    – fixed launch angle (rad); tests assume 45°</li>
+ *   <li>{@code launchAngleRad} – fixed launch angle (radians); tests assume 45°</li>
  *   <li>{@code wheelRadiusMeters} – flywheel radius used for RPM conversion</li>
- *   <li>{@code launchHeightMeters}– shooter height above the field floor (m)</li>
- *   <li>{@code g}                 – gravitational acceleration (m/s²)</li>
+ *   <li>{@code launchHeightMeters} – shooter height above field floor, applied to
+ *       clearance calculations so obstacle heights and trajectory heights share
+ *       the same reference frame</li>
+ *   <li>{@code g} – gravitational acceleration (m/s²)</li>
  * </ul>
- *
- * <p>Obstacle clearance heights are measured from the field floor. The trajectory
- * height at each obstacle is offset by {@code launchHeightMeters} so both values
- * share the same reference frame.
  */
-public class ShotCalculatorTest {
+class ShotCalculatorTest {
 
     // ------------------------------------------------------------------
     // Basic validity
     // ------------------------------------------------------------------
 
     /**
-     * Stationary robot, no obstacles, target at (5, 0, 0).
-     * Expects a finite positive RPM with all warning flags false.
+     * Stationary robot, no obstacles, target directly ahead at (5, 0, 0).
+     * Expects a finite positive RPM with all warning and error flags false.
      */
     @Test
-    public void basicValidShot_finitePositiveRPM() {
+    void basicValidShot_finitePositiveRPM() {
         ShotCalculator.ShotResult r = ShotCalculator.calculateShot(
             5.0, 0.0, 0.0,
             0.0, 0.0,
             null, null
         );
 
-        assertFalse("Should not be impossible",      r.impossible);
-        assertFalse("Should not be near-impossible", r.nearImpossible);
-        assertTrue("RPM should be positive",         r.requiredRPM > 0);
-        assertFalse("RPM should be finite",          Double.isInfinite(r.requiredRPM));
-        assertTrue("clearanceOK with no obstacles",  r.clearanceOK);
+        assertFalse(r.impossible,                    "Should not be impossible");
+        assertFalse(r.nearImpossible,                "Should not be near-impossible");
+        assertTrue(r.requiredRPM > 0,               "RPM should be positive");
+        assertFalse(Double.isInfinite(r.requiredRPM), "RPM should be finite");
+        assertTrue(r.clearanceOK,                   "clearanceOK should be true with no obstacles");
     }
 
     /**
-     * A diagonal target (dx=3, dy=4) has the same horizontal range as a straight
-     * target at (5, 0, 0) since {@code x = hypot(dx, dy) = 5}. Both should
-     * produce identical RPM values.
+     * A diagonal target with {@code dx=3, dy=4} has a horizontal range of 5 m,
+     * identical to a straight shot with {@code dx=5, dy=0}. Both should require
+     * the same RPM since only the horizontal range and height affect the physics.
      */
     @Test
-    public void diagonalTarget_sameRPMAsStraight() {
+    void diagonalTarget_sameRPMAsStraight() {
         ShotCalculator.ShotResult straight = ShotCalculator.calculateShot(5.0, 0.0, 0.0, 0.0, 0.0, null, null);
         ShotCalculator.ShotResult diagonal = ShotCalculator.calculateShot(3.0, 4.0, 0.0, 0.0, 0.0, null, null);
 
-        assertEquals("Diagonal and straight shots of equal range must require equal RPM",
-            straight.requiredRPM, diagonal.requiredRPM, 1e-6);
+        assertEquals(straight.requiredRPM, diagonal.requiredRPM, 1e-6,
+            "Diagonal shot must equal straight shot of same horizontal range");
     }
 
     /**
-     * RPM must be strictly positive for every non-impossible shot across a range
-     * of (dx, dy, dz) combinations.
+     * RPM must be strictly positive for every non-impossible shot across a
+     * representative set of (dx, dy, dz) inputs.
      */
     @Test
-    public void validShots_rpmAlwaysPositive() {
+    void validShots_rpmAlwaysPositive() {
         double[][] cases = {
             {3.0,  0.0,  0.0},
             {5.0,  5.0,  1.0},
@@ -73,7 +71,7 @@ public class ShotCalculatorTest {
             ShotCalculator.ShotResult r = ShotCalculator.calculateShot(
                 c[0], c[1], c[2], 0, 0, null, null);
             if (!r.impossible) {
-                assertTrue("RPM must be positive for a valid shot", r.requiredRPM > 0);
+                assertTrue(r.requiredRPM > 0, "RPM must be positive for a valid shot");
             }
         }
     }
@@ -83,68 +81,68 @@ public class ShotCalculatorTest {
     // ------------------------------------------------------------------
 
     /**
-     * When {@code dz == x * tan(launchAngle)}, the parabolic margin is exactly 0
-     * and the shot must be marked impossible with RPM = ∞.
+     * When {@code dz} equals {@code x * tan(launchAngle)} the parabolic margin
+     * is exactly 0, making the shot geometrically impossible.
      * At 45°: margin = 5 * tan(45°) − 5 = 0.
      */
     @Test
-    public void marginZero_impossible() {
+    void marginZero_impossible() {
         ShotCalculator.ShotResult r = ShotCalculator.calculateShot(
             5.0, 0.0, 5.0,
             0.0, 0.0,
             null, null
         );
 
-        assertTrue("margin = 0 must be marked impossible",   r.impossible);
-        assertTrue("RPM must be infinite when impossible",   Double.isInfinite(r.requiredRPM));
+        assertTrue(r.impossible,                    "margin=0 should be marked impossible");
+        assertTrue(Double.isInfinite(r.requiredRPM), "RPM should be infinite when impossible");
     }
 
     /**
-     * When {@code dz > x * tan(launchAngle)}, the margin is negative and the
-     * target is above the maximum arc height — must be marked impossible.
+     * When {@code dz} exceeds {@code x * tan(launchAngle)} the margin is negative
+     * and the shot is impossible — the target is above the peak of the arc.
      */
     @Test
-    public void marginNegative_impossible() {
+    void marginNegative_impossible() {
         ShotCalculator.ShotResult r = ShotCalculator.calculateShot(
             5.0, 0.0, 10.0,
             0.0, 0.0,
             null, null
         );
 
-        assertTrue("Negative margin must be marked impossible", r.impossible);
+        assertTrue(r.impossible, "Negative margin must be marked impossible");
     }
 
     /**
-     * When {@code 0 < margin < 0.20 m}, the shot is physically possible but
-     * considered unreliable — {@code nearImpossible} must be set and
-     * {@code impossible} must remain false.
+     * When the margin is positive but less than 0.20 m the shot is unreliable.
+     * {@link ShotCalculator.ShotResult#nearImpossible} must be {@code true} and
+     * {@link ShotCalculator.ShotResult#impossible} must remain {@code false}.
      * margin = 5 * tan(45°) − 4.85 = 0.15 m.
      */
     @Test
-    public void tinyMargin_nearImpossible() {
+    void tinyMargin_nearImpossible() {
         ShotCalculator.ShotResult r = ShotCalculator.calculateShot(
             5.0, 0.0, 4.85,
             0.0, 0.0,
             null, null
         );
 
-        assertFalse("Should not be fully impossible",  r.impossible);
-        assertTrue("Should be near-impossible",        r.nearImpossible);
+        assertFalse(r.impossible,    "Should not be fully impossible");
+        assertTrue(r.nearImpossible, "Should be near-impossible");
     }
 
     /**
-     * When the margin is well above 0.20 m, {@code nearImpossible} must be false.
-     * margin = 5 * tan(45°) − 0 = 5 m.
+     * A large margin (5 m at 45° with dz=0) is well above the 0.20 m threshold,
+     * so {@link ShotCalculator.ShotResult#nearImpossible} must be {@code false}.
      */
     @Test
-    public void largeMargin_notNearImpossible() {
+    void largeMargin_notNearImpossible() {
         ShotCalculator.ShotResult r = ShotCalculator.calculateShot(
             5.0, 0.0, 0.0,
             0.0, 0.0,
             null, null
         );
 
-        assertFalse("Large margin must not be near-impossible", r.nearImpossible);
+        assertFalse(r.nearImpossible, "Large margin must not be near-impossible");
     }
 
     // ------------------------------------------------------------------
@@ -152,47 +150,45 @@ public class ShotCalculatorTest {
     // ------------------------------------------------------------------
 
     /**
-     * A robot moving toward the target (+X) already contributes velocity in the
-     * shot direction, so the flywheel needs to add less — resulting in lower RPM
-     * than a stationary robot.
+     * A robot moving toward the target in the +X direction already contributes
+     * forward velocity, so the flywheel needs to add less → lower RPM than
+     * a stationary robot shooting the same target.
      */
     @Test
-    public void movingTowardTarget_lowerRPM() {
+    void movingTowardTarget_lowerRPM() {
         ShotCalculator.ShotResult stat = ShotCalculator.calculateShot(5.0, 0.0, 0.0, 0.0, 0.0, null, null);
         ShotCalculator.ShotResult move = ShotCalculator.calculateShot(5.0, 0.0, 0.0, 1.0, 0.0, null, null);
 
-        assertTrue("Moving toward target should require less RPM",
-            move.requiredRPM < stat.requiredRPM);
+        assertTrue(move.requiredRPM < stat.requiredRPM, "Moving toward target should require less RPM");
     }
 
     /**
-     * A robot moving away from the target (−X) opposes the required ball velocity,
-     * so the flywheel must compensate — resulting in higher RPM than a stationary robot.
+     * A robot moving away from the target in the −X direction opposes the shot,
+     * so the flywheel must compensate → higher RPM than a stationary robot.
      */
     @Test
-    public void movingAwayFromTarget_higherRPM() {
+    void movingAwayFromTarget_higherRPM() {
         ShotCalculator.ShotResult stat = ShotCalculator.calculateShot(5.0, 0.0, 0.0,  0.0, 0.0, null, null);
         ShotCalculator.ShotResult move = ShotCalculator.calculateShot(5.0, 0.0, 0.0, -1.0, 0.0, null, null);
 
-        assertTrue("Moving away from target should require more RPM",
-            move.requiredRPM > stat.requiredRPM);
+        assertTrue(move.requiredRPM > stat.requiredRPM, "Moving away from target should require more RPM");
     }
 
     /**
-     * Lateral robot motion (perpendicular to the shot direction) still affects
-     * the required exit velocity via vector subtraction and must produce a valid,
-     * positive RPM.
+     * Lateral robot motion (perpendicular to the shot direction) must still
+     * produce a valid, positive RPM — the compensation simply changes the
+     * exit vector direction rather than its overall feasibility.
      */
     @Test
-    public void lateralMotion_validRPM() {
+    void lateralMotion_validRPM() {
         ShotCalculator.ShotResult r = ShotCalculator.calculateShot(
             5.0, 0.0, 0.0,
             0.0, 2.0,
             null, null
         );
 
-        assertFalse("Lateral motion should not make shot impossible", r.impossible);
-        assertTrue("Lateral motion should still give positive RPM",   r.requiredRPM > 0);
+        assertFalse(r.impossible,       "Lateral motion should not make the shot impossible");
+        assertTrue(r.requiredRPM > 0,  "Lateral motion should still give a positive RPM");
     }
 
     // ------------------------------------------------------------------
@@ -200,34 +196,33 @@ public class ShotCalculatorTest {
     // ------------------------------------------------------------------
 
     /**
-     * At very short range (0.5 m) the ball has not yet reached the apex of its arc,
-     * so {@code descendingAtGoal} must be false.
+     * At very short range (0.5 m, 45°) the ball has not yet reached the peak of
+     * its arc when it arrives at the goal, so it must still be ascending.
      */
     @Test
-    public void shortRange_ascendingAtGoal() {
+    void shortRange_ascendingAtGoal() {
         ShotCalculator.ShotResult r = ShotCalculator.calculateShot(
             0.5, 0.0, 0.0,
             0.0, 0.0,
             null, null
         );
 
-        assertFalse("Short-range shot should not be descending at goal", r.descendingAtGoal);
+        assertFalse(r.descendingAtGoal, "Short-range shot should not be descending at goal");
     }
 
     /**
-     * At long range (20 m) the ball is well past the apex and on the descending
-     * half of its arc when it reaches the goal, so {@code descendingAtGoal} must
-     * be true.
+     * At long range (20 m, 45°) the ball is well past the apex of its arc when
+     * it arrives at the goal, so it must be descending.
      */
     @Test
-    public void longRange_descendingAtGoal() {
+    void longRange_descendingAtGoal() {
         ShotCalculator.ShotResult r = ShotCalculator.calculateShot(
             20.0, 0.0, 0.0,
             0.0, 0.0,
             null, null
         );
 
-        assertTrue("Long-range shot should be descending at goal", r.descendingAtGoal);
+        assertTrue(r.descendingAtGoal, "Long-range shot should be descending at goal");
     }
 
     // ------------------------------------------------------------------
@@ -235,28 +230,29 @@ public class ShotCalculatorTest {
     // ------------------------------------------------------------------
 
     /**
-     * When both obstacle arrays are {@code null}, {@code clearanceMargins} must
-     * be a non-null empty array and {@code clearanceOK} must be {@code true}.
+     * When both obstacle arrays are {@code null}, {@link ShotCalculator.ShotResult#clearanceMargins}
+     * must be a non-null empty array and {@link ShotCalculator.ShotResult#clearanceOK}
+     * must be {@code true}.
      */
     @Test
-    public void nullObstacles_emptyMarginArrayAndClearanceOK() {
+    void nullObstacles_emptyMarginArrayAndClearanceOK() {
         ShotCalculator.ShotResult r = ShotCalculator.calculateShot(
             5.0, 0.0, 0.0,
             0.0, 0.0,
             null, null
         );
 
-        assertNotNull("clearanceMargins must never be null",                    r.clearanceMargins);
-        assertEquals("clearanceMargins must be empty for null obstacle arrays", 0, r.clearanceMargins.length);
-        assertTrue("clearanceOK must be true with no obstacles",                r.clearanceOK);
+        assertNotNull(r.clearanceMargins,               "clearanceMargins must never be null");
+        assertEquals(0, r.clearanceMargins.length,      "clearanceMargins must be empty for null obstacle arrays");
+        assertTrue(r.clearanceOK,                       "clearanceOK must be true with no obstacles");
     }
 
     /**
-     * A single obstacle well below the trajectory must produce a positive clearance
-     * margin and leave {@code clearanceOK} true.
+     * A single obstacle well below the trajectory must pass clearance:
+     * {@link ShotCalculator.ShotResult#clearanceOK} true and the margin positive.
      */
     @Test
-    public void singleLowObstacle_clearanceOK() {
+    void singleLowObstacle_clearanceOK() {
         ShotCalculator.ShotResult r = ShotCalculator.calculateShot(
             5.0, 0.0, 0.0,
             0.0, 0.0,
@@ -264,16 +260,16 @@ public class ShotCalculatorTest {
             new double[]{0.1}
         );
 
-        assertTrue("Low obstacle should pass clearance",  r.clearanceOK);
-        assertTrue("Clearance margin should be positive", r.clearanceMargins[0] > 0);
+        assertTrue(r.clearanceOK,                  "Low obstacle should pass clearance");
+        assertTrue(r.clearanceMargins[0] > 0,      "Clearance margin should be positive");
     }
 
     /**
-     * A single obstacle taller than the entire arc must produce a negative clearance
-     * margin and set {@code clearanceOK} to {@code false}.
+     * A single impossibly tall obstacle (100 m) must fail clearance:
+     * {@link ShotCalculator.ShotResult#clearanceOK} false and the margin negative.
      */
     @Test
-    public void singleTallObstacle_clearanceFails() {
+    void singleTallObstacle_clearanceFails() {
         ShotCalculator.ShotResult r = ShotCalculator.calculateShot(
             5.0, 0.0, 0.0,
             0.0, 0.0,
@@ -281,17 +277,17 @@ public class ShotCalculatorTest {
             new double[]{100.0}
         );
 
-        assertFalse("Tall obstacle should fail clearance",        r.clearanceOK);
-        assertTrue("Clearance margin should be negative",         r.clearanceMargins[0] < 0);
+        assertFalse(r.clearanceOK,                 "Tall obstacle should fail clearance");
+        assertTrue(r.clearanceMargins[0] < 0,      "Clearance margin should be negative");
     }
 
     /**
-     * Multiple obstacles all below the arc must each have a positive margin,
-     * {@code clearanceOK} must be {@code true}, and {@code clearanceMargins}
-     * must have the same length as the obstacle arrays.
+     * Multiple obstacles all well below the arc must all pass: every margin
+     * positive, {@link ShotCalculator.ShotResult#clearanceOK} true, and the
+     * {@code clearanceMargins} array length must match the obstacle count.
      */
     @Test
-    public void multipleObstacles_allClear() {
+    void multipleObstacles_allClear() {
         ShotCalculator.ShotResult r = ShotCalculator.calculateShot(
             10.0, 0.0, 0.0,
             0.0, 0.0,
@@ -299,20 +295,20 @@ public class ShotCalculatorTest {
             new double[]{0.1, 0.1, 0.1}
         );
 
-        assertTrue("All low obstacles should pass",                    r.clearanceOK);
-        assertEquals("clearanceMargins length must equal obstacle count",
-            3, r.clearanceMargins.length);
+        assertTrue(r.clearanceOK,                                       "All low obstacles should pass");
+        assertEquals(3, r.clearanceMargins.length,             "clearanceMargins length must equal obstacle count");
         for (double m : r.clearanceMargins) {
-            assertTrue("Each individual margin should be positive", m > 0);
+            assertTrue(m > 0, "Each individual margin should be positive");
         }
     }
 
     /**
-     * When any single obstacle fails clearance, {@code clearanceOK} must be
-     * {@code false} even if all other obstacles pass.
+     * When one of several obstacles is impossibly tall,
+     * {@link ShotCalculator.ShotResult#clearanceOK} must be {@code false}
+     * regardless of the other obstacles passing.
      */
     @Test
-    public void multipleObstacles_oneFails_clearanceNotOK() {
+    void multipleObstacles_oneFails_clearanceNotOK() {
         ShotCalculator.ShotResult r = ShotCalculator.calculateShot(
             10.0, 0.0, 0.0,
             0.0, 0.0,
@@ -320,6 +316,6 @@ public class ShotCalculatorTest {
             new double[]{0.1, 100.0, 0.1}
         );
 
-        assertFalse("One tall obstacle should set clearanceOK = false", r.clearanceOK);
+        assertFalse(r.clearanceOK, "One tall obstacle should set clearanceOK = false");
     }
 }

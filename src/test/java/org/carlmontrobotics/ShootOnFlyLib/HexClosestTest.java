@@ -1,86 +1,87 @@
 package org.carlmontrobotics.ShootOnFlyLib;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
- * JUnit 4 tests for {@link HexClosest}.
+ * JUnit 5 tests for {@link HexClosest}.
  *
- * <p>{@code closestVectorToHex} returns the (dx, dy) vector from the robot's
- * position to the nearest point on the target hub's hexagonal boundary. The
- * magnitude of this vector equals the robot's straight-line distance to the
- * hub edge.
- *
- * <p>Approximate hub centers used for reference in these tests:
- * <ul>
- *   <li>Blue hub: x ≈ 180 in, y ≈ 159 in</li>
- *   <li>Red  hub: x ≈ 468 in, y ≈ 159 in</li>
- * </ul>
- * Hex apothem (center to nearest edge): ≈ 18 in / 0.457 m.
+ * <p>Blue hub approximate center: x ≈ 180 in, y ≈ 159 in
+ * <br>Red hub approximate center: x ≈ 468 in, y ≈ 159 in
+ * <br>Hex apothem (center to nearest edge): ≈ 18 in / 0.457 m
  */
-public class HexClosestTest {
+class HexClosestTest {
+
+    // ------------------------------------------------------------------
+    // Directional sanity checks
+    // ------------------------------------------------------------------
 
     /**
-     * Robot far to the left of the blue hub → the closest boundary point is
-     * to the robot's right, so the returned vector must have a positive X component.
+     * Robot far to the left of the blue hub → closest boundary point is to its
+     * right, so the returned vector must have a positive X component.
      */
     @Test
-    public void blue_robotLeftOfHub_vectorPointsRight() {
+    void blue_robotLeftOfHub_vectorPointsRight() {
         Pose2d robot = new Pose2d(0, Units.inchesToMeters(160), new Rotation2d());
         Translation2d vec = HexClosest.closestVectorToHex(robot, false);
 
-        assertTrue("Vector X should be positive pointing right toward blue hub", vec.getX() > 0);
+        assertTrue(vec.getX() > 0, "Vector X should point right (+) toward blue hub");
     }
 
     /**
-     * Robot far to the right of the red hub → the closest boundary point is
-     * to the robot's left, so the returned vector must have a negative X component.
+     * Robot far to the right of the red hub → closest boundary point is to its
+     * left, so the returned vector must have a negative X component.
      */
     @Test
-    public void red_robotRightOfHub_vectorPointsLeft() {
+    void red_robotRightOfHub_vectorPointsLeft() {
         Pose2d robot = new Pose2d(Units.inchesToMeters(700), Units.inchesToMeters(160), new Rotation2d());
         Translation2d vec = HexClosest.closestVectorToHex(robot, true);
 
-        assertTrue("Vector X should be negative pointing left toward red hub", vec.getX() < 0);
+        assertTrue(vec.getX() < 0, "Vector X should point left (-) toward red hub");
     }
 
     /**
-     * Robot directly below the blue hub center → the closest boundary point is
-     * directly above, so the returned vector must have a positive Y component.
+     * Robot directly below the blue hub center → closest boundary point is above
+     * it, so the returned vector must have a positive Y component.
      */
     @Test
-    public void blue_robotBelowHub_vectorPointsUp() {
-        Pose2d robot = new Pose2d(Units.inchesToMeters(180.0), 0, new Rotation2d());
+    void blue_robotBelowHub_vectorPointsUp() {
+        Pose2d robot = new Pose2d(Units.inchesToMeters(180), 0, new Rotation2d());
         Translation2d vec = HexClosest.closestVectorToHex(robot, false);
 
-        assertTrue("Vector Y should be positive pointing up toward blue hub", vec.getY() > 0);
+        assertTrue(vec.getY() > 0, "Vector Y should point up (+) when robot is below hub");
     }
 
+    // ------------------------------------------------------------------
+    // Magnitude checks
+    // ------------------------------------------------------------------
+
     /**
-     * For any robot not sitting exactly on the hex boundary, the returned
-     * vector must have non-zero magnitude.
+     * The returned vector must be non-zero for any robot not sitting exactly
+     * on the hex boundary.
      */
     @Test
-    public void vectorNonZeroForDistantRobot() {
+    void vectorNonZeroForDistantRobot() {
         Pose2d robot = new Pose2d(0, 0, new Rotation2d());
         Translation2d vec = HexClosest.closestVectorToHex(robot, false);
 
         double len = Math.hypot(vec.getX(), vec.getY());
-        assertTrue("Vector length must be > 0 for a robot not on the boundary", len > 1e-6);
+        assertTrue(len > 1e-6, "Vector length must be > 0 for a robot not on the boundary");
     }
 
     /**
      * From the approximate center of the blue hub the vector magnitude should
-     * equal the hub's apothem (≈ 18 in / 0.457 m), within 5 cm.
+     * equal the hub's apothem (≈ 0.457 m) within 5 cm, since the closest
+     * boundary point is on the nearest edge directly outward from center.
      */
     @Test
-    public void blue_fromCenter_vectorLengthMatchesApothem() {
+    void blue_fromCenter_vectorLengthMatchesApothem() {
         Pose2d robot = new Pose2d(
             Units.inchesToMeters(180.0),
             Units.inchesToMeters(159.0),
@@ -90,16 +91,19 @@ public class HexClosestTest {
         Translation2d vec = HexClosest.closestVectorToHex(robot, false);
         double len = Math.hypot(vec.getX(), vec.getY());
 
-        assertEquals("Vector length from hub center should equal apothem (~0.457 m)",
-            0.457, len, 0.05);
+        assertEquals(0.457, len, 0.05, "Vector length from hub center should ~= apothem (0.457 m)");
     }
 
+    // ------------------------------------------------------------------
+    // Blue vs. red distinction
+    // ------------------------------------------------------------------
+
     /**
-     * Querying from the same midfield position must yield different X components
-     * for blue vs. red, since the two hubs are on opposite sides of the field.
+     * Querying from the same midfield position must yield different vectors for
+     * blue vs. red, since the two hubs are on opposite sides of the field.
      */
     @Test
-    public void blueAndRedDifferForSameRobot() {
+    void blueAndRedDifferForSameRobot() {
         Pose2d robot = new Pose2d(
             Units.inchesToMeters(300),
             Units.inchesToMeters(160),
@@ -109,16 +113,16 @@ public class HexClosestTest {
         Translation2d blue = HexClosest.closestVectorToHex(robot, false);
         Translation2d red  = HexClosest.closestVectorToHex(robot, true);
 
-        assertNotEquals("Blue and red vectors must differ in X from midfield",
-            blue.getX(), red.getX(), 1e-3);
+        assertNotEquals(blue.getX(), red.getX(), 1e-3,
+            "Blue and red vectors must have different X components from midfield");
     }
 
     /**
-     * From midfield, the blue vector must point left (−X) and the red vector
-     * must point right (+X), matching their respective positions on the field.
+     * From midfield, the blue vector should point left (-X) toward the blue hub
+     * and the red vector should point right (+X) toward the red hub.
      */
     @Test
-    public void blue_midfieldVectorPointsLeft_red_midfieldVectorPointsRight() {
+    void blue_midfieldVectorPointsLeft_red_midfieldVectorPointsRight() {
         Pose2d robot = new Pose2d(
             Units.inchesToMeters(323),
             Units.inchesToMeters(159),
@@ -128,17 +132,21 @@ public class HexClosestTest {
         Translation2d blue = HexClosest.closestVectorToHex(robot, false);
         Translation2d red  = HexClosest.closestVectorToHex(robot, true);
 
-        assertTrue("Blue vector should point left (-X) from midfield",  blue.getX() < 0);
-        assertTrue("Red vector should point right (+X) from midfield",  red.getX()  > 0);
+        assertTrue(blue.getX() < 0, "Blue vector should point left (-X) from midfield");
+        assertTrue(red.getX()  > 0, "Red vector should point right (+X) from midfield");
     }
+
+    // ------------------------------------------------------------------
+    // Symmetry
+    // ------------------------------------------------------------------
 
     /**
      * Robots placed symmetrically above and below the hub's horizontal midline
-     * must be equidistant from the hex boundary, since the hex is symmetric
-     * about that axis.
+     * should be equidistant from the hex boundary, since the hex is symmetric
+     * about that line.
      */
     @Test
-    public void blue_symmetricRobots_equalVectorMagnitudes() {
+    void blue_symmetricRobots_equalVectorMagnitudes() {
         double centerX = Units.inchesToMeters(180.0);
         double centerY = Units.inchesToMeters(159.0);
         double offset  = Units.inchesToMeters(50.0);
@@ -153,7 +161,6 @@ public class HexClosestTest {
             HexClosest.closestVectorToHex(below, false).getX(),
             HexClosest.closestVectorToHex(below, false).getY());
 
-        assertEquals("Symmetric robots must be equidistant from the boundary",
-            lenAbove, lenBelow, 1e-6);
+        assertEquals(lenAbove, lenBelow, 1e-6, "Symmetric robots must be equidistant from the boundary");
     }
 }

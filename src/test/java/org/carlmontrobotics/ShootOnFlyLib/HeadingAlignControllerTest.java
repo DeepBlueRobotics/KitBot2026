@@ -1,16 +1,17 @@
 package org.carlmontrobotics.ShootOnFlyLib;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
- * JUnit 4 tests for {@link HeadingAlignController}.
+ * JUnit 5 tests for {@link HeadingAlignController}.
  *
- * <p>Heading error is wrapped into (-π, π] via {@link edu.wpi.first.math.MathUtil#angleModulus}.
+ * <p>Heading error is wrapped into (-π, π] via {@link edu.wpi.first.math.MathUtil#angleModulus},
+ * so all edge cases around ±π are handled correctly.
  *
  * <p>Constants assumed from {@code Constants.ShootOnFlyc}:
  * <ul>
@@ -18,7 +19,7 @@ import org.junit.Test;
  *   <li>{@code toleranceRad} – alignment tolerance in radians</li>
  * </ul>
  */
-public class HeadingAlignControllerTest {
+class HeadingAlignControllerTest {
 
     /**
      * Robot at origin facing east (+X), target due north (+Y).
@@ -26,72 +27,70 @@ public class HeadingAlignControllerTest {
      * Omega must be positive (CCW correction).
      */
     @Test
-    public void targetNorth_omegaPositive() {
+    void targetNorth_omegaPositive() {
         Pose2d current = new Pose2d(0, 0, new Rotation2d(0));
         Pose2d target  = new Pose2d(0, 5, new Rotation2d(0));
 
         double omega = HeadingAlignController.calculateOmega(current, target);
-        assertTrue("Omega should be positive when target is to the left", omega > 0);
+        assertTrue(omega > 0, "Omega should be positive when target is to the left");
     }
 
     /**
      * Robot facing directly toward the target → error = 0 → omega = 0.
      */
     @Test
-    public void alreadyFacing_omegaNearZero() {
+    void alreadyFacing_omegaNearZero() {
         Pose2d current = new Pose2d(0, 0, new Rotation2d(0));
         Pose2d target  = new Pose2d(5, 0, new Rotation2d(0));
 
         double omega = HeadingAlignController.calculateOmega(current, target);
-        assertEquals("Omega should be ~0 when already aligned", 0.0, omega, 1e-9);
+        assertEquals(0.0, omega, 1e-9, "Omega should be ~0 when already aligned");
     }
 
     /**
      * Robot facing south (-π/2), target directly south → error = 0 → omega = 0.
      */
     @Test
-    public void facingSouth_targetSouth_omegaNearZero() {
+    void facingSouth_targetSouth_omegaNearZero() {
         Pose2d current = new Pose2d(0, 0, new Rotation2d(-Math.PI / 2));
         Pose2d target  = new Pose2d(0, -5, new Rotation2d(0));
 
         double omega = HeadingAlignController.calculateOmega(current, target);
-        assertEquals("Omega should be ~0 when facing target south", 0.0, omega, 1e-9);
+        assertEquals(0.0, omega, 1e-9, "Omega should be ~0 when facing target south");
     }
 
     /**
-     * Target is to the robot's right (south when facing east) → omega must be
-     * negative (CW correction).
+     * Target is to the robot's right (south when facing east) → omega must be negative (CW correction).
      */
     @Test
-    public void targetToRight_omegaNegative() {
-        Pose2d current = new Pose2d(0, 0, new Rotation2d(0));
-        Pose2d target  = new Pose2d(0, -5, new Rotation2d(0));
+    void targetToRight_omegaNegative() {
+        Pose2d current = new Pose2d(0, 0, new Rotation2d(0));   // facing east
+        Pose2d target  = new Pose2d(0, -5, new Rotation2d(0));  // target is south
 
         double omega = HeadingAlignController.calculateOmega(current, target);
-        assertTrue("Omega should be negative when target is to the right", omega < 0);
+        assertTrue(omega < 0, "Omega should be negative when target is to the right");
     }
 
     /**
-     * Robot facing north (π/2), target due south → raw error = -π.
-     * {@code MathUtil.angleModulus} correctly wraps this to ±π rather than 0,
+     * Robot facing directly away from target (error = ±π).
+     * {@link edu.wpi.first.math.MathUtil#angleModulus} correctly wraps this to ±π,
      * so omega must be non-zero.
      */
     @Test
-    public void facingDirectlyAway_omegaNonZero() {
-        Pose2d current = new Pose2d(0, 0, new Rotation2d(Math.PI / 2));
-        Pose2d target  = new Pose2d(0, -10, new Rotation2d(0));
+    void facingDirectlyAway_omegaNonZero() {
+        Pose2d current = new Pose2d(0, 0, new Rotation2d(Math.PI / 2)); // facing north
+        Pose2d target  = new Pose2d(0, -10, new Rotation2d(0));         // target is south
 
         double omega = HeadingAlignController.calculateOmega(current, target);
-        assertNotEquals("Omega must be non-zero when facing directly away from target",
-            0.0, omega, 1e-9);
+        assertNotEquals(0.0, omega, 1e-9, "Omega must be non-zero when facing directly away from target");
     }
 
     /**
-     * {@code atGoal} returns {@code true} when the robot is pointing directly at
-     * the target (error = 0, well within {@code toleranceRad}).
+     * {@link HeadingAlignController#atGoal} returns {@code true} when the robot
+     * is pointing directly at the target (error = 0).
      */
     @Test
-    public void atGoal_trueWhenAligned() {
+    void atGoal_trueWhenAligned() {
         Pose2d current = new Pose2d(0, 0, new Rotation2d(0));
         Pose2d target  = new Pose2d(10, 0, new Rotation2d(0));
 
@@ -99,30 +98,30 @@ public class HeadingAlignControllerTest {
     }
 
     /**
-     * {@code atGoal} returns {@code false} when the robot is 90° off target,
-     * which far exceeds any reasonable {@code toleranceRad}.
+     * {@link HeadingAlignController#atGoal} returns {@code false} when the robot
+     * is 90° off target.
      */
     @Test
-    public void atGoal_falseWhenFar() {
-        Pose2d current = new Pose2d(0, 0, new Rotation2d(0));
-        Pose2d target  = new Pose2d(0, 10, new Rotation2d(0));
+    void atGoal_falseWhenFar() {
+        Pose2d current = new Pose2d(0, 0, new Rotation2d(0));   // facing east
+        Pose2d target  = new Pose2d(0, 10, new Rotation2d(0));  // target is north
 
         assertFalse(HeadingAlignController.atGoal(current, target));
     }
 
     /**
-     * {@code calculateOmega} and {@code atGoal} must be consistent: when omega
-     * is 0 (robot already aligned), {@code atGoal} must return {@code true}.
+     * {@link HeadingAlignController#calculateOmega} and {@link HeadingAlignController#atGoal}
+     * must be consistent: when omega is 0 the robot is aligned, so atGoal must return {@code true}.
      */
     @Test
-    public void omegaZeroImpliesAtGoal() {
+    void omegaZeroImpliesAtGoal() {
         Pose2d current = new Pose2d(3, 4, new Rotation2d(0));
-        Pose2d target  = new Pose2d(10, 4, new Rotation2d(0));
+        Pose2d target  = new Pose2d(10, 4, new Rotation2d(0)); // due east
 
         double omega = HeadingAlignController.calculateOmega(current, target);
         boolean goal  = HeadingAlignController.atGoal(current, target);
 
-        assertEquals("Omega should be 0 when aligned east", 0.0, omega, 1e-9);
-        assertTrue("atGoal must agree when omega == 0", goal);
+        assertEquals(0.0, omega, 1e-9, "Omega should be 0 when aligned east");
+        assertTrue(goal, "atGoal must agree when omega == 0");
     }
 }
