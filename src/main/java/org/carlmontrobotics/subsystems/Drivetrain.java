@@ -38,19 +38,14 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.math.controller.PIDController;
 
 //vendordeps
-import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
@@ -63,30 +58,18 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 
 //rev
-import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 //units
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
 
 import static edu.wpi.first.units.Units.Volts;
@@ -100,14 +83,9 @@ import static edu.wpi.first.units.Units.Meters;
 
 //Constants
 import org.carlmontrobotics.Constants;
-import org.carlmontrobotics.Constants.Drivetrainc;
-import org.carlmontrobotics.Constants.Drivetrainc.Autoc;
-import org.carlmontrobotics.Robot;
-import org.carlmontrobotics.subsystems.Limelight;
 import org.carlmontrobotics.commands.DriveCommands.RotateToFieldRelativeAngle;
 import org.carlmontrobotics.commands.DriveCommands.TeleopDrive;
 import static org.carlmontrobotics.Constants.Drivetrainc.*;
-import static org.carlmontrobotics.Constants.LimeLightc.*;
 
 public class Drivetrain extends SubsystemBase {
 
@@ -118,13 +96,13 @@ public class Drivetrain extends SubsystemBase {
     private SwerveDrivePoseEstimator poseEstimator = null;
 
     private SwerveModule modules[];
+    private String moduleNames[] = {"FL", "FR", "BL", "BR"};
     private boolean fieldOriented = true;
     private double fieldOffset = 0;
     // FIXME not for permanent use!!
     private SparkBase[] driveMotors = new SparkBase[] { null, null, null, null };
     private SparkBase[] turnMotors = new SparkBase[] { null, null, null, null };
     private CANcoder[] turnEncoders = new CANcoder[] { null, null, null, null };
-    private final SparkClosedLoopController[] turnPidControllers = new SparkClosedLoopController[] {null, null, null, null};
     public final float initPitch;
     public final float initRoll;
 
@@ -137,14 +115,6 @@ public class Drivetrain extends SubsystemBase {
     private final Field2d field = new Field2d();
     private final Field2d odometryField = new Field2d();
     private final Field2d poseWithLimelightField = new Field2d();
-
-    public double ppKpDrive = 5.0;
-    public double ppKiDrive = 0;
-    public double ppKdDrive = 0;
-
-    public double ppKpTurn = 3;
-    public double ppKiTurn = 0;
-    public double ppKdTurn = 0;
 
     double accelX;
     double accelY;
@@ -218,6 +188,7 @@ public class Drivetrain extends SubsystemBase {
                 driveMotors[0] = MotorControllerFactory.createSpark(driveFrontLeftPort, driveMotorConfig), 
                 turnMotors[0] = MotorControllerFactory.createSpark(turnFrontLeftPort, turnMotorConfig), 
                 turnEncoders[0] = SensorFactory.createCANCoder(Constants.Drivetrainc.canCoderPortFL), 0, pitchSupplier, rollSupplier);
+            
             moduleFR = new SwerveModule(Constants.Drivetrainc.swerveConfig, SwerveModule.ModuleType.FR, 
                 driveMotors[1] = MotorControllerFactory.createSpark(driveFrontRightPort, driveMotorConfig), 
                 turnMotors[1] = MotorControllerFactory.createSpark(turnFrontRightPort, turnMotorConfig), 
@@ -232,14 +203,12 @@ public class Drivetrain extends SubsystemBase {
                 driveMotors[3] = MotorControllerFactory.createSpark(driveBackRightPort, driveMotorConfig), 
                 turnMotors[3] = MotorControllerFactory.createSpark(turnBackRightPort, turnMotorConfig),
                 turnEncoders[3] = SensorFactory.createCANCoder(Constants.Drivetrainc.canCoderPortBR), 3, pitchSupplier, rollSupplier);
+                
             modules = new SwerveModule[] { moduleFL, moduleFR, moduleBL, moduleBR };
-            turnPidControllers[0] = turnMotors[0].getClosedLoopController();
-            turnPidControllers[1] = turnMotors[1].getClosedLoopController();
-            turnPidControllers[2] = turnMotors[2].getClosedLoopController();
-            turnPidControllers[3] = turnMotors[3].getClosedLoopController();
+
             if (RobotBase.isSimulation()) {
                 moduleSims = new SwerveModuleSim[] {
-                    moduleFL.createSim(), moduleFR.createSim(), moduleBL.createSim(), moduleBR.createSim()
+                    moduleFL.createSim(), moduleFR.createSim(), moduleBL.createSim(), moduleBR.createSim() //FIXME this is with values based off of hammerhead
                 };
                 gyroYawSim = new SimDeviceSim("navX-Sensor[0]").getDouble("Yaw");
             }
@@ -259,7 +228,6 @@ public class Drivetrain extends SubsystemBase {
             turnConfig.encoder.uvwAverageDepth(2);
             turnConfig.encoder.uvwMeasurementPeriod(16);
 
-            //turnConfig.closedLoop.pid(kP, kI, kD).feedbackSensor(FeedbackSensor.kPrimaryEncoder);
             for (SparkBase turnMotor : turnMotors) {
                 turnMotor.configure(turnConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
             }
@@ -275,10 +243,6 @@ public class Drivetrain extends SubsystemBase {
             accelXY = Math.sqrt(gyro.getWorldLinearAccelX() * gyro.getWorldLinearAccelX() + gyro.getWorldLinearAccelY() * gyro.getWorldLinearAccelY());
 
         }
-
-        // odometry = new SwerveDriveOdometry(kinematics,
-        // Rotation2d.fromDegrees(getHeading()), getModulePositions(),
-        // new Pose2d());
 
         poseEstimator = new SwerveDrivePoseEstimator(
                 getKinematics(),
@@ -355,76 +319,15 @@ public class Drivetrain extends SubsystemBase {
     public void periodic() {
         detectCollision(); //This does nothing
         PathPlannerLogging.logCurrentPose(getPose());
-
-
-        //pid.setIZone(20);
-        // SparkMaxConfig config = new SparkMaxConfig();
-        
-        //config.closedLoop.feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder);
-        // System.out.println(kP);
-        // config.closedLoop.pid(kP ,kI,kD);
-        // config.encoder.positionConversionFactor(360/Constants.Drivetrainc.turnGearing);
-        // turnMotors[0].configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-        // //moduleFL.move(0.0000001, 180);
-        // turnPidControllers[0].setReference(goal
-
-        // , ControlType.kPosition, ClosedLoopSlot.kSlot0);
-        
-        
-        // 167 -> -200
-        // 138 -> 360
-        // for (CANcoder coder : turnEncoders) {
-        //     SignalLogger.writeDouble("Regular position " + coder.toString(),
-        //     coder.getPosition().getValue().baseUnitMagnitude());
-        //     SignalLogger.writeDouble("Velocity " + coder.toString(),
-        //     coder.getVelocity().getValue().baseUnitMagnitude());
-        //     SignalLogger.writeDouble("Absolute position " + coder.toString(),
-        //     coder.getAbsolutePosition().getValue().baseUnitMagnitude());
-        // }
-        // String out=""; int i=0;
-        // for (CANcoder coder : turnEncoders) {
-        //     out+=String.format("[i] Abs Pos: %.3f Goal Pos: %.3f ", coder.getAbsolutePosition().getValue().baseUnitMagnitude(),0);
-        //     i++;
-        // }
-        // lobotomized to prevent ucontrollabe swerve behavior
-        // moduleFL.periodic();
-        // moduleFR.periodic();
-        // moduleBL.periodic();
-        // moduleBR.periodic();
-
-        // field.setRobotPose(odometry.getPoseMeters());
-
-        
-
-        // odometry.update(gyro.getRotation2d(), getModulePositions());
-
-        // poseEstimator.update(gyro.getRotation2d(), getModulePositions());
-        
-        //odometry.update(Rotation2d.fromDegrees(getHeading()), getModulePositions());
-
-        // updateMT2PoseEstimator();
-
-        // if (lastSetX != currSetX || lastSetY != currSetY
-        // || lastSetTheta != currSetTheta) {
-        // setPose(new Pose2d(currSetX, currSetY,
-        // Rotation2d.fromDegrees(currSetTheta)));
-        // }
-
-        // setPose(new Pose2d(getPose().getTranslation().getX(),
-        // getPose().getTranslation().getY(),
-        // Rotation2d.fromDegrees(getHeading())));
-
-
     }
 
     @Override
     public void initSendable(SendableBuilder builder) {
         super.initSendable(builder);
-
+        builder.setSafeState(this::stop);
         for (SwerveModule module : modules){
             SendableRegistry.addChild(this, module);
         }
-        String moduleNames[] = {"FL", "FR", "BL", "BR"};
         for (int i = 0; i < 4; i++) {
             final int j = i; //make java happy
             builder.addDoubleProperty(moduleNames[j] + "Turn Encoder (Deg)", () -> modules[j].getModuleAngle(), null);
@@ -503,11 +406,9 @@ public class Drivetrain extends SubsystemBase {
                 (speeds, feedforwards) -> drive(kinematics.toSwerveModuleStates(speeds)), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
                 //PathFollowingController controller,
                 new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                        new PIDConstants(4
-                        , ppKiDrive, ppKdDrive), // Translation PID constants
-                        new PIDConstants(1, ppKiTurn, ppKdTurn)
+                        new PIDConstants(ppkPDrive, ppkIDrive, ppkDDrive), // Translation PID constants
+                        new PIDConstants(ppkPTurn, ppkITurn, ppkDTurn)
                 ),
-                //RobotConfig robotConfig,
                 config, // The robot configuration
                 //BooleanSupplier shouldFlipPath,
                 () -> {
@@ -739,26 +640,18 @@ public class Drivetrain extends SubsystemBase {
         }
     }
     /**
-     * @deprecated Use {@link #setMode(Mode)} instead
      * Changes between IdleModes
      */
-    @Deprecated
     public void toggleMode() {
         for (SwerveModule module : modules)
             module.toggleMode();
     }
-    /** 
-     * @deprecated Use {@link #setMode(Mode)} instead
-     */
-    @Deprecated
+
     public void brake() {
         for (SwerveModule module : modules)
             module.brake();
     }
-    /**
-     * @deprecated Use {@link #setMode(Mode)} instead
-     */
-    @Deprecated
+
     public void coast() {
         for (SwerveModule module : modules)
             module.coast();

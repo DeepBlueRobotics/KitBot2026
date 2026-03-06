@@ -183,6 +183,12 @@ public final class Constants {
 
 		public static final double driveIzone = .1;
 		public static final double COLLISION_ACCELERATION_THRESHOLD = 2; //The minimum acceleration that will trigger a collision detection, in m/s^2
+		public static final double ppkPDrive = 5;
+		public static final double ppkIDrive = 0;
+		public static final double ppkDDrive = 0;
+		public static final double ppkPTurn = 3;
+		public static final double ppkITurn = 0;
+		public static final double ppkDTurn = 0;
 		public static final class Autoc {
 			public static final RobotConfig robotConfig = new RobotConfig(
 					// Mass mass, kg
