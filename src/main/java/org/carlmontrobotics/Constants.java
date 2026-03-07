@@ -307,7 +307,7 @@ public final class Constants {
 		public static final double toleranceRad = Math.PI/90; //Looks good, like 2 degrees is good?
 		public static final double maxRPM = 6784; //RPM
 		public static final double g = 9.81; //m/s^2
-		public static final double launchHeightMeters = 1; //TODO
+		public static final double launchHeightMeters = Units.InchesToMeters(26.3967075);
 		public static final double clearanceSafety = 0.1651; // extra margin (m)
 
 
