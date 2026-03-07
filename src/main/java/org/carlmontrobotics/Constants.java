@@ -246,15 +246,15 @@ public final class Constants {
 	}
 	//#region Manipulator
 	public static final class IntakeC { // FIXME get real values fpr both
-		public static final int INTAKE_ID = 1;
-		public static final int CONVEYOR_ID = 1;
+		public static final int INTAKE_ID = 21;
+		public static final int CONVEYOR_ID = 22;
 		public static final double INTAKE_SPEED = 0.1;
 		public static final double CONVEYOR_SPEED = 0.5;
 	}	
 	public static final class OuttakeC { 
-		public static final int OUTTAKE_ID = 14;
-		public static final int OUTTAKE_FOLLOWER_ID = 6;
-		public static final int OUTTAKE_FEEDER_ID = 7;
+		public static final int OUTTAKE_ID = 31;
+		public static final int OUTTAKE_FOLLOWER_ID = 32;
+		public static final int OUTTAKE_FEEDER_ID = 23;
 		public static final MotorConfig OUTTAKE_MASTER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 		public static final MotorConfig OUTTAKE_FOLLOWER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 		public static final MotorConfig OUTTAKE_FEEDER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
