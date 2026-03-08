@@ -472,7 +472,6 @@ public class Drivetrain extends SubsystemBase {
         for (SwerveModule module : modules) {
           // module.turnPeriodic();
           // module.turnPeriodic();
-          module.move(0.00000000001, goal);
           module.periodic();
         }
 
