@@ -64,26 +64,22 @@ public final class Constants {
 
     //#region Drivetrain
 	public static final class Drivetrainc {
-		public static final double wheelBase = Units.inchesToMeters(16.750003); // Correct measurments for hammerhead
-		public static final double trackWidth = Units.inchesToMeters(23.750000); // Correct measurments for hammerhead
+		public static final double wheelBase = CONFIG.isHammerHead() ? Units.inchesToMeters(16.750003) : Units.inchesToMeters(20.5); 
+		public static final double trackWidth = CONFIG.isHammerHead() ? Units.inchesToMeters(23.750000) : Units.inchesToMeters(20.5);
 		// "swerveRadius" is the distance from the center of the robot to one of the modules
 		public static final double swerveRadius = Math.sqrt(Math.pow(wheelBase / 2, 2) + Math.pow(trackWidth / 2, 2));
 		// The gearing reduction from the drive motor controller to the wheels
-		// Gearing for the Swerve Modules is 6.75 : 1
-		public static final double driveGearing = 6.75;
+
+		public static final double driveGearing = 8.16; //if no worky try 6.86
 		// Turn motor shaft to "module shaft"
-		public static final double turnGearing = 150.0 / 7;
+		public static final double turnGearing = 12.8;
 
 		public static final double driveModifier = 1;
-		public static final double wheelDiameterMeters = Units.inchesToMeters(4.0) * 7.36 / 7.65; // empiric correction FIXME this should be fine tuned
+		public static final double wheelDiameterMeters = Units.inchesToMeters(4.0);
 																				
 		public static final double mu = 1; /* 70/83.2; */ // coefficient of friction. less means less max acceleration.
-		public static final double ROBOTMASS_KG = 36.2874;// 80lb ish
+		public static final double ROBOTMASS_KG = Units.lbsToKilograms(80);// TODO weigh actual robot with bumpers and battery later
 		// moment of inertia, kg/mm
-		// calculated by integral of mass * radius^2 for every point of the robot
-		// easy way? just do total mass * radius^2
-		// This seems to be relying that all the mass is located in the corners
-		//public static final double MOI = ROBOTMASS_KG * swerveRadius * swerveRadius; caveman way 
 		// USE ONSHAPE it has a calculator for this
 		public static final double MOI = Math.pow(Units.inchesToMeters(1),2) * Units.lbsToKilograms(1) * 14040.21738; // 14040.21738 in^2 lb 
 
@@ -114,57 +110,45 @@ public final class Constants {
 		// kP, kI, and kD constants for turn motor controllers in the order of
 		// front-left, front-right, back-left, back-right.
 		// Determine correct turn PID constants
-		public static final double[] turnkP = CONFIG.isHammerHead() ? new double[] {0,0,0,0} : 
-			new double[]{0,0,0,0};//{1.9085, /*0.21577*/0.1, /*0.12356*/0.05, 0.36431};//sysid for fr that didnt't work{0.099412, 0.13414, 3.6809, 3.6809} //{49, 23,33, 28};//{51.078, 25, 35.946, 30.986}; // {0.00374, 0.00374, 0.00374,
-																		// 0.00374};
-		public static final double[] turnkI = {0, 0, 0, 0};//{ 0, 0.1, 0, 0 };
-		public static final double[] turnkD = { 0, 0, 0, 0 };// :
-			//new double[]{0, 0, 0, 0};//{ 0.2/* dont edit */, 0.3, 0.5, 0.4}; // todo: use d
-		// public static final double[] turnkS = {0.2, 0.2, 0.2, 0.2};
-		public static final double[] turnkS = new double[]{ 1, 1, 1, 1};
-			//new double[]{0.21969, 0.11487, 0.18525, 0.24865};//sysid for fr that didnt't work{0.041796, 0.09111, 0.64804, 1.0873}//{ 0.13027, 0.17026, 0.2, 0.23262 };
+		public static final double[] turnkP = CONFIG.isHammerHead() ? new double[] {50,50,50,50} : 
+			new double[]{50,50,50,50}; //good starting point
+		
+		public static final double[] turnkI = CONFIG.isHammerHead() ? new double[] {0, 0, 0, 0} :
+			new double[] {0,0,0,0};
+		public static final double[] turnkD = CONFIG.isHammerHead() ? new double[] {0, 0, 0, 0 } :
+			new double[] {0,0,0,0};
 
-		// V = kS + kV * v + kA * a
-		// 12 = 0.2 + 0.00463 * v
-		// v = (12 - 0.2) / 0.00463 = 2548.596 degrees/s
-		public static final double[] turnkV =new double[] { 0, 0, 0, 0 };//:
-			//new double[] {2.7073, 2.6208, 2.7026, 2.7639};//sysid for fr that didnt't work{2.6403, 2.6603, 2.6168, 2.5002} //{2.6532, 2.7597, 2.7445, 2.7698};
-		public static final double[] turnkA =new double[] { 0, 0, 0, 0 };//:
-			//new double[]{0.18069, 0.06593, 0.17439, 0.2571};//sysid for fr that didnt't work{0.33266, 0.25535, 0.17924, 0.17924} //{ 0.17924, 0.17924, 0.17924, 0.17924 };
+		public static final double[] turnkS = new double[]{ 0.2, 0.2, 0.2, 0.2};
+		public static final double[] turnkV = new double[] { 2, 2, 2, 2 };//good starting point
+		public static final double[] turnkA = new double[] { 0, 0, 0, 0 };
 
-		// kP is an average of the forward and backward kP values
-		// Forward: 1.72, 1.71, 1.92, 1.94
-		// Backward: 1.92, 1.92, 2.11, 1.89
 		// Order of modules: (FL, FR, BL, BR)
-		public static final double[] drivekP = {1, 1, 1, 1};// CONFIG.isHammerHead() ? new double[] { 0, 0, 0, 0 }
-		//: new double[] {0,0,0,0};//trust guys //{2.2319, 2.2462, 2.4136, 3.6862}; // {1.82/100, 1.815/100, 2.015/100,
-																// 1.915/100};
-		public static final double[] drivekI = { 0, 0, 0, 0};//CONFIG.isHammerHead()? new double[] {0,0,0,0} :
-			//new double[] { 0, 0, 0, 0 };
+		public static final double[] drivekP = CONFIG.isHammerHead() ? new double[] {2, 2, 2, 2}:
+			new double[] {2, 2, 2, 2}; //Good starting point
+		public static final double[] drivekI = CONFIG.isHammerHead() ? new double[]{ 0, 0, 0, 0} : 
+			new double[] {0, 0, 0, 0};
 		public static final double[] drivekD = CONFIG.isHammerHead()? new double[] { 0, 0, 0, 0 }:
 			new double[] { 0,0,0,0 };
 		public static final boolean[] driveInversion = (CONFIG.isHammerHead()
 		? new boolean[] { true, false, true, false }
 		: new boolean[] { false, true, false, true });
 		public static final boolean[] turnInversion = { true, true, true, true };
+		
 		// kS
-		// public static final double[] kForwardVolts = { 0.26744, 0.31897, 0.27967, 0.2461 };
-		public static final double[] kForwardVolts = CONFIG.isHammerHead() ? new double[] { 0.2,0.2,0.2,0.2 }:
-			new double[] {0, 0, 0, 0}; //{0.59395, 0.52681, 0.11097, 0.17914};      //{ 0.2, 0.2, 0.2, 0.2 };
+		public static final double[] kForwardVolts = CONFIG.isHammerHead() ? new double[] {0,0,0,0 }:
+			new double[] {0, 0, 0, 0}; //HIGHLY NOT RECOMMENDED can cause drift keep at 0 is better
 		public static final double[] kBackwardVolts = kForwardVolts;
 
 		//kV
-		// public static final double[] kForwardVels = { 2.81, 2.9098, 2.8378, 2.7391 };
 		public static final double[] kForwardVels = CONFIG.isHammerHead() ? new double[] { 0,0,0,0 }:
-			new double[] { 2.9875, 2.9875, 2.7323, 2.9264 };//{2.4114, 2.7465, 2.7546, 2.7412};        //{ 0, 0, 0, 0 };//volts per m/s
+			new double[] { 0, 0, 0, 0 };
 		public static final double[] kBackwardVels = kForwardVels;
 
 		//kA
-		// public static final double[] kForwardAccels = { 1.1047 / 2, 0.79422 / 2, 0.77114 / 2, 1.1003 / 2 };
-		public static final double[] kForwardAccels = { 0, 0, 0, 0 };//{0.31958, 0.33557, 0.70264, 0.46644};    //{ 0, 0, 0, 0 };// volts per m/s^2
+		public static final double[] kForwardAccels = { 0, 0, 0, 0 };
 		public static final double[] kBackwardAccels = kForwardAccels;
 
-		public static final double autoMaxSpeedMps = 4;//0.6 * 4.4; // Meters / second
+		public static final double autoMaxSpeedMps = 4.3 ; // Meters / second
 		public static final double autoMaxAccelMps2 = mu * g; // Meters / seconds^2
 		public static final double autoMaxAmps = 40.0; 
 		// The maximum acceleration the robot can achieve is equal to the coefficient of
@@ -175,7 +159,7 @@ public final class Constants {
 		public static final boolean isGyroReversed = true;
 
 		public static final double[] thetaPIDController = CONFIG.isHammerHead() ? new double[] { 0.10, 0.0, 0.001 }
-		: new double[] {0.05, 0.0, 0.00};
+		: new double[] {0, 0, 0};
 
 		public static final SwerveConfig swerveConfig = new SwerveConfig(wheelDiameterMeters, driveGearing, mu,
 		autoCentripetalAccel, kForwardVolts, kForwardVels, kForwardAccels, kBackwardVolts, kBackwardVels,
@@ -266,14 +250,23 @@ public final class Constants {
 	}
 	//#endregion
 	public static class LimeLightc {
-		public static final String sampleLL1 = "";
-		public static final String sampleLL2 = ""; 
+		public static final String FRONT_LL = "FRONT_LL";
+		public static final String BACK_LL = "BACK_LL"; 
 
-		public static final int[] sampleLL1_VALID_IDS = {1, 2, 12, 13};
-		public static final int[] sampleLL2_VALID_IDS = {1, 6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22};
-	}
+		public static final int[] LL_FRONT_SHOOTING_VALID_IDS = {9,10, 12, 7, 8,5, 11, 2, 18, 27, 21, 24, 25, 26};
+		public static final int[] LL_BACK_SHOOTING_VALID_IDS = {13,14,15,16, 7, 12, 28, 23, 29, 30, 31, 32};
+		public static final int[] LL_GENERAL_VALID_IDS = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32};
+
+		public static final int[] LL_IDS_IGNORE_FOR_BLUE = {15,16,14,13,9,10,7,12};
+		public static final int[] LL_IDS_IGNORE_FOR_RED = {28, 23, 25, 26, 29,30,31,32};
+
+		public static final int[] LL_FRONT_GENERAL_CROP = {0,0,0,0}; //XMin, xMax, yMin, yMax all values (-1,1)
+		public static final int[] LL_BACK_GENERAL_CROP = {0,0,0,0}; //XMin, xMax, yMin, yMax all values (-1,1)
+		public static final int[] LL_FRONT_SHOOTING_CROP = {0,0,0,0}; //XMin, xMax, yMin, yMax all values (-1,1)
+		public static final int[] LL_BACK_SHOOTING_CROP = {0,0,0,0}; //XMin, xMax, yMin, yMax all values (-1,1)
+	}	
 	//#region Manipulator
-	public static final class IntakeC { // FIXME get real values fpr both
+	public static final class IntakeC { // FIXME get real values for both
 		public static final int INTAKE_ID = 21;
 		public static final int CONVEYOR_ID = 22;
 		public static final double INTAKE_SPEED = 0.1;
