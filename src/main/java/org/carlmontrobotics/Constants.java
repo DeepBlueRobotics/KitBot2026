@@ -70,7 +70,7 @@ public final class Constants {
 		public static final double swerveRadius = Math.sqrt(Math.pow(wheelBase / 2, 2) + Math.pow(trackWidth / 2, 2));
 		// The gearing reduction from the drive motor controller to the wheels
 
-		public static final double driveGearing = 8.16; //if no worky try 6.86
+		public static final double driveGearing = 6.86; //if no worky try 8.16
 		// Turn motor shaft to "module shaft"
 		public static final double turnGearing = 12.8;
 
