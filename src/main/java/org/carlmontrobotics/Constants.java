@@ -105,13 +105,13 @@ public final class Constants {
 		// Determine correct turnZero constants (FL, FR, BL, BR)
 		public static final double[] turnZeroDeg = RobotBase.isSimulation() ? new double[] {-90.0, -90.0, -90.0, -90.0 }
 		: (CONFIG.isHammerHead() ? new double[] { 85.7812, 85.0782, -96.9433, -162.9492 }
-			: new double[] { 17.2266, -96.8555, -95.8008, 85.166 });/* real values here */
+			: new double[] { -38.232421875, -156.4453125, -7.3828125, -41.66015625 });/* real values here */
 
 		// kP, kI, and kD constants for turn motor controllers in the order of
 		// front-left, front-right, back-left, back-right.
 		// Determine correct turn PID constants
 		public static final double[] turnkP = CONFIG.isHammerHead() ? new double[] {50,50,50,50} : 
-			new double[]{50,50,50,50}; //good starting point
+			new double[]{40,40,40,40}; //good starting point
 		
 		public static final double[] turnkI = CONFIG.isHammerHead() ? new double[] {0, 0, 0, 0} :
 			new double[] {0,0,0,0};
@@ -131,8 +131,8 @@ public final class Constants {
 			new double[] { 0,0,0,0 };
 		public static final boolean[] driveInversion = (CONFIG.isHammerHead()
 		? new boolean[] { true, false, true, false }
-		: new boolean[] { false, true, false, true });
-		public static final boolean[] turnInversion = { true, true, true, true };
+		: new boolean[] { false, false, false, false });
+		public static final boolean[] turnInversion = { false, false, false, false };
 		
 		// kS
 		public static final double[] kForwardVolts = CONFIG.isHammerHead() ? new double[] {0,0,0,0 }:
@@ -167,19 +167,19 @@ public final class Constants {
 		driveInversion, reversed, driveModifier, turnInversion);
 
 		public static final int driveFrontLeftPort = CONFIG.isHammerHead() ? 1 : 1;
-		public static final int driveFrontRightPort = CONFIG.isHammerHead() ? 2 : 2;
-		public static final int driveBackLeftPort = CONFIG.isHammerHead() ? 3 : 3;
-		public static final int driveBackRightPort = CONFIG.isHammerHead() ? 4 : 4;
+		public static final int driveFrontRightPort = CONFIG.isHammerHead() ? 2 : 12;
+		public static final int driveBackLeftPort = CONFIG.isHammerHead() ? 3 : 14;
+		public static final int driveBackRightPort = CONFIG.isHammerHead() ? 4 : 13;
 
 		public static final int turnFrontLeftPort = CONFIG.isHammerHead() ? 11 : 11;
-		public static final int turnFrontRightPort = CONFIG.isHammerHead() ? 12 : 12;
-		public static final int turnBackLeftPort = CONFIG.isHammerHead() ? 13 : 13;
-		public static final int turnBackRightPort = CONFIG.isHammerHead() ? 14 : 14;
-		
-		public static final int canCoderPortFL = CONFIG.isHammerHead() ? 0 : 1; 
-		public static final int canCoderPortFR = CONFIG.isHammerHead() ? 1 : 2; 
+		public static final int turnFrontRightPort = CONFIG.isHammerHead() ? 12 : 2;
+		public static final int turnBackLeftPort = CONFIG.isHammerHead() ? 13 : 4;
+		public static final int turnBackRightPort = CONFIG.isHammerHead() ? 14 : 3;
+
+		public static final int canCoderPortFL = CONFIG.isHammerHead() ? 0 : 0; 
+		public static final int canCoderPortFR = CONFIG.isHammerHead() ? 1 : 1; 
 		public static final int canCoderPortBL = CONFIG.isHammerHead() ? 3 : 3;
-		public static final int canCoderPortBR = CONFIG.isHammerHead() ? 2 : 0; 
+		public static final int canCoderPortBR = CONFIG.isHammerHead() ? 2 : 2; 
 
 		public static double kNormalDriveSpeed = 1; // Percent Multiplier	
 		public static double kNormalDriveRotation = 0.5; // Percent Multiplier
@@ -280,9 +280,9 @@ public final class Constants {
 		public static final MotorConfig OUTTAKE_FOLLOWER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 		public static final MotorConfig OUTTAKE_FEEDER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 		public static final double OUTTAKE_RPM = 60;
-		public static final double kP = 0.01;
-		public static final double kI = 0;
-		public static final double kD = 0;
+		public static final double kP = 0.1;
+		public static final double kI = 0.1;
+		public static final double kD = 0.1;
 		public static final double OUTTAKE_FEEDER_VOLT_PERC = 0.7;
 		public static final double OUTTAKE_ESTIMATE_OFFSET = 0; //+- range for atGoal
 	}

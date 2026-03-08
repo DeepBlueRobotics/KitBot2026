@@ -56,7 +56,8 @@ public class SmartShoot extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    outtake.stopOuttake();
+    outtake.stopOuttake();  
+    outtake.spinOuttakeFeeder(0);
     intake.stopConveyor();
   }
 
