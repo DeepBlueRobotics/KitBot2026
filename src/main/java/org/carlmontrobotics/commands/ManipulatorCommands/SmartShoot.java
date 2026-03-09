@@ -21,18 +21,22 @@ public class SmartShoot extends Command {
   Intake intake;
   boolean timed;
   double time;
+  double goalRPM;
   /** Creates a new SmartShoot. */
-  public SmartShoot(Outtake outtake, Intake intake) {
+  public SmartShoot(Outtake outtake, Intake intake, double RPM) {
     // Use addRequirements() here to declare subsystem dependencies.
     timer = new Timer();
+    timed = false;
+    goalRPM = RPM;
     addRequirements(outtake, intake);
   }
 
-  public SmartShoot(Outtake outtake, Intake intake, double time) {
+  public SmartShoot(Outtake outtake, Intake intake, double time, double RPM) {
     // Use addRequirements() here to declare subsystem dependencies.
     timer = new Timer();
     timed = true;
-    this.timer = timer;
+    this.time = time;
+    goalRPM = RPM;
     addRequirements(outtake, intake);
 
   }
@@ -41,7 +45,7 @@ public class SmartShoot extends Command {
   @Override
   public void initialize() {
     timer.restart();
-    outtake.spinOuttake(OUTTAKE_RPM);
+    outtake.spinOuttake(goalRPM);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
