@@ -19,13 +19,18 @@ import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_SHOOTING_RPM;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
 import java.util.function.BooleanSupplier;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
@@ -72,7 +77,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 
-public class RobotContainer {
+public class RobotContainer implements Sendable {
     
     public final GenericHID driverController = new GenericHID(Driver.port);
     public final XboxController driverRumble = new XboxController(Driver.port); //For rumbling the controller
@@ -88,10 +93,12 @@ public class RobotContainer {
     private SendableChooser<Command> autoChooser = new SendableChooser<>();   
     public boolean alignOverride = true;
     public boolean autoScoring = true;
-
     public static int intakeCounter;
 
     public RobotContainer() {
+
+      
+
         //#region AutoRegistration
         RegisterAutoCommands();
         autoChooser = AutoBuilder.buildAutoChooser();
@@ -160,6 +167,91 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
   }
+public boolean isHubActive() {
+  Optional<Alliance> alliance = DriverStation.getAlliance();
+  // If we have no alliance, we cannot be enabled, therefore no hub.
+  if (alliance.isEmpty()) {
+    return false;
+  }
+  // Hub is always enabled in autonomous.
+  if (DriverStation.isAutonomousEnabled()) {
+    return true;
+  }
+  // At this point, if we're not teleop enabled, there is no hub.
+  if (!DriverStation.isTeleopEnabled()) {
+    return false;
+  }
+
+  // We're teleop enabled, compute.
+  double matchTime = DriverStation.getMatchTime();
+  String gameData = DriverStation.getGameSpecificMessage();
+  // If we have no game data, we cannot compute, assume hub is active, as its likely early in teleop.
+  if (gameData.isEmpty()) {
+    return true;
+  }
+  boolean redInactiveFirst = false;
+  switch (gameData.charAt(0)) {
+    case 'R' -> redInactiveFirst = true;
+    case 'B' -> redInactiveFirst = false;
+    default -> {
+      // If we have invalid game data, assume hub is active.
+      return true;
+    }
+  }
+
+  // Shift was is active for blue if red won auto, or red if blue won auto.
+  boolean shift1Active = switch (alliance.get()) {
+    case Red -> !redInactiveFirst;
+    case Blue -> redInactiveFirst;
+  };
+
+  if (matchTime > 130) {
+    // Transition shift, hub is active.
+    return true;
+  } else if (matchTime > 105) {
+    // Shift 1
+    return shift1Active;
+  } else if (matchTime > 80) {
+    // Shift 2
+    return !shift1Active;
+  } else if (matchTime > 55) {
+    // Shift 3
+    return shift1Active;
+  } else if (matchTime > 30) {
+    // Shift 4
+    return !shift1Active;
+  } else {
+    // End game, hub always active.
+    return true;
+  }
+}
+  public double hubTimeLeft(){ //Gets time left until hub is active/inactive
+    double matchTime = DriverStation.getMatchTime();
+    if (matchTime > 130) {
+    // Transition shift, hub is active.
+    return matchTime - 130;
+  } else if (matchTime > 105) {
+    // Shift 1
+    return matchTime - 105;
+  } else if (matchTime > 80) {
+    // Shift 2
+    return matchTime - 80;
+  } else if (matchTime > 55) {
+    // Shift 3
+    return matchTime - 55;
+  } else if (matchTime > 30) {
+    // Shift 4
+    return matchTime - 30;
+  } else {
+    // End game, hub always active.
+    return matchTime;
+  }
+  }
+  @Override
+  public void initSendable(SendableBuilder builder){
+  builder.addBooleanProperty("Hub Active (T/F)", this::isHubActive, null);
+  builder.addDoubleProperty("Hub Time Left", this::hubTimeLeft, null);
+  } 
   //#endregion
   //#region HelpfulMethods
   //TODO: integrate these methods into lib199
