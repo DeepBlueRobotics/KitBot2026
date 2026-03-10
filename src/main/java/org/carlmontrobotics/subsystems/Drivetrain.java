@@ -58,13 +58,12 @@ public class Drivetrain extends SubsystemBase {
     private SwerveDrivePoseEstimator poseEstimator = null;
 
     private SwerveModule modules[];
-    private String moduleNames[] = {"FL", "FR", "BL", "BR"};
     private boolean fieldOriented = true;
     private double fieldOffset = 0;
     // FIXME not for permanent use!!
-    private SparkBase[] driveMotors = new SparkBase[] { null, null, null, null };
-    private SparkBase[] turnMotors = new SparkBase[] { null, null, null, null };
-    private CANcoder[] turnEncoders = new CANcoder[] { null, null, null, null };
+    private SparkBase[] driveMotors = new SparkBase[4];
+    private SparkBase[] turnMotors = new SparkBase[4];
+    private CANcoder[] turnEncoders = new CANcoder[4];
     public final float initPitch;
     public final float initRoll;
 
@@ -272,9 +271,9 @@ public class Drivetrain extends SubsystemBase {
         for (SwerveModule module : modules){
             SendableRegistry.addChild(this, module);
         }
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < SwerveModule.ModuleType.values().length; i++) {
             final int j = i; //make java happy
-            builder.addDoubleProperty(moduleNames[j] + "Turn Encoder (Deg)", () -> modules[j].getModuleAngle(), null);
+            builder.addDoubleProperty((SwerveModule.ModuleType.values()[j]).toString() + "Turn Encoder (Deg)", () -> modules[j].getModuleAngle(), null);
         }
         SendableRegistry.addChild(this, CONFIG);
         builder.addBooleanProperty("Magnetic Field Disturbance", gyro::isMagneticDisturbance, null);
@@ -479,8 +478,10 @@ public class Drivetrain extends SubsystemBase {
         //odometry.resetPosition(Rotation2d.fromDegrees(getHeading()), getModulePositions(), initialPose);
     }
 
+    //TODO: implement this
     //This method will set the pose using limelight if it sees a tag and if not it is supposed to run like setPose()
     public void setPoseWithLimelight(Pose2d backupPose){ //the pose will be set to backupPose if no tag is seen
+        setPose(backupPose); //FIXME: remove this once we actually implement the method
     //     Rotation2d gyroRotation = gyro.getRotation2d();
     //     Pose2d pose;
 
