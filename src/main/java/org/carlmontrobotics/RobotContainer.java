@@ -15,6 +15,8 @@ import org.carlmontrobotics.commands.ManipulatorCommands.RunConveyor;
 import org.carlmontrobotics.commands.ManipulatorCommands.ShootBalls;
 import org.carlmontrobotics.commands.ManipulatorCommands.SmartShoot;
 
+import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_SHOOTING_RPM;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,7 +135,7 @@ public class RobotContainer {
       new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
       .whileTrue(new ShootBalls(outtake));
       new JoystickButton(manipulatorController, Manipulator.SMART_SHOOT_BUTTON)
-      .whileTrue(new SmartShoot(outtake, intake));
+      .whileTrue(new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM));
     }
     //#endregion
     //#region AutoMaking
