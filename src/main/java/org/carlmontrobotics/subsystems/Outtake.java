@@ -44,11 +44,14 @@ public class Outtake extends SubsystemBase {
   public void configureMotors(){
     outtakeConfig = MotorControllerFactory.sparkConfig(OUTTAKE_MASTER_MOTOR_CONFIG);
     outtakeConfig.idleMode(IdleMode.kCoast)
-                  .closedLoop.pid(kP, kI, kD);
+                  .inverted(true)
+                  .encoder.quadratureAverageDepth(2)
+                          .quadratureMeasurementPeriod(10);
+    outtakeConfig.closedLoop.pid(kP, kI, kD);
 
     outtakeFollowerConfig = MotorControllerFactory.sparkConfig(OUTTAKE_FOLLOWER_MOTOR_CONFIG);
     outtakeFollowerConfig.apply(outtakeConfig)
-                          .follow(OUTTAKE_ID, true); // may need to be false and swap outtake to true
+                          .follow(OUTTAKE_ID, true); 
 
     outtakeFeederConfig = MotorControllerFactory.sparkConfig(OUTTAKE_FEEDER_MOTOR_CONFIG);
   }
@@ -67,7 +70,7 @@ public class Outtake extends SubsystemBase {
 
   public boolean atGoal(double estimateOffset){
     return Math.abs(pidController.getSetpoint() - outtakeMasterEncoder.getVelocity()) < estimateOffset;
-    }
+  }
 
   @Override
   public void initSendable(SendableBuilder builder){
