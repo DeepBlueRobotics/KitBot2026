@@ -187,7 +187,7 @@ public boolean isHubActive() {
   }
   // At this point, if we're not teleop enabled, there is no hub.
   if (!DriverStation.isTeleopEnabled()) {
-    return false;
+    return true;
   }
 
   // We're teleop enabled, compute.
