@@ -262,6 +262,11 @@ public class Drivetrain extends SubsystemBase {
     public void periodic() {
         detectCollision(); //This does nothing
         PathPlannerLogging.logCurrentPose(getPose());
+        for (SwerveModule module : modules) {
+          // module.turnPeriodic();
+          // module.turnPeriodic();
+          module.periodic();
+        }
     }
 
     @Override

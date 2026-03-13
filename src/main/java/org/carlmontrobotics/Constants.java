@@ -89,13 +89,13 @@ public final class Constants {
 		public static final int canCoderPorts[] = { canCoderPortFL, canCoderPortFR, canCoderPortBL, canCoderPortBR };
 
 		// swerve config constants
-		public static final double wheelBase = CONFIG.isHammerHead() ? Units.inchesToMeters(16.750003) : 
-																		Units.inchesToMeters(16.750003);
-		public static final double trackWidth = CONFIG.isHammerHead() ? Units.inchesToMeters(23.750000) : 
-																		Units.inchesToMeters(23.750000);
+		public static final double wheelBase = CONFIG.isHammerHead() ? Units.inchesToMeters(16.750003) : Units.inchesToMeters(20.5); 
+		public static final double trackWidth = CONFIG.isHammerHead() ? Units.inchesToMeters(23.750000) : Units.inchesToMeters(20.5);
+		// "swerveRadius" is the distance from the center of the robot to one of the modules
+		// The gearing reduction from the drive motor controller to the wheels
 		public static final double swerveRadius = Math.sqrt(Math.pow(wheelBase / 2, 2) + Math.pow(trackWidth / 2, 2));
-		public static final double wheelDiameterMeters = Units.inchesToMeters(4.0) * 7.36 / 7.65;
-		public static final double driveGearing = 6.75;
+		public static final double wheelDiameterMeters = Units.inchesToMeters(4.0);
+		public static final double driveGearing = 6.86; //if no worky try 8.16
 		public static final double mu = 1; /* 70/83.2; */ // coefficient of friction. less means less max acceleration.
 		public static final double autoCentripetalAccel = mu * g * 2;
 		public static final double[] kForwardVolts = CONFIG.isHammerHead() ? new double[] { 0.2,0.2,0.2,0.2 }: //kS
@@ -107,26 +107,26 @@ public final class Constants {
 		public static final double[] kBackwardVels = kForwardVels;
 		public static final double[] kBackwardAccels = kForwardAccels;
 
-		public static final double[] drivekP = {1, 1, 1, 1};
+		public static final double[] drivekP = {2, 2, 2, 2};
 		public static final double[] drivekI = {0, 0, 0, 0};
 		public static final double[] drivekD = CONFIG.isHammerHead()? new double[] { 0, 0, 0, 0 }:
 																		new double[] { 0,0,0,0 };
 		public static final double[] turnkP = CONFIG.isHammerHead() ? new double[] {50, 50, 50, 50} : 
-																		new double[] {0,0,0,0};
+																		new double[] {40, 40, 40, 40}; //good starting point
 		public static final double[] turnkI = {0, 0, 0, 0};
 		public static final double[] turnkD = {0, 0, 0, 0};
-		public static final double[] turnkS = {1, 1, 1, 1};
-		public static final double[] turnkV = {0, 0, 0, 0};
+		public static final double[] turnkS = {0.2, 0.2, 0.2, 0.2};
+		public static final double[] turnkV = {2, 2, 2, 2};
 		public static final double[] turnkA = {0, 0, 0, 0};
 		public static final double[] turnZeroDeg = CONFIG.isHammerHead() ? new double[] { 85.7812, 85.0782, -96.9433, -162.9492 } : 
-																				new double[] { 17.2266, -96.8555, -95.8008, 85.166 };
+																			new double[] { -38.232421875, -156.4453125, -7.3828125, -41.66015625 };
 		public static final boolean[] driveInversion = CONFIG.isHammerHead() ? new boolean[] { true, false, true, false } :
-																				new boolean[] { false, true, false, true };
+																				new boolean[] { false, false, false, false };
 		public static final boolean[] reversed = { false, false, false, false };
 		public static final double driveModifier = 1;
-		public static final boolean[] turnInversion = { true, true, true, true };
+		public static final boolean[] turnInversion = {false, false, false, false};
 
-		public static final double turnGearing = 150.0 / 7;
+		public static final double turnGearing = 12.8; //150/7
 		public static final double ROBOTMASS_KG = CONFIG.isHammerHead() ? 35.49159484 : 48.582;
 		public static final double MOI = CONFIG.isHammerHead() ? 4.10872647 : 5.38619461; // moment of inertia, kg/m^2, Lzz in onshape
 		public static final double NEOFreeSpeed = 5676 * (2 * Math.PI) / 60; // radians/s
@@ -144,8 +144,7 @@ public final class Constants {
 		// is sqrt((wheelBase/2)^2 + (trackWidth/2)^2)
 		// Angular velocity = Tangential speed / radius
 		public static final double maxRCW = maxSpeed / swerveRadius;
-
-		public static final double autoMaxSpeedMps = 4;//0.6 * 4.4; // Meters / second
+		
 		public static final double autoMaxAccelMps2 = mu * g; // Meters / seconds^2
 		public static final double autoMaxAmps = 40.0; 
 		// The maximum acceleration the robot can achieve is equal to the coefficient of
@@ -155,13 +154,12 @@ public final class Constants {
 		public static final boolean isGyroReversed = true;
 
 		public static final double[] thetaPIDController = CONFIG.isHammerHead() ? new double[] { 0.10, 0.0, 0.001 }
-		: new double[] {0.05, 0.0, 0.00};
+		: new double[] {0, 0, 0};
 
 		public static final SwerveConfig swerveConfig = new SwerveConfig(wheelDiameterMeters, driveGearing, mu,
 		autoCentripetalAccel, kForwardVolts, kForwardVels, kForwardAccels, kBackwardVolts, kBackwardVels,
 		kBackwardAccels, drivekP, drivekI, drivekD, turnkP, turnkI, turnkD, turnkS, turnkV, turnkA, turnZeroDeg,
 		driveInversion, reversed, driveModifier, turnInversion);
-
 
 		public static double kNormalDriveSpeed = 1; // Percent Multiplier	
 		public static double kNormalDriveRotation = 0.5; // Percent Multiplier
@@ -238,32 +236,45 @@ public final class Constants {
 	}
 	//#endregion
 	public static class LimeLightc {
-		public static final String sampleLL1 = "";
-		public static final String sampleLL2 = ""; 
+		public static final String FRONT_LL = "FRONT_LL";
+		public static final String BACK_LL = "BACK_LL"; 
 
-		public static final int[] sampleLL1_VALID_IDS = {1, 2, 12, 13};
-		public static final int[] sampleLL2_VALID_IDS = {1, 6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22};
-	}
+		public static final int[] LL_FRONT_SHOOTING_VALID_IDS = {9,10, 12, 7, 8,5, 11, 2, 18, 27, 21, 24, 25, 26};
+		public static final int[] LL_BACK_SHOOTING_VALID_IDS = {13,14,15,16, 7, 12, 28, 23, 29, 30, 31, 32};
+		public static final int[] LL_GENERAL_VALID_IDS = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32};
+
+		public static final int[] LL_IDS_IGNORE_FOR_BLUE = {15,16,14,13,9,10,7,12};
+		public static final int[] LL_IDS_IGNORE_FOR_RED = {28, 23, 25, 26, 29,30,31,32};
+
+		public static final int[] LL_FRONT_GENERAL_CROP = {0,0,0,0}; //XMin, xMax, yMin, yMax all values (-1,1)
+		public static final int[] LL_BACK_GENERAL_CROP = {0,0,0,0}; //XMin, xMax, yMin, yMax all values (-1,1)
+		public static final int[] LL_FRONT_SHOOTING_CROP = {0,0,0,0}; //XMin, xMax, yMin, yMax all values (-1,1)
+		public static final int[] LL_BACK_SHOOTING_CROP = {0,0,0,0}; //XMin, xMax, yMin, yMax all values (-1,1)
+	}	
 	//#region Manipulator
-	public static final class IntakeC { // FIXME get real values fpr both
+	public static final class IntakeC {
 		public static final int INTAKE_ID = 21;
 		public static final int CONVEYOR_ID = 22;
-		public static final double INTAKE_SPEED = 0.1;
-		public static final double CONVEYOR_SPEED = 0.5;
+		public static final double INTAKE_SPEED = 0.1; //TODO
+		public static final double CONVEYOR_SPEED = 0.5; //TODO
 	}	
 	public static final class OuttakeC { 
 		public static final int OUTTAKE_ID = 31;
 		public static final int OUTTAKE_FOLLOWER_ID = 32;
 		public static final int OUTTAKE_FEEDER_ID = 23;
+
 		public static final MotorConfig OUTTAKE_MASTER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 		public static final MotorConfig OUTTAKE_FOLLOWER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 		public static final MotorConfig OUTTAKE_FEEDER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
-		public static final double OUTTAKE_RPM = 60;
-		public static final double kP = 0.01;
-		public static final double kI = 0;
-		public static final double kD = 0;
+
+		public static final double OUTTAKE_SHOOTING_RPM = 60; //TODO
+		public static final double OUTTAKE_PASSING_RPM = 10; //TODO
+		
+		public static final double kP = 0.1;
+		public static final double kI = 0.1;
+		public static final double kD = 0.1;
 		public static final double OUTTAKE_FEEDER_VOLT_PERC = 0.7;
-		public static final double OUTTAKE_ESTIMATE_OFFSET = 0; //+- range for atGoal
+		public static final double OUTTAKE_ESTIMATE_OFFSET = 20; //+- range for atGoal
 	}
 }
 //#endregion

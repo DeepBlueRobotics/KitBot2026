@@ -18,33 +18,67 @@ public class Limelight extends SubsystemBase {
   // NEEDS TO SEE: Barge, Reef, Processor, Coral Dropoff
   public Limelight() {
     
-    LimelightHelpers.SetFiducialIDFiltersOverride(sampleLL2, sampleLL2_VALID_IDS);
-    LimelightHelpers.SetFiducialIDFiltersOverride(sampleLL1, sampleLL1_VALID_IDS);
+    LimelightHelpers.SetFiducialIDFiltersOverride(FRONT_LL, LL_GENERAL_VALID_IDS);
+    LimelightHelpers.SetFiducialIDFiltersOverride(BACK_LL, LL_GENERAL_VALID_IDS);
 
-    // SmartDashboard.putBoolean("sees coral station tag", seesTag(CORAL_LL));
-    SmartDashboard.putBoolean("sees reef tag", seesTag(sampleLL1));
-    // SmartDashboard.putNumber("distance to coral", getDistanceToApriltag(CORAL_LL, CORAL_MOUNT_ANGLE, Apriltagc.CORAL_HEIGHT_METERS, CORAL_LL_HEIGHT_FROM_GROUND_METERS));
-    // SmartDashboard.putNumber("distance to reef", getDistanceToApriltag(REEF_LL, REEF_MOUNT_ANGLE, Apriltagc.REEF_HEIGHT_METERS, REEF_LL_HEIGHT_FROM_GROUND_METERS));
-    SmartDashboard.putNumber("distance to reef mt2", getDistanceToApriltagMT2(sampleLL1));
-
-    SmartDashboard.putNumber("strafe left", 0);
-    SmartDashboard.putNumber("strafe right", 0);
-
-    SmartDashboard.putNumber("limelight strafing kp", 1);
-
-
-    SmartDashboard.putNumber("limelight forward kp", 6);
   }
 
   @Override
   public void periodic() {
-    // SmartDashboard.putBoolean("sees coral station tag", seesTag(CORAL_LL));
-    SmartDashboard.putBoolean("sees reef tag", seesTag(sampleLL1));
-    // SmartDashboard.putNumber("distance to coral", getDistanceToApriltag(CORAL_LL, CORAL_MOUNT_ANGLE, Apriltagc.CORAL_HEIGHT_METERS, CORAL_LL_HEIGHT_FROM_GROUND_METERS));
-    // SmartDashboard.putNumber("distance to reef", getDistanceToApriltag(REEF_LL, REEF_MOUNT_ANGLE, Apriltagc.REEF_HEIGHT_METERS, REEF_LL_HEIGHT_FROM_GROUND_METERS));
-    SmartDashboard.putNumber("distance to reef megatag2", getDistanceToApriltagMT2(sampleLL1));
 
   }
+  /**
+   * Allows for smartShooting
+   * @param shootingCrop boolean to use shooting crop or general
+   */
+  public void setCrop(boolean shootingCrop) {
+    if (shootingCrop) {
+      LimelightHelpers.setCropWindow(FRONT_LL, LL_FRONT_SHOOTING_CROP[0], LL_FRONT_SHOOTING_CROP[1], LL_FRONT_SHOOTING_CROP[2], LL_FRONT_SHOOTING_CROP[3]);
+      LimelightHelpers.setCropWindow(BACK_LL, LL_BACK_SHOOTING_CROP[0], LL_BACK_SHOOTING_CROP[1], LL_BACK_SHOOTING_CROP[2], LL_BACK_SHOOTING_CROP[3]);
+    }
+    else {
+      LimelightHelpers.setCropWindow(FRONT_LL, LL_FRONT_GENERAL_CROP[0], LL_FRONT_GENERAL_CROP[1], LL_FRONT_GENERAL_CROP[2], LL_FRONT_GENERAL_CROP[3]);
+      LimelightHelpers.setCropWindow(BACK_LL, LL_BACK_GENERAL_CROP[0], LL_BACK_GENERAL_CROP[1], LL_BACK_GENERAL_CROP[2], LL_BACK_GENERAL_CROP[3]);
+    }
+  }
+
+  /**
+   * Allows for faster speeds at certain times
+   * @param redAlliance which alliance are you on
+   * @param shootingFilter shooting or not
+   */
+  public void setIDFilters(boolean redAlliance, boolean shootingFilter) {
+    if (redAlliance) {
+      if (shootingFilter) {
+        int[] frontFilter = difference(LL_FRONT_SHOOTING_VALID_IDS, LL_IDS_IGNORE_FOR_RED);
+        int[] backFilter = difference(LL_BACK_SHOOTING_VALID_IDS, LL_IDS_IGNORE_FOR_RED);
+        LimelightHelpers.SetFiducialIDFiltersOverride(FRONT_LL, frontFilter);
+        LimelightHelpers.SetFiducialIDFiltersOverride(BACK_LL, backFilter);
+      }
+      else {
+        int[] filter = difference(LL_GENERAL_VALID_IDS, LL_IDS_IGNORE_FOR_RED);
+        LimelightHelpers.SetFiducialIDFiltersOverride(FRONT_LL, filter);
+        LimelightHelpers.SetFiducialIDFiltersOverride(BACK_LL, filter);
+      }
+    }
+    else {
+      if (shootingFilter) {
+        int[] frontFilter = difference(LL_FRONT_SHOOTING_VALID_IDS, LL_IDS_IGNORE_FOR_BLUE);
+        int[] backFilter = difference(LL_BACK_SHOOTING_VALID_IDS, LL_IDS_IGNORE_FOR_BLUE);
+        LimelightHelpers.SetFiducialIDFiltersOverride(FRONT_LL, frontFilter);
+        LimelightHelpers.SetFiducialIDFiltersOverride(BACK_LL, backFilter);
+      }
+      else {
+        int[] filter = difference(LL_GENERAL_VALID_IDS, LL_IDS_IGNORE_FOR_BLUE);
+        LimelightHelpers.SetFiducialIDFiltersOverride(FRONT_LL, filter);
+        LimelightHelpers.SetFiducialIDFiltersOverride(BACK_LL, filter);
+      }
+    }
+  }
+
+
+
+
   public static double getThor(String limelightName) {
       return LimelightHelpers.getT2DArray(limelightName)[15];
   }
@@ -126,18 +160,37 @@ public class Limelight extends SubsystemBase {
     return LimelightHelpers.getTV(limelightName);
   }
 
+  /**
+   * Finds all the ints that are in the first array that are not in the second
+   * @param first owner array
+   * @param second subtractor
+   * @return
+   */
+  public static int[] difference(int[] first, int[] second) {
+    int[] temp = new int[first.length];
+    int count = 0;
 
-  public boolean seesTagId(int redId, int blueId) {
-    if (seesTag(sampleLL1)) {
-      if ((int) LimelightHelpers.getFiducialID(sampleLL1) == redId || (int) LimelightHelpers.getFiducialID(sampleLL1) == blueId) {
-        return true;
-      }
-      else {
-        return false;
-      }
+    for (int i = 0; i < first.length; i++) {
+        boolean found = false;
+
+        for (int j = 0; j < second.length; j++) {
+            if (first[i] == second[j]) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            temp[count] = first[i];
+            count++;
+        }
     }
-    else {
-      return false;
+
+    int[] result = new int[count];
+    for (int i = 0; i < count; i++) {
+        result[i] = temp[i];
     }
-  }
+
+    return result;
+}
 }
