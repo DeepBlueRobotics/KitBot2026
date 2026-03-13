@@ -46,6 +46,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -193,6 +194,7 @@ public class Drivetrain extends SubsystemBase {
 
         // Setup autopath builder
         //configurePPLAutoBuilder();
+        SmartDashboard.putData(this);
     }
 
     public boolean isAtAngle(double desiredAngleDeg, double toleranceDeg){
