@@ -64,34 +64,79 @@ public final class Constants {
 
     //#region Drivetrain
 	public static final class Drivetrainc {
+		//general drivetrain constants
+
+		public static final int driveFrontLeftPort = 1;
+		public static final int driveFrontRightPort = 2;
+		public static final int driveBackLeftPort = 3;
+		public static final int driveBackRightPort = 4;
+
+		public static final int turnFrontLeftPort = 11;
+		public static final int turnFrontRightPort = 12;
+		public static final int turnBackLeftPort = 13;
+		public static final int turnBackRightPort = 14;
+
+		public static final MotorConfig driveMotorConfig = CONFIG.isVortexDrive() ? MotorConfig.NEO_VORTEX : MotorConfig.NEO;
+		public static final MotorConfig turnMotorConfig = MotorConfig.NEO;
+		//TODO: set hammerhead can coder ports the same as kitbot
+		public static final int canCoderPortFL = CONFIG.isHammerHead() ? 0 : 1; 
+		public static final int canCoderPortFR = CONFIG.isHammerHead() ? 1 : 2; 
+		public static final int canCoderPortBL = CONFIG.isHammerHead() ? 3 : 3;
+		public static final int canCoderPortBR = CONFIG.isHammerHead() ? 2 : 0; 
+
+		public static final int drivePorts[] = { driveFrontLeftPort, driveFrontRightPort, driveBackLeftPort, driveBackRightPort };
+		public static final int turnPorts[] = { turnFrontLeftPort, turnFrontRightPort, turnBackLeftPort, turnBackRightPort };
+		public static final int canCoderPorts[] = { canCoderPortFL, canCoderPortFR, canCoderPortBL, canCoderPortBR };
+
+		// swerve config constants
 		public static final double wheelBase = CONFIG.isHammerHead() ? Units.inchesToMeters(16.750003) : Units.inchesToMeters(20.5); 
 		public static final double trackWidth = CONFIG.isHammerHead() ? Units.inchesToMeters(23.750000) : Units.inchesToMeters(20.5);
 		// "swerveRadius" is the distance from the center of the robot to one of the modules
-		public static final double swerveRadius = Math.sqrt(Math.pow(wheelBase / 2, 2) + Math.pow(trackWidth / 2, 2));
 		// The gearing reduction from the drive motor controller to the wheels
-
-		public static final double driveGearing = 6.86; //if no worky try 8.16
-		// Turn motor shaft to "module shaft"
-		public static final double turnGearing = 12.8;
-
-		public static final double driveModifier = 1;
+		public static final double swerveRadius = Math.sqrt(Math.pow(wheelBase / 2, 2) + Math.pow(trackWidth / 2, 2));
 		public static final double wheelDiameterMeters = Units.inchesToMeters(4.0);
-																				
+		public static final double driveGearing = 6.86; //if no worky try 8.16
 		public static final double mu = 1; /* 70/83.2; */ // coefficient of friction. less means less max acceleration.
-		public static final double ROBOTMASS_KG = Units.lbsToKilograms(80);// TODO weigh actual robot with bumpers and battery later
-		// moment of inertia, kg/mm
-		// USE ONSHAPE it has a calculator for this
-		public static final double MOI = Math.pow(Units.inchesToMeters(1),2) * Units.lbsToKilograms(1) * 14040.21738; // 14040.21738 in^2 lb 
+		public static final double autoCentripetalAccel = mu * g * 2;
+		public static final double[] kForwardVolts = CONFIG.isHammerHead() ? new double[] { 0.2,0.2,0.2,0.2 }: //kS
+																				new double[] {0, 0, 0, 0}; 
+		public static final double[] kForwardVels = CONFIG.isHammerHead() ? new double[] { 0,0,0,0 } : //kV
+																				new double[] { 2.9875, 2.9875, 2.7323, 2.9264 };
+		public static final double[] kForwardAccels = { 0, 0, 0, 0 };//{0.31958, 0.33557, 0.70264, 0.46644};    //{ 0, 0, 0, 0 };// volts per m/s^2
+		public static final double[] kBackwardVolts = kForwardVolts;
+		public static final double[] kBackwardVels = kForwardVels;
+		public static final double[] kBackwardAccels = kForwardAccels;
 
+		public static final double[] drivekP = {2, 2, 2, 2};
+		public static final double[] drivekI = {0, 0, 0, 0};
+		public static final double[] drivekD = CONFIG.isHammerHead()? new double[] { 0, 0, 0, 0 }:
+																		new double[] { 0,0,0,0 };
+		public static final double[] turnkP = CONFIG.isHammerHead() ? new double[] {50, 50, 50, 50} : 
+																		new double[] {40, 40, 40, 40}; //good starting point
+		public static final double[] turnkI = {0, 0, 0, 0};
+		public static final double[] turnkD = {0, 0, 0, 0};
+		public static final double[] turnkS = {0.2, 0.2, 0.2, 0.2};
+		public static final double[] turnkV = {2, 2, 2, 2};
+		public static final double[] turnkA = {0, 0, 0, 0};
+		public static final double[] turnZeroDeg = CONFIG.isHammerHead() ? new double[] { 85.7812, 85.0782, -96.9433, -162.9492 } : 
+																			new double[] { -38.232421875, -156.4453125, -7.3828125, -41.66015625 };
+		public static final boolean[] driveInversion = CONFIG.isHammerHead() ? new boolean[] { true, false, true, false } :
+																				new boolean[] { false, false, false, false };
+		public static final boolean[] reversed = { false, false, false, false };
+		public static final double driveModifier = 1;
+		public static final boolean[] turnInversion = {false, false, false, false};
+
+		public static final double turnGearing = 12.8; //150/7
+		public static final double ROBOTMASS_KG = CONFIG.isHammerHead() ? 35.49159484 : 48.582;
+		public static final double MOI = CONFIG.isHammerHead() ? 4.10872647 : 5.38619461; // moment of inertia, kg/m^2, Lzz in onshape
 		public static final double NEOFreeSpeed = 5676 * (2 * Math.PI) / 60; // radians/s
 		public static final double VortexFreeSpeed = 6784 * (2 * Math.PI) / 60; // radians/s
 		// Angular speed to translational speed --> v = omega * r / gearing
 		public static final double maxSpeed = (CONFIG.isVortexDrive() ? VortexFreeSpeed : NEOFreeSpeed) * (wheelDiameterMeters / 2.0) / driveGearing; // meter/s
-		public static final double maxForward = maxSpeed; // todo: use smart dashboard to figure this out
-		public static final double maxStrafe = maxSpeed; // todo: use smart dashboard to figure this out
+		public static final double maxForward = maxSpeed;
+		public static final double maxStrafe = maxSpeed;
 		// seconds it takes to go from 0 to 12 volts(aka MAX)
 		public static final double secsPer12Volts = 0.1;
-
 		// maxRCW is the angular velocity of the robot.
 		// Calculated by looking at one of the motors and treating it as a point mass
 		// moving around in a circle.
@@ -99,62 +144,12 @@ public final class Constants {
 		// is sqrt((wheelBase/2)^2 + (trackWidth/2)^2)
 		// Angular velocity = Tangential speed / radius
 		public static final double maxRCW = maxSpeed / swerveRadius;
-
-		public static final boolean[] reversed = { false, false, false, false };
-		// public static final boolean[] reversed = {true, true, true, true};
-		// Determine correct turnZero constants (FL, FR, BL, BR)
-		public static final double[] turnZeroDeg = RobotBase.isSimulation() ? new double[] {-90.0, -90.0, -90.0, -90.0 }
-		: (CONFIG.isHammerHead() ? new double[] { 85.7812, 85.0782, -96.9433, -162.9492 }
-			: new double[] { -38.232421875, -156.4453125, -7.3828125, -41.66015625 });/* real values here */
-
-		// kP, kI, and kD constants for turn motor controllers in the order of
-		// front-left, front-right, back-left, back-right.
-		// Determine correct turn PID constants
-		public static final double[] turnkP = CONFIG.isHammerHead() ? new double[] {50,50,50,50} : 
-			new double[]{40,40,40,40}; //good starting point
 		
-		public static final double[] turnkI = CONFIG.isHammerHead() ? new double[] {0, 0, 0, 0} :
-			new double[] {0,0,0,0};
-		public static final double[] turnkD = CONFIG.isHammerHead() ? new double[] {0, 0, 0, 0 } :
-			new double[] {0,0,0,0};
-
-		public static final double[] turnkS = new double[]{ 0.2, 0.2, 0.2, 0.2};
-		public static final double[] turnkV = new double[] { 2, 2, 2, 2 };//good starting point
-		public static final double[] turnkA = new double[] { 0, 0, 0, 0 };
-
-		// Order of modules: (FL, FR, BL, BR)
-		public static final double[] drivekP = CONFIG.isHammerHead() ? new double[] {2, 2, 2, 2}:
-			new double[] {2, 2, 2, 2}; //Good starting point
-		public static final double[] drivekI = CONFIG.isHammerHead() ? new double[]{ 0, 0, 0, 0} : 
-			new double[] {0, 0, 0, 0};
-		public static final double[] drivekD = CONFIG.isHammerHead()? new double[] { 0, 0, 0, 0 }:
-			new double[] { 0,0,0,0 };
-		public static final boolean[] driveInversion = (CONFIG.isHammerHead()
-		? new boolean[] { true, false, true, false }
-		: new boolean[] { false, false, false, false });
-		public static final boolean[] turnInversion = { false, false, false, false };
-		
-		// kS
-		public static final double[] kForwardVolts = CONFIG.isHammerHead() ? new double[] {0,0,0,0 }:
-			new double[] {0, 0, 0, 0}; //HIGHLY NOT RECOMMENDED can cause drift keep at 0 is better
-		public static final double[] kBackwardVolts = kForwardVolts;
-
-		//kV
-		public static final double[] kForwardVels = CONFIG.isHammerHead() ? new double[] { 0,0,0,0 }:
-			new double[] { 0, 0, 0, 0 };
-		public static final double[] kBackwardVels = kForwardVels;
-
-		//kA
-		public static final double[] kForwardAccels = { 0, 0, 0, 0 };
-		public static final double[] kBackwardAccels = kForwardAccels;
-
-		public static final double autoMaxSpeedMps = 4.3 ; // Meters / second
 		public static final double autoMaxAccelMps2 = mu * g; // Meters / seconds^2
 		public static final double autoMaxAmps = 40.0; 
 		// The maximum acceleration the robot can achieve is equal to the coefficient of
 		// static friction times the gravitational acceleration
 		// a = mu * 9.8 m/s^2
-		public static final double autoCentripetalAccel = mu * g * 2;
 
 		public static final boolean isGyroReversed = true;
 
@@ -165,21 +160,6 @@ public final class Constants {
 		autoCentripetalAccel, kForwardVolts, kForwardVels, kForwardAccels, kBackwardVolts, kBackwardVels,
 		kBackwardAccels, drivekP, drivekI, drivekD, turnkP, turnkI, turnkD, turnkS, turnkV, turnkA, turnZeroDeg,
 		driveInversion, reversed, driveModifier, turnInversion);
-
-		public static final int driveFrontLeftPort = CONFIG.isHammerHead() ? 1 : 1;
-		public static final int driveFrontRightPort = CONFIG.isHammerHead() ? 2 : 12;
-		public static final int driveBackLeftPort = CONFIG.isHammerHead() ? 3 : 14;
-		public static final int driveBackRightPort = CONFIG.isHammerHead() ? 4 : 13;
-
-		public static final int turnFrontLeftPort = CONFIG.isHammerHead() ? 11 : 11;
-		public static final int turnFrontRightPort = CONFIG.isHammerHead() ? 12 : 2;
-		public static final int turnBackLeftPort = CONFIG.isHammerHead() ? 13 : 4;
-		public static final int turnBackRightPort = CONFIG.isHammerHead() ? 14 : 3;
-
-		public static final int canCoderPortFL = CONFIG.isHammerHead() ? 0 : 0; 
-		public static final int canCoderPortFR = CONFIG.isHammerHead() ? 1 : 1; 
-		public static final int canCoderPortBL = CONFIG.isHammerHead() ? 3 : 3;
-		public static final int canCoderPortBR = CONFIG.isHammerHead() ? 2 : 2; 
 
 		public static double kNormalDriveSpeed = 1; // Percent Multiplier	
 		public static double kNormalDriveRotation = 0.5; // Percent Multiplier
@@ -206,6 +186,12 @@ public final class Constants {
 
 		public static final double driveIzone = .1;
 		public static final double COLLISION_ACCELERATION_THRESHOLD = 2; //The minimum acceleration that will trigger a collision detection, in m/s^2
+		public static final double ppkPDrive = 5;
+		public static final double ppkIDrive = 0;
+		public static final double ppkDDrive = 0;
+		public static final double ppkPTurn = 3;
+		public static final double ppkITurn = 0;
+		public static final double ppkDTurn = 0;
 		public static final class Autoc {
 			public static final RobotConfig robotConfig = new RobotConfig(
 					// Mass mass, kg
