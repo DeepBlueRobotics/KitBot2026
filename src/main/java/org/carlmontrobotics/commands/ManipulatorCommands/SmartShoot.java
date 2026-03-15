@@ -16,18 +16,18 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class SmartShoot extends Command {
-  Timer timer;
+
   Outtake outtake;
   Intake intake;
-  boolean timed;
-  double time;
   double goalRPM;
   /** Creates a new SmartShoot. */
   public SmartShoot(Outtake outtake, Intake intake, double RPM) {//FIXME smartshoot kills code
     // Use addRequirements() here to declare subsystem dependencies.
     goalRPM = RPM;
+    this.outtake = outtake;
+    this.intake = intake;
     addRequirements(outtake, intake);
-  }
+   }
 
   // Called when the command is initially scheduled.
   @Override
@@ -53,8 +53,9 @@ public class SmartShoot extends Command {
   }
 
   // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return timed && timer.hasElapsed(time);
-  }
+
+  // @Override
+  // public boolean isFinished() {
+    // return timed && timer.hasElapsed(time);
+  // }
 }
