@@ -39,16 +39,17 @@ public class Outtake extends SubsystemBase {
 
     outtakeMasterEncoder = outtakeMaster.getEncoder();
 
-  }
+   }
 
   public void configureMotors(){
     outtakeConfig = MotorControllerFactory.sparkConfig(OUTTAKE_MASTER_MOTOR_CONFIG);
     outtakeConfig.idleMode(IdleMode.kCoast)
-                  .closedLoop.pid(kP, kI, kD);
+                                    .closedLoop.pid(kP, kI, kD);
 
     outtakeFollowerConfig = MotorControllerFactory.sparkConfig(OUTTAKE_FOLLOWER_MOTOR_CONFIG);
     outtakeFollowerConfig.apply(outtakeConfig)
-                          .follow(OUTTAKE_ID, true); // may need to be false and swap outtake to true
+                          .inverted(true)
+                          .follow(OUTTAKE_ID);
 
     outtakeFeederConfig = MotorControllerFactory.sparkConfig(OUTTAKE_FEEDER_MOTOR_CONFIG);
   }
@@ -65,15 +66,15 @@ public class Outtake extends SubsystemBase {
     pidController.setSetpoint(0, ControlType.kDutyCycle);
   }
 
-  public boolean atGoal(double estimateOffset){
-    return Math.abs(pidController.getSetpoint() - outtakeMasterEncoder.getVelocity()) < estimateOffset;
+  public boolean atGoal(double erorrMargin){
+    return Math.abs(pidController.getSetpoint() - outtakeMasterEncoder.getVelocity()) < erorrMargin;
     }
 
   @Override
   public void initSendable(SendableBuilder builder){
     super.initSendable(builder);
     builder.addDoubleProperty("Outtake master Speed perc", () -> outtakeMaster.getAppliedOutput(), null);
-    builder.addDoubleProperty("Outtake master Velocity", () -> outtakeMaster.getEncoder().getVelocity(), null);
+    builder.addDoubleProperty("Outtake master Velocity", () -> outtakeMasterEncoder.getVelocity(), null);
     builder.addDoubleProperty("Outtake master setpoint", () -> pidController.getSetpoint(), this::spinOuttake);
 
     builder.addDoubleProperty("Outtake Feeder Speed perc", () -> outtakeFeeder.getAppliedOutput(), this::spinOuttakeFeeder);

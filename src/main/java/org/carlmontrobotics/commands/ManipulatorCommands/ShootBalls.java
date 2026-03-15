@@ -28,6 +28,7 @@ public class ShootBalls extends Command {
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
+  //it timed 
     public ShootBalls(Outtake outtake, double time) {
     this.outtake = outtake;
     timer = new Timer();

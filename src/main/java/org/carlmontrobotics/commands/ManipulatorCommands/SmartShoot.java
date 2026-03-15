@@ -23,29 +23,16 @@ public class SmartShoot extends Command {
   double time;
   double goalRPM;
   /** Creates a new SmartShoot. */
-  public SmartShoot(Outtake outtake, Intake intake, double RPM) {
+  public SmartShoot(Outtake outtake, Intake intake, double RPM) {//FIXME smartshoot kills code
     // Use addRequirements() here to declare subsystem dependencies.
-    timer = new Timer();
-    timed = false;
     goalRPM = RPM;
     addRequirements(outtake, intake);
-  }
-
-  public SmartShoot(Outtake outtake, Intake intake, double time, double RPM) {
-    // Use addRequirements() here to declare subsystem dependencies.
-    timer = new Timer();
-    timed = true;
-    this.time = time;
-    goalRPM = RPM;
-    addRequirements(outtake, intake);
-
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    timer.restart();
-    outtake.spinOuttake(goalRPM);
+   outtake.spinOuttake(goalRPM);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
