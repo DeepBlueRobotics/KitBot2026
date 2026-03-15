@@ -65,8 +65,8 @@ public class Drivetrain extends SubsystemBase {
     private SparkBase[] driveMotors = new SparkBase[4];
     private SparkBase[] turnMotors = new SparkBase[4];
     private CANcoder[] turnEncoders = new CANcoder[4];
-    public final float initPitch;
-    public final float initRoll;
+        public final float initPitch;
+        public final float initRoll;    
 
     // debug purposes
     private SwerveModule moduleFL;
@@ -132,16 +132,12 @@ public class Drivetrain extends SubsystemBase {
 
         // Initialize modules
         {
-            // initPitch = 0;
-            // initRoll = 0;
             Supplier<Float> pitchSupplier = () -> 0F;
             Supplier<Float> rollSupplier = () -> 0F;
             initPitch = gyro.getPitch();
             initRoll = gyro.getRoll();
-            // Supplier<Float> pitchSupplier = () -> gyro.getPitch();
-            // Supplier<Float> rollSupplier = () -> gyro.getRoll();
 
-                SparkBaseConfig driveConfig = MotorControllerFactory.sparkConfig(driveMotorConfig);
+            SparkBaseConfig driveConfig = MotorControllerFactory.sparkConfig(driveMotorConfig);
             driveConfig.openLoopRampRate(secsPer12Volts)
                         .encoder.positionConversionFactor(wheelDiameterMeters * Math.PI / driveGearing)
                                 .velocityConversionFactor(wheelDiameterMeters * Math.PI / driveGearing / 60)
@@ -172,6 +168,7 @@ public class Drivetrain extends SubsystemBase {
                     moduleFL.createSim(), moduleFR.createSim(), moduleBL.createSim(), moduleBR.createSim() //FIXME this is with values based off of hammerhead
                 };
                 gyroYawSim = new SimDeviceSim("navX-Sensor[0]").getDouble("Yaw");
+                simTimer.start();
             }
 
             for (CANcoder coder : turnEncoders) {
@@ -262,7 +259,6 @@ public class Drivetrain extends SubsystemBase {
 
     @Override
     public void periodic() {
-        detectCollision(); //This does nothing
         PathPlannerLogging.logCurrentPose(getPose());
         for (SwerveModule module : modules) {
           // module.turnPeriodic();
@@ -313,7 +309,7 @@ public class Drivetrain extends SubsystemBase {
      *                 positive
      */
     public void setExtraSpeedMult(double set) {
-        extraSpeedMult=set;
+        extraSpeedMult = set;
     }
     
     /**
@@ -341,7 +337,7 @@ public class Drivetrain extends SubsystemBase {
     }
     
     /**
-     * Configures PathPlanner AutoBuilder
+     * Configures PathPlanner AutoBuilder.
      */
     public void AutoBuilder() {
         RobotConfig config = Constants.Drivetrainc.Autoc.robotConfig;
@@ -426,6 +422,7 @@ public class Drivetrain extends SubsystemBase {
     /**
      * Constructs and returns four SwerveModuleState objects, one for each side,
      * using forward, strafe, and rotation values.
+     * Note: strafe is negated to match the kinematics coordinate convention.
      *
      * @param forward  The desired forward speed, in m/s. Forward is positive.
      * @param strafe   The desired strafe speed, in m/s. Left is positive.
