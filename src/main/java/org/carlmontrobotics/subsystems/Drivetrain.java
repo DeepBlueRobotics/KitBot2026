@@ -228,9 +228,8 @@ public class Drivetrain extends SubsystemBase {
         newAngleDeg *= (isGyroReversed ? -1.0 : 1.0);
         if (gyroYawSim == null) {
             gyroYawSim = new SimDeviceSim("navX-Sensor[0]").getDouble("Yaw");
-        }else{
-            gyroYawSim.set(newAngleDeg);
         }
+        gyroYawSim.set(newAngleDeg);
     }
 
     /**
