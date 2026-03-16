@@ -542,8 +542,7 @@ public class Drivetrain extends SubsystemBase {
         builder.addBooleanProperty("Magnetic Field Disturbance",
         gyro::isMagneticDisturbance, null);
         builder.addBooleanProperty("Gyro Calibrating", gyro::isCalibrating, null);
-        builder.addBooleanProperty("Field Oriented", () -> fieldOriented,
-        fieldOriented -> this.fieldOriented = fieldOriented);
+        builder.addBooleanProperty("Field Oriented", () -> fieldOriented, null);
         builder.addDoubleProperty("Pose Estimator X", () -> getPose().getX(),
                 null);
         builder.addDoubleProperty("Pose Estimator Y", () -> getPose().getY(),

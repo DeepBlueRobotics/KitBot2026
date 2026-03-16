@@ -40,7 +40,7 @@ public class ShootBalls extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    outtake.spinOuttake(OUTTAKE_FEEDER_VOLT_PERC);
+    outtake.spinOuttake(OUTTAKE_SHOOTING_RPM);
     // timer.restart();
   }
 

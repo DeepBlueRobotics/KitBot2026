@@ -10,6 +10,7 @@ import org.carlmontrobotics.subsystems.*;
 
 
 import org.carlmontrobotics.commands.DriveCommands.TeleopDrive;
+import org.carlmontrobotics.commands.ManipulatorCommands.EjectBalls;
 import org.carlmontrobotics.commands.ManipulatorCommands.IntakeBalls;
 import org.carlmontrobotics.commands.ManipulatorCommands.RunConveyor;
 import org.carlmontrobotics.commands.ManipulatorCommands.ShootBalls;
@@ -137,6 +138,7 @@ public class RobotContainer {
       .whileTrue(new ShootBalls(outtake));
       new JoystickButton(manipulatorController, Manipulator.SMART_SHOOT_BUTTON)
       .whileTrue(new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM));
+      new JoystickButton(manipulatorController, Manipulator.REPEL_BALLS).whileTrue(new EjectBalls(intake, outtake));
     }
     //#endregion
     //#region AutoMaking
