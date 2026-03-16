@@ -51,10 +51,10 @@ public final class Constants {
 
 		public static final class Manipulator {
 			public static final int port = 1;
-			public static final int Y = Button.kY.value;
-			public static final int INTAKE_CONVEYOR_BUTTON = Button.kA.value; //get real buttons later
+			public static final int INTAKE_BUTTON = Button.kX.value;
+			public static final int INTAKE_CONVEYOR_BUTTON = Button.kY.value;
             public static final int OUTTAKE_BUTTON = Button.kB.value; 
-			public static final int SMART_SHOOT_BUTTON = Button.kX.value;
+			public static final int SMART_SHOOT_BUTTON = Button.kA.value;
         }
 
 		public static final double JOY_THRESH = 0.13;
@@ -74,7 +74,7 @@ public final class Constants {
 		// Turn motor shaft to "module shaft"
 		public static final double turnGearing = 12.8;
 
-		public static final double driveModifier = 1;
+		public static final double driveModifier = 8;
 		public static final double wheelDiameterMeters = Units.inchesToMeters(4.0);
 																				
 		public static final double mu = 1; /* 70/83.2; */ // coefficient of friction. less means less max acceleration.
@@ -105,13 +105,15 @@ public final class Constants {
 		// Determine correct turnZero constants (FL, FR, BL, BR)
 		public static final double[] turnZeroDeg = RobotBase.isSimulation() ? new double[] {-90.0, -90.0, -90.0, -90.0 }
 		: (CONFIG.isHammerHead() ? new double[] { 85.7812, 85.0782, -96.9433, -162.9492 }
-			: new double[] { -38.232421875, -156.4453125, -7.3828125, -41.66015625 });/* real values here */
+			: new double[] { -40.341796875, -155.830078125, -8.61328125, -43.06640625});/* real values here */
+			
 
 		// kP, kI, and kD constants for turn motor controllers in the order of
 		// front-left, front-right, back-left, back-right.
 		// Determine correct turn PID constants
 		public static final double[] turnkP = CONFIG.isHammerHead() ? new double[] {50,50,50,50} : 
-			new double[]{40,40,40,40}; //good starting point
+			new double[]{44,44,44,44};
+		
 		
 		public static final double[] turnkI = CONFIG.isHammerHead() ? new double[] {0, 0, 0, 0} :
 			new double[] {0,0,0,0};
@@ -124,18 +126,18 @@ public final class Constants {
 
 		// Order of modules: (FL, FR, BL, BR)
 		public static final double[] drivekP = CONFIG.isHammerHead() ? new double[] {2, 2, 2, 2}:
-			new double[] {2, 2, 2, 2}; //Good starting point
+			new double[] {3, 3, 3, 3};
 		public static final double[] drivekI = CONFIG.isHammerHead() ? new double[]{ 0, 0, 0, 0} : 
 			new double[] {0, 0, 0, 0};
 		public static final double[] drivekD = CONFIG.isHammerHead()? new double[] { 0, 0, 0, 0 }:
 			new double[] { 0,0,0,0 };
 		public static final boolean[] driveInversion = (CONFIG.isHammerHead()
 		? new boolean[] { true, false, true, false }
-		: new boolean[] { false, false, false, false });
+		: new boolean[] { false, true, false, true });
 		public static final boolean[] turnInversion = { false, false, false, false };
 		
 		// kS
-		public static final double[] kForwardVolts = CONFIG.isHammerHead() ? new double[] {0,0,0,0 }:
+		public static final double[] kForwardVolts = CONFIG.isHammerHead() ? new double[] { 0,0,0,0 }:
 			new double[] {0, 0, 0, 0}; //HIGHLY NOT RECOMMENDED can cause drift keep at 0 is better
 		public static final double[] kBackwardVolts = kForwardVolts;
 
@@ -166,15 +168,15 @@ public final class Constants {
 		kBackwardAccels, drivekP, drivekI, drivekD, turnkP, turnkI, turnkD, turnkS, turnkV, turnkA, turnZeroDeg,
 		driveInversion, reversed, driveModifier, turnInversion);
 
-		public static final int driveFrontLeftPort = CONFIG.isHammerHead() ? 1 : 1;
-		public static final int driveFrontRightPort = CONFIG.isHammerHead() ? 2 : 12;
-		public static final int driveBackLeftPort = CONFIG.isHammerHead() ? 3 : 14;
-		public static final int driveBackRightPort = CONFIG.isHammerHead() ? 4 : 13;
+		public static final int driveFrontLeftPort = 1;
+		public static final int driveFrontRightPort = 2;
+		public static final int driveBackLeftPort = 3;
+		public static final int driveBackRightPort = 4;
 
 		public static final int turnFrontLeftPort = CONFIG.isHammerHead() ? 11 : 11;
-		public static final int turnFrontRightPort = CONFIG.isHammerHead() ? 12 : 2;
-		public static final int turnBackLeftPort = CONFIG.isHammerHead() ? 13 : 4;
-		public static final int turnBackRightPort = CONFIG.isHammerHead() ? 14 : 3;
+		public static final int turnFrontRightPort = CONFIG.isHammerHead() ? 12 : 12;
+		public static final int turnBackLeftPort = CONFIG.isHammerHead() ? 13 : 13;
+		public static final int turnBackRightPort = CONFIG.isHammerHead() ? 14 : 14;
 
 		public static final int canCoderPortFL = CONFIG.isHammerHead() ? 0 : 0; 
 		public static final int canCoderPortFR = CONFIG.isHammerHead() ? 1 : 1; 
@@ -269,7 +271,7 @@ public final class Constants {
 	public static final class IntakeC {
 		public static final int INTAKE_ID = 21;
 		public static final int CONVEYOR_ID = 22;
-		public static final double INTAKE_SPEED = 0.1; //TODO
+		public static final double INTAKE_SPEED = 3000; //TODO
 		public static final double CONVEYOR_SPEED = 0.5; //TODO
 	}	
 	public static final class OuttakeC { 
@@ -281,12 +283,12 @@ public final class Constants {
 		public static final MotorConfig OUTTAKE_FOLLOWER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 		public static final MotorConfig OUTTAKE_FEEDER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 
-		public static final double OUTTAKE_SHOOTING_RPM = 60; //TODO
+		public static final double OUTTAKE_SHOOTING_RPM = 1000; //TODO
 		public static final double OUTTAKE_PASSING_RPM = 10; //TODO
 		
-		public static final double kP = 0.1;
-		public static final double kI = 0.1;
-		public static final double kD = 0.1;
+		public static final double kP = 0.2;
+		public static final double kI = 0;
+		public static final double kD = 0;
 		public static final double OUTTAKE_FEEDER_VOLT_PERC = 0.7;
 		public static final double OUTTAKE_ESTIMATE_OFFSET = 20; //+- range for atGoal
 	}

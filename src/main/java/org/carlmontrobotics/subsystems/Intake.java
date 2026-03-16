@@ -9,22 +9,32 @@ import org.carlmontrobotics.lib199.MotorConfig;
 import org.carlmontrobotics.lib199.MotorControllerFactory;
 
 import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.config.SparkBaseConfig;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase {
   SparkBase intakeMotor;
   SparkBase conveyorMotor;
+  SparkClosedLoopController pidC;
   
   /** Creates a new Intake. */
   public Intake() {
-    intakeMotor = MotorControllerFactory.createSpark(IntakeC.INTAKE_ID, MotorConfig.NEO_VORTEX);
-    conveyorMotor = MotorControllerFactory.createSpark(IntakeC.CONVEYOR_ID, MotorConfig.NEO_VORTEX);
+    SparkBaseConfig conveyorConfig = MotorControllerFactory.sparkConfig(MotorConfig.NEO_VORTEX);
+    SparkBaseConfig intakeConfig = MotorControllerFactory.sparkConfig(MotorConfig.NEO_VORTEX);
+    conveyorConfig.inverted(true);
+    intakeConfig.closedLoop.pid(0.0002, 0, 0);
+    intakeMotor = MotorControllerFactory.createSpark(IntakeC.INTAKE_ID, MotorConfig.NEO_VORTEX, intakeConfig);
+    conveyorMotor = MotorControllerFactory.createSpark(IntakeC.CONVEYOR_ID, MotorConfig.NEO_VORTEX, conveyorConfig);
+    pidC = intakeMotor.getClosedLoopController();
   }
 
   public void spinIntake(double intakeSpeed) {
-    intakeMotor.set(intakeSpeed);
+    pidC.setSetpoint(intakeSpeed, ControlType.kVelocity);
   }
 
   public void spinConveyor(double conveyorSpeed) {
@@ -44,10 +54,12 @@ public class Intake extends SubsystemBase {
     super.initSendable(builder);
     builder.addDoubleProperty("Intake Speed perc", () -> intakeMotor.get(), this::spinIntake);
     builder.addDoubleProperty("Conveyor Speed perc", () -> conveyorMotor.get(), this::spinConveyor);
+    builder.addDoubleProperty("Intake Speed rpm actual", () -> intakeMotor.getEncoder().getVelocity(), this::spinIntake);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("rpm brr", intakeMotor.getEncoder().getVelocity());
   }
 }
