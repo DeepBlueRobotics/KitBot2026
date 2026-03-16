@@ -19,7 +19,9 @@ public class EjectBalls extends Command {
   private final Outtake outtake;
   /** Creates a new EjectBalls. */
   public EjectBalls(Intake intake, Outtake outtake) {
-    addRequirements(this.intake = intake, this.outtake = outtake);
+    this.intake = intake;
+    this.outtake = outtake;
+    addRequirements(intake,outtake);
   }
 
   // Called when the command is initially scheduled.

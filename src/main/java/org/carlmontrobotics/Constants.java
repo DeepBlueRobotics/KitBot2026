@@ -55,6 +55,7 @@ public final class Constants {
 			public static final int INTAKE_CONVEYOR_BUTTON = Button.kY.value;
             public static final int OUTTAKE_BUTTON = Button.kB.value; 
 			public static final int SMART_SHOOT_BUTTON = Button.kA.value;
+			public static final int REPEL_BALLS = Button.kLeftBumper.value;
         }
 
 		public static final double JOY_THRESH = 0.13;
@@ -74,7 +75,7 @@ public final class Constants {
 		// Turn motor shaft to "module shaft"
 		public static final double turnGearing = 12.8;
 
-		public static final double driveModifier = 8;
+		public static final double driveModifier = 1;
 		public static final double wheelDiameterMeters = Units.inchesToMeters(4.0);
 																				
 		public static final double mu = 1; /* 70/83.2; */ // coefficient of friction. less means less max acceleration.
@@ -142,8 +143,8 @@ public final class Constants {
 		public static final double[] kBackwardVolts = kForwardVolts;
 
 		//kV
-		public static final double[] kForwardVels = CONFIG.isHammerHead() ? new double[] { 0,0,0,0 }:
-			new double[] { 0, 0, 0, 0 };
+		public static final double[] kForwardVels = CONFIG.isHammerHead() ? new double[] {2,2,2,2 }:
+			new double[] { 1, 1, 1, 1 };
 		public static final double[] kBackwardVels = kForwardVels;
 
 		//kA
@@ -283,12 +284,13 @@ public final class Constants {
 		public static final MotorConfig OUTTAKE_FOLLOWER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 		public static final MotorConfig OUTTAKE_FEEDER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 
-		public static final double OUTTAKE_SHOOTING_RPM = 1000; //TODO
+		public static final double OUTTAKE_SHOOTING_RPM = 3000; //TODO
 		public static final double OUTTAKE_PASSING_RPM = 10; //TODO
 		
-		public static final double kP = 0.2;
+		public static final double kP = 0;
 		public static final double kI = 0;
 		public static final double kD = 0;
+		public static final double kV = 0.002;
 		public static final double OUTTAKE_FEEDER_VOLT_PERC = 0.7;
 		public static final double OUTTAKE_ESTIMATE_OFFSET = 20; //+- range for atGoal
 	}

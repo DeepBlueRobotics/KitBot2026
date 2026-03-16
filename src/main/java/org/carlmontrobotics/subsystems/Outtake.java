@@ -16,6 +16,7 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Outtake extends SubsystemBase {
@@ -38,6 +39,7 @@ public class Outtake extends SubsystemBase {
     pidController = outtakeMaster.getClosedLoopController();
 
     outtakeMasterEncoder = outtakeMaster.getEncoder();
+    SmartDashboard.putData(this);
 
    }
 
@@ -47,7 +49,8 @@ public class Outtake extends SubsystemBase {
                       .inverted(true)
                   .encoder.quadratureAverageDepth(2)
                           .quadratureMeasurementPeriod(10);
-    outtakeConfig.closedLoop.pid(kP, kI, kD);
+    outtakeConfig.closedLoop.pid(kP, kI, kD)
+                            .feedForward.kV(kV);
 
     outtakeFollowerConfig = MotorControllerFactory.sparkConfig(OUTTAKE_FOLLOWER_MOTOR_CONFIG);
     outtakeFollowerConfig.apply(outtakeConfig)
@@ -59,6 +62,7 @@ public class Outtake extends SubsystemBase {
                           
 
     outtakeFeederConfig = MotorControllerFactory.sparkConfig(OUTTAKE_FEEDER_MOTOR_CONFIG);
+    outtakeFeederConfig.inverted(true);
   }
 
   public void spinOuttake(double input) {
@@ -76,6 +80,10 @@ public class Outtake extends SubsystemBase {
   public boolean atGoal(double erorrMargin){
     return Math.abs(pidController.getSetpoint() - outtakeMasterEncoder.getVelocity()) < erorrMargin;
     }
+
+  public boolean atVelGoal(double goal, double erorrMargin) {
+    return Math.abs(goal - outtakeMasterEncoder.getVelocity()) < erorrMargin;
+  }
   @Override
   public void initSendable(SendableBuilder builder){
     super.initSendable(builder);
