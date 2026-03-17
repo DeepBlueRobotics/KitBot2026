@@ -11,6 +11,7 @@ import org.carlmontrobotics.subsystems.Intake;
 import org.carlmontrobotics.subsystems.Outtake;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 
@@ -27,18 +28,20 @@ public class SmartShoot extends Command {
     this.outtake = outtake;
     this.intake = intake;
     addRequirements(outtake, intake);
+    SmartDashboard.putNumber("GoalRPMOuttake", goalRPM);
+
    }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-   outtake.spinOuttake(goalRPM);
+     outtake.spinOuttake(SmartDashboard.getNumber("GoalRPMOuttake", goalRPM));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(outtake.atVelGoal(goalRPM, OUTTAKE_ESTIMATE_OFFSET)){
+    if(outtake.atVelGoal(SmartDashboard.getNumber("GoalRPMOuttake", goalRPM), OUTTAKE_ESTIMATE_OFFSET)){
       outtake.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC);
       intake.spinConveyor(CONVEYOR_SPEED);
     }

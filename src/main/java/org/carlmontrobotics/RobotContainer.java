@@ -157,7 +157,8 @@ public class RobotContainer {
       manipulatorController,
       () -> SmartDashboard.getBoolean("Baby Mode", Config.CONFIG.isBabyMode())
       ));
-  }
+
+    }
   //#endregion
   //#region getAutoCommand
   public Command getAutonomousCommand() {
