@@ -16,24 +16,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class ShootBalls extends Command {
   Outtake outtake;
   // Timer timer;
-  // boolean timed;
-  // double time;
-
 
   /** Creates a new ShootBalls. */
   public ShootBalls(Outtake outtake) {
     this.outtake = outtake;
-    // timer = new Timer();
     addRequirements(outtake);
-    // Use addRequirements() here to declare subsystem dependencies.
-  }
-
-  //it timed 
-    public ShootBalls(Outtake outtake, double time) {
-    this.outtake = outtake;
-    // timer = new Timer();
-    addRequirements(outtake);
-    // this.time = time;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -41,7 +28,6 @@ public class ShootBalls extends Command {
   @Override
   public void initialize() {
     outtake.spinOuttake(OUTTAKE_SHOOTING_RPM);
-    // timer.restart();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -57,8 +43,8 @@ public class ShootBalls extends Command {
   }
 
   // Returns true when the command should end.
-  // @Override
-  // public boolean isFinished() {
-  //   // return timed && timer.hasElapsed(time);
-  // }
+  @Override
+  public boolean isFinished() {
+    return false;
+  }
 }

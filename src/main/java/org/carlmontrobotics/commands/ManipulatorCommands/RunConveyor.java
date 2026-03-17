@@ -14,24 +14,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class RunConveyor extends Command {
   Intake conveyor;
-  Timer timer;
-  boolean timed;
-  double time;
 
   /** Creates a new RunConveyor. */
   public RunConveyor(Intake conveyor) {
     this.conveyor = conveyor;
-    timer = new Timer();
-    timed = false;
-    addRequirements(conveyor);
-    // Use addRequirements() here to declare subsystem dependencies.
-  }
-
-  public RunConveyor(Intake conveyor, double time) {
-    this.conveyor = conveyor;
-    this.time = time;
-    timer = new Timer();
-    timed = true;
     addRequirements(conveyor);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -40,7 +26,6 @@ public class RunConveyor extends Command {
   @Override
   public void initialize() {
     conveyor.spinConveyor(CONVEYOR_SPEED);
-    timer.restart();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -56,6 +41,6 @@ public class RunConveyor extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return timed && timer.hasElapsed(time);
+    return false;
   }
 }
