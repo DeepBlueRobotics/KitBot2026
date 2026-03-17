@@ -159,6 +159,7 @@ public class RobotContainer {
       () -> SmartDashboard.getBoolean("Baby Mode", Config.CONFIG.isBabyMode())
       ));
 
+      outtake.setDefaultCommand(new ShootBalls(outtake));
     }
   //#endregion
   //#region getAutoCommand
