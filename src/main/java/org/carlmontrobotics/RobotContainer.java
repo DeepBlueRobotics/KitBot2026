@@ -135,11 +135,11 @@ public class RobotContainer {
     //  new JoystickButton(manipulatorController, Manipulator.INTAKE_BUTTON)
     //   .whileTrue(new IntakeBalls(intake));
       new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
-      .whileTrue(new ShootBalls(outtake))
-      .whileFalse(new IntakeBalls(intake));
+      .whileTrue(new ShootBalls(outtake));
       new JoystickButton(manipulatorController, Manipulator.SMART_SHOOT_BUTTON)
       .whileTrue(new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM));
-      new JoystickButton(manipulatorController, Manipulator.REPEL_BALLS).whileTrue(new EjectBalls(intake, outtake));
+      new JoystickButton(manipulatorController, Manipulator.REPEL_BALLS).whileTrue(new EjectBalls(intake))
+            .whileFalse(new IntakeBalls(intake));
     }
     //#endregion
     //#region AutoMaking

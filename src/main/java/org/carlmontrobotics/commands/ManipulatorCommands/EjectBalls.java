@@ -16,12 +16,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class EjectBalls extends Command {
   private final Intake intake;
-  private final Outtake outtake;
   /** Creates a new EjectBalls. */
-  public EjectBalls(Intake intake, Outtake outtake) {
+  public EjectBalls(Intake intake) {
     this.intake = intake;
-    this.outtake = outtake;
-    addRequirements(intake,outtake);
+    addRequirements(intake);
   }
 
   // Called when the command is initially scheduled.
@@ -29,7 +27,6 @@ public class EjectBalls extends Command {
   public void initialize() {
     intake.spinConveyor(-CONVEYOR_SPEED);
     intake.spinIntake(-INTAKE_SPEED);
-    outtake.spinOuttakeFeeder(-OUTTAKE_FEEDER_VOLT_PERC);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -43,7 +40,6 @@ public class EjectBalls extends Command {
   public void end(boolean interrupted) {
     intake.spinConveyor(0);
     intake.spinIntake(0);
-    outtake.spinOuttakeFeeder(0);
   }
 
   // Returns true when the command should end.
