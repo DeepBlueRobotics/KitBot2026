@@ -52,8 +52,9 @@ public final class Constants {
 		public static final class Manipulator {
 			public static final int port = 1;
 			public static final int INTAKE_BUTTON = Button.kX.value;
-			public static final int INTAKE_CONVEYOR_BUTTON = Button.kY.value;
-            public static final int OUTTAKE_BUTTON = Button.kB.value; 
+			public static final int INTAKE_CONVEYOR_BUTTON = Button.kB.value;
+			public static final int OUTTAKE_FEEDER_BUTTON = Button.kRightBumper.value;
+            public static final int OUTTAKE_BUTTON = Button.kY.value; 
 			public static final int SMART_SHOOT_BUTTON = Button.kA.value;
 			public static final int REPEL_BALLS = Button.kLeftBumper.value;
         }

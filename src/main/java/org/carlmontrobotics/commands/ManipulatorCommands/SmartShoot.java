@@ -10,7 +10,6 @@ import static org.carlmontrobotics.Constants.OuttakeC.*;
 import org.carlmontrobotics.subsystems.Intake;
 import org.carlmontrobotics.subsystems.Outtake;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -22,7 +21,7 @@ public class SmartShoot extends Command {
   Intake intake;
   double goalRPM;
   /** Creates a new SmartShoot. */
-  public SmartShoot(Outtake outtake, Intake intake, double RPM) {//FIXME smartshoot kills code
+  public SmartShoot(Outtake outtake, Intake intake, double RPM) {
     // Use addRequirements() here to declare subsystem dependencies.
     goalRPM = RPM;
     this.outtake = outtake;

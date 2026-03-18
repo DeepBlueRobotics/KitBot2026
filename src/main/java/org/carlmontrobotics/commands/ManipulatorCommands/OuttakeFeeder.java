@@ -4,27 +4,27 @@
 
 package org.carlmontrobotics.commands.ManipulatorCommands;
 
-import static org.carlmontrobotics.Constants.IntakeC.*;
-
-import org.carlmontrobotics.subsystems.Intake;
-import org.carlmontrobotics.subsystems.Outtake;
 import edu.wpi.first.wpilibj2.command.Command;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class RunConveyor extends Command {
-  Intake conveyor;
+import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_FEEDER_VOLT_PERC;
 
-  /** Creates a new RunConveyor. */
-  public RunConveyor(Intake conveyor) {
-    this.conveyor = conveyor;
-    addRequirements(conveyor);
+import org.carlmontrobotics.subsystems.Outtake;
+
+/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
+public class OuttakeFeeder extends Command {
+  /** Creates a new OuttakeFeeder. */
+  Outtake feeder;
+
+  public OuttakeFeeder(Outtake feeder) {
+    this.feeder = feeder;
+    addRequirements(feeder);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    conveyor.spinConveyor(CONVEYOR_SPEED);
+    feeder.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -34,7 +34,7 @@ public class RunConveyor extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    conveyor.spinConveyor(0);
+    feeder.spinOuttakeFeeder(0);
   }
 
   // Returns true when the command should end.

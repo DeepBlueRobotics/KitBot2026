@@ -15,6 +15,7 @@ import org.carlmontrobotics.commands.ManipulatorCommands.IntakeBalls;
 import org.carlmontrobotics.commands.ManipulatorCommands.RunConveyor;
 import org.carlmontrobotics.commands.ManipulatorCommands.ShootBalls;
 import org.carlmontrobotics.commands.ManipulatorCommands.SmartShoot;
+import org.carlmontrobotics.commands.ManipulatorCommands.OuttakeFeeder;
 
 import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_SHOOTING_RPM;
 
@@ -132,6 +133,8 @@ public class RobotContainer {
     private void setBindingsManipulator() {
       new JoystickButton(manipulatorController, Manipulator.INTAKE_CONVEYOR_BUTTON)
       .whileTrue(new RunConveyor(intake)); //could be toggle mode instead
+      new JoystickButton(manipulatorController, Manipulator.OUTTAKE_FEEDER_BUTTON)
+      .whileTrue(new OuttakeFeeder(outtake)); //could be toggle mode instead
     //  new JoystickButton(manipulatorController, Manipulator.INTAKE_BUTTON)
     //   .whileTrue(new IntakeBalls(intake));
       new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
@@ -159,7 +162,6 @@ public class RobotContainer {
       () -> SmartDashboard.getBoolean("Baby Mode", Config.CONFIG.isBabyMode())
       ));
 
-      outtake.setDefaultCommand(new ShootBalls(outtake));
     }
   //#endregion
   //#region getAutoCommand
