@@ -285,7 +285,7 @@ public final class Constants {
 		public static final MotorConfig OUTTAKE_FOLLOWER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 		public static final MotorConfig OUTTAKE_FEEDER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 
-		public static final double OUTTAKE_SHOOTING_RPM = 2200; //TODO
+		public static final double OUTTAKE_SHOOTING_RPM = 5000; //TODO
 		public static final double OUTTAKE_PASSING_RPM = 5000; //TODO
 		
 		public static final double kP = 0.0004;
