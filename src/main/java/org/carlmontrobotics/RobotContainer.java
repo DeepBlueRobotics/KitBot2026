@@ -101,16 +101,20 @@ public class RobotContainer implements Sendable {
       
 
         //#region AutoRegistration
-        RegisterAutoCommands();
+        //RegisterAutoCommands();
+        //
+        //
+        
+        
         autoChooser = AutoBuilder.buildAutoChooser();
 
         SmartDashboard.putData("Auto Chooser", autoChooser); 
 
         SmartDashboard.putBoolean("AutoScoring", autoScoring);
         //#endregion
-        setDefaultCommands();
-        setBindingsDriver();
-        setBindingsManipulator();
+        // setDefaultCommands();
+        // setBindingsDriver();
+        // setBindingsManipulator();
 
         SmartDashboard.putBoolean("Baby Mode", Config.CONFIG.isBabyMode());
         // SmartDashboard.putData("Rotate Command",new RotateToTag(drivetrain, limelight));
@@ -118,6 +122,7 @@ public class RobotContainer implements Sendable {
         SmartDashboard.putString("Location", DriverStation.getLocation().toString());
         SmartDashboard.putBoolean("Connected to FMS?", DriverStation.isFMSAttached());
         SmartDashboard.putString("Station", DriverStation.getAlliance().toString() + " " + DriverStation.getLocation().toString());
+        SmartDashboard.putData("Hub", this);
 
     }
    
@@ -243,6 +248,9 @@ public class RobotContainer implements Sendable {
   public double hubTimeLeft(){ //Gets time left until hub is active/inactive
     double matchTime = DriverStation.getMatchTime();
     Optional<Alliance> alliance = DriverStation.getAlliance();
+    if (alliance.isEmpty()) {
+      return -1;
+    }
     if (DriverStation.isAutonomous()) {
       return assumeAutoWin ? matchTime + 10 : matchTime + 35;
     }
@@ -311,11 +319,46 @@ public class RobotContainer implements Sendable {
     assumeAutoWin = assumption;
   }
 
+  private int shiftNumber() {
+    if (DriverStation.isAutonomous()) {
+      return 0;
+    }
+    if (DriverStation.isTeleop()) {
+      double matchTime = DriverStation.getMatchTime();
+      if (matchTime > 130) {
+      // Transition shift
+      return 0;
+      } 
+      else if (matchTime > 105) {
+        // Shift 1
+        return 1;
+      } 
+      else if (matchTime > 80) {
+        // Shift 2
+        return 2;
+      } 
+      else if (matchTime > 55) {
+        // Shift 3
+        return 3;
+      } 
+      else if (matchTime > 30) {
+        // Shift 4
+        return 4;
+      } 
+      else {
+        // End game
+        return 5;
+      }
+    }
+    return 0;
+  }
+
   @Override
   public void initSendable(SendableBuilder builder){
     builder.addBooleanProperty("Hub Active (T/F)", this::isHubActive, null);
     builder.addDoubleProperty("Hub Time Left", this::hubTimeLeft, null);
     builder.addBooleanProperty("Assume Won Auto", this::getAssumeAutoWin, this::setAssumeAutoWin);
+    builder.addDoubleProperty("Active shift", this::shiftNumber, null);
   } 
   //#endregion
   //#region HelpfulMethods
