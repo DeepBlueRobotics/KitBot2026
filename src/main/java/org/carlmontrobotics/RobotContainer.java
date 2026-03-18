@@ -103,7 +103,7 @@ public class RobotContainer implements Sendable {
       
 
         //#region AutoRegistration
-        //RegisterAutoCommands();
+        RegisterAutoCommands();
         //
         //
         
@@ -114,9 +114,9 @@ public class RobotContainer implements Sendable {
 
         SmartDashboard.putBoolean("AutoScoring", autoScoring);
         //#endregion
-        // setDefaultCommands();
-        // setBindingsDriver();
-        // setBindingsManipulator();
+        setDefaultCommands();
+        setBindingsDriver();
+        setBindingsManipulator();
 
         SmartDashboard.putBoolean("Baby Mode", Config.CONFIG.isBabyMode());
         // SmartDashboard.putData("Rotate Command",new RotateToTag(drivetrain, limelight));
