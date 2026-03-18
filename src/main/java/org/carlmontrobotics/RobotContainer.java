@@ -136,9 +136,9 @@ public class RobotContainer {
    // .whileTrue(new OuttakeFeeder(outtake)); //could be toggle mode instead
      new JoystickButton(manipulatorController, Manipulator.INTAKE_BUTTON)
       .whileTrue(new IntakeBalls(intake));
-      //new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
-      //.whileTrue(new ShootBalls(outtake));
-      new JoystickButton(manipulatorController, Manipulator.SMART_SHOOT_BUTTON)
+      new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
+      .whileTrue(new ShootBalls(outtake));
+      axisTrigger(manipulatorController, Manipulator.SMART_SHOOT_AXIS, OI.JOY_THRESH)
       .whileTrue(new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM));
       new JoystickButton(manipulatorController, Manipulator.REPEL_BALLS)
       .whileTrue(new EjectBalls(intake));
@@ -161,7 +161,6 @@ public class RobotContainer {
       () -> SmartDashboard.getBoolean("Baby Mode", Config.CONFIG.isBabyMode())
       ));
 
-      outtake.setDefaultCommand(new ShootBalls(outtake));
       intake.setDefaultCommand(new IntakeBalls(intake));
     }
   //#endregion
@@ -209,7 +208,7 @@ public class RobotContainer {
     return inputProcessing(getStickValue(hid, axis));
   }
   
-  private Trigger axisTrigger(GenericHID controller, Axis axis, double threshold) {
+  private Trigger   axisTrigger(GenericHID controller, Axis axis, double threshold) {
     return new Trigger((BooleanSupplier)(() -> Math.abs(getStickValue(controller, axis)) > threshold));
   }
   //#endregion

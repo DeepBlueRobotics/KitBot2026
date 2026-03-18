@@ -16,6 +16,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.XboxController.Button;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.math.util.Units;
 import static org.carlmontrobotics.Config.CONFIG;
 
@@ -55,8 +56,8 @@ public final class Constants {
 			public static final int INTAKE_CONVEYOR_BUTTON = Button.kB.value;
 			//public static final int OUTTAKE_FEEDER_BUTTON = Button.kRightBumper.value;
             public static final int OUTTAKE_BUTTON = Button.kY.value; 
-			public static final int SMART_SHOOT_BUTTON = Button.kA.value;
-			public static final int REPEL_BALLS = Button.kLeftBumper.value;
+			public static final Axis SMART_SHOOT_AXIS = Axis.kRightTrigger;
+			public static final int REPEL_BALLS = Button.kA.value;
         }
 
 		public static final double JOY_THRESH = 0.13;
