@@ -43,7 +43,7 @@ public class Outtake extends SubsystemBase {
 
    }
 
-  public void configureMotors(){
+  private void configureMotors(){
     outtakeConfig = MotorControllerFactory.sparkConfig(OUTTAKE_MASTER_MOTOR_CONFIG);
     outtakeConfig.idleMode(IdleMode.kCoast)
                       .inverted(true)
@@ -64,7 +64,10 @@ public class Outtake extends SubsystemBase {
     outtakeFeederConfig = MotorControllerFactory.sparkConfig(OUTTAKE_FEEDER_MOTOR_CONFIG);
     outtakeFeederConfig.inverted(true);
   }
-
+  /**
+   * 
+   * @param input RPM
+   */
   public void spinOuttake(double input) {
     pidController.setSetpoint(input, ControlType.kVelocity);
   }
