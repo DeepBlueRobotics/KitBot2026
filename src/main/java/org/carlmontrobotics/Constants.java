@@ -53,7 +53,7 @@ public final class Constants {
 			public static final int port = 1;
 			public static final int INTAKE_BUTTON = Button.kX.value;
 			public static final int INTAKE_CONVEYOR_BUTTON = Button.kB.value;
-			public static final int OUTTAKE_FEEDER_BUTTON = Button.kRightBumper.value;
+			//public static final int OUTTAKE_FEEDER_BUTTON = Button.kRightBumper.value;
             public static final int OUTTAKE_BUTTON = Button.kY.value; 
 			public static final int SMART_SHOOT_BUTTON = Button.kA.value;
 			public static final int REPEL_BALLS = Button.kLeftBumper.value;
@@ -80,7 +80,7 @@ public final class Constants {
 		public static final double wheelDiameterMeters = Units.inchesToMeters(4.0);
 																				
 		public static final double mu = 1; /* 70/83.2; */ // coefficient of friction. less means less max acceleration.
-		public static final double ROBOTMASS_KG = Units.lbsToKilograms(80);// TODO weigh actual robot with bumpers and battery later
+		public static final double ROBOTMASS_KG = Units.lbsToKilograms(104+15);// TODO weigh actual robot with bumpers and battery later
 		// moment of inertia, kg/mm
 		// USE ONSHAPE it has a calculator for this
 		public static final double MOI = Math.pow(Units.inchesToMeters(1),2) * Units.lbsToKilograms(1) * 14040.21738; // 14040.21738 in^2 lb 

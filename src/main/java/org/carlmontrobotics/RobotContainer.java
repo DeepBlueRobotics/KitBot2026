@@ -133,16 +133,15 @@ public class RobotContainer {
     private void setBindingsManipulator() {
       new JoystickButton(manipulatorController, Manipulator.INTAKE_CONVEYOR_BUTTON)
       .whileTrue(new RunConveyor(intake)); //could be toggle mode instead
-      new JoystickButton(manipulatorController, Manipulator.OUTTAKE_FEEDER_BUTTON)
-      .whileTrue(new OuttakeFeeder(outtake)); //could be toggle mode instead
-    //  new JoystickButton(manipulatorController, Manipulator.INTAKE_BUTTON)
-    //   .whileTrue(new IntakeBalls(intake));
-      new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
-      .whileTrue(new ShootBalls(outtake));
+   // .whileTrue(new OuttakeFeeder(outtake)); //could be toggle mode instead
+     new JoystickButton(manipulatorController, Manipulator.INTAKE_BUTTON)
+      .whileTrue(new IntakeBalls(intake));
+      //new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
+      //.whileTrue(new ShootBalls(outtake));
       new JoystickButton(manipulatorController, Manipulator.SMART_SHOOT_BUTTON)
       .whileTrue(new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM));
-      new JoystickButton(manipulatorController, Manipulator.REPEL_BALLS).whileTrue(new EjectBalls(intake))
-            .whileFalse(new IntakeBalls(intake));
+      new JoystickButton(manipulatorController, Manipulator.REPEL_BALLS)
+      .whileTrue(new EjectBalls(intake));
     }
     //#endregion
     //#region AutoMaking
@@ -162,6 +161,8 @@ public class RobotContainer {
       () -> SmartDashboard.getBoolean("Baby Mode", Config.CONFIG.isBabyMode())
       ));
 
+      outtake.setDefaultCommand(new ShootBalls(outtake));
+      intake.setDefaultCommand(new IntakeBalls(intake));
     }
   //#endregion
   //#region getAutoCommand
