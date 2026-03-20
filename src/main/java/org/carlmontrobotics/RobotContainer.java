@@ -82,7 +82,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class RobotContainer implements Sendable {
     
     public final GenericHID driverController = new GenericHID(Driver.port);
-    public final XboxController driverRumble = new XboxController(Driver.port); //For rumbling the controller
     public final GenericHID manipulatorController = new GenericHID(Manipulator.port);
 
     public final Limelight limelight = new Limelight();
@@ -146,7 +145,7 @@ public class RobotContainer implements Sendable {
       .whileTrue(new RunConveyor(intake)); //could be toggle mode instead
    // .whileTrue(new OuttakeFeeder(outtake)); //could be toggle mode instead
      new JoystickButton(manipulatorController, Manipulator.INTAKE_BUTTON)
-      .whileTrue(new IntakeBalls(intake));
+      .whileTrue(new IntakeBalls(intake, manipulatorController));
       new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
       .whileTrue(new ShootBalls(outtake));
       axisTrigger(manipulatorController, Manipulator.SMART_SHOOT_AXIS, OI.JOY_THRESH)
@@ -172,7 +171,7 @@ public class RobotContainer implements Sendable {
       () -> SmartDashboard.getBoolean("Baby Mode", Config.CONFIG.isBabyMode())
       ));
 
-      intake.setDefaultCommand(new IntakeBalls(intake));
+      intake.setDefaultCommand(new IntakeBalls(intake, manipulatorController));
     }
   //#endregion
   //#region getAutoCommand
