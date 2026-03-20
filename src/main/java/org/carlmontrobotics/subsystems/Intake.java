@@ -62,4 +62,28 @@ public class Intake extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("rpm brr", intakeMotor.getEncoder().getVelocity());
   }
+
+  /**
+   * 
+   * @return Number the RPM of the motor
+   */
+  public double getIntakeVelocity() {
+    return intakeMotor.getEncoder().getVelocity();
+  }
+
+  /**
+   * 
+   * @return The motor controller's output current in Amps.
+   */
+  public double getIntakeCurrent() {
+    return intakeMotor.getOutputCurrent();
+  }
+  /**
+   * 
+   * @return The motor controller's applied output duty cycle.
+
+   */
+  public double getIntakeAppliedOutput() {
+    return intakeMotor.getAppliedOutput();
+  }
 }
