@@ -10,6 +10,7 @@ import static org.carlmontrobotics.Constants.OuttakeC.*;
 import org.carlmontrobotics.subsystems.Intake;
 import org.carlmontrobotics.subsystems.Outtake;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -20,6 +21,10 @@ public class SmartShoot extends Command {
   Outtake outtake;
   Intake intake;
   double goalRPM;
+  double oscillateTimeStampForward = -1;
+  double oscillateTimeStampBackward = -1;
+
+  private final boolean oscillate = true;
   /** Creates a new SmartShoot. */
   public SmartShoot(Outtake outtake, Intake intake, double RPM) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -27,22 +32,36 @@ public class SmartShoot extends Command {
     this.outtake = outtake;
     this.intake = intake;
     addRequirements(outtake, intake);
-    SmartDashboard.putNumber("GoalRPMOuttake", goalRPM);
-
    }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    outtake.spinOuttake(SmartDashboard.getNumber("GoalRPMOuttake", goalRPM));
+    outtake.spinOuttake(goalRPM);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(outtake.atVelGoal(SmartDashboard.getNumber("GoalRPMOuttake", goalRPM), OUTTAKE_ESTIMATE_OFFSET)){
+    if(outtake.atVelGoal(goalRPM, OUTTAKE_ESTIMATE_OFFSET)){
       outtake.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC);
-      intake.spinConveyor(CONVEYOR_SPEED);
+      if (oscillate) {
+        if (oscillateTimeStampForward == -1) {
+        oscillateTimeStampForward = Timer.getFPGATimestamp();
+        intake.spinConveyor(CONVEYOR_SPEED);
+      }
+      else if (Timer.getFPGATimestamp() - oscillateTimeStampForward > 5) {
+        oscillateTimeStampBackward = Timer.getFPGATimestamp();
+        intake.spinConveyor(-0.2);
+      }
+      else if (Timer.getFPGATimestamp() - oscillateTimeStampBackward > 2) {
+        oscillateTimeStampForward = Timer.getFPGATimestamp();
+        intake.spinConveyor(CONVEYOR_SPEED);
+      } 
+      }
+      else {
+        intake.spinConveyor(CONVEYOR_SPEED);
+      } 
     }
   }
 
