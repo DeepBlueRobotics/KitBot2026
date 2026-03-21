@@ -11,6 +11,7 @@ import org.carlmontrobotics.lib199.SensorFactory;
 import org.carlmontrobotics.lib199.swerve.SwerveModule;
 import org.carlmontrobotics.lib199.swerve.SwerveModuleSim;
 import org.carlmontrobotics.lib199.vendorLibs.Elastic;
+import org.carlmontrobotics.lib199.vendorLibs.LimelightHelpers;
 
 import static org.carlmontrobotics.Config.CONFIG;
 
@@ -417,11 +418,17 @@ public class Drivetrain extends SubsystemBase {
     private double timeStampLatestGyroWarning = 0;
     private Elastic.Notification notification = new Elastic.Notification();
 
+    public void resetPoseEstimator() {
+        poseEstimator.resetPose(LimelightHelpers.getBotPose2d(RIGHT_LL));
+    }
+    public void resetPoseEstimator(Pose2d pose) {
+        poseEstimator.resetPose(pose);
+    }
+
     @Override
     public void periodic() {
-        detectCollision(); //This does nothing
+        //detectCollision(); //This does nothing
         PathPlannerLogging.logCurrentPose(getPose());
-        double goal = SmartDashboard.getNumber("bigoal", 0);
         for (SwerveModule module : modules) {
           // module.turnPeriodic();
           // module.turnPeriodic();
@@ -450,14 +457,9 @@ public class Drivetrain extends SubsystemBase {
         }
 
 
-        // field.setRobotPose(odometry.getPoseMeters());
 
-        
-
-        // odometry.update(gyro.getRotation2d(), getModulePositions());
-
-        // poseEstimator.update(gyro.getRotation2d(), getModulePositions());
-        
+        poseEstimator.update(gyro.getRotation2d(), getModulePositions());
+        poseEstimator.addVisionMeasurement(LimelightHelpers.getBotPose2d(RIGHT_LL), Timer.getFPGATimestamp());
         //odometry.update(Rotation2d.fromDegrees(getHeading()), getModulePositions());
 
         // updateMT2PoseEstimator();
@@ -591,7 +593,7 @@ public class Drivetrain extends SubsystemBase {
                 //Supplier<Pose2d> poseSupplier,
                 this::getPose, // Robot pose supplier
                 //Consumer<Pose2d> resetPose,
-                this::setPoseWithLimelight, // Method to reset odometry (will be called if your auto has a starting pose)
+                this::resetPoseEstimator, // Method to reset odometry (will be called if your auto has a starting pose)
                 //Supplier<ChassisSpeeds> robotRelativeSpeedsSupplier,
                 this::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 //BiConsumer<ChassisSpeeds,DriveFeedforwards> output,
@@ -810,12 +812,6 @@ public class Drivetrain extends SubsystemBase {
      */
     public void resetFieldOrientationWithAngle(double angle) {
         fieldOffset = angle + gyro.getAngle();
-    }
-    public void resetPoseEstimator() {
-        // odometry.resetPosition(new Rotation2d(), getModulePositions(), new Pose2d());
-
-        poseEstimator.resetPosition(new Rotation2d(), getModulePositions(), new Pose2d());
-        gyro.reset();
     }
 
     public SwerveDriveKinematics getKinematics() {
