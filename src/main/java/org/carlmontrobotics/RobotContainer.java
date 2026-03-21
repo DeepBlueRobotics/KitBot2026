@@ -185,7 +185,8 @@ public class RobotContainer implements Sendable {
   //#endregion
   //#region getAutoCommand
   public Command getAutonomousCommand() {
-    return new SimpleShootAuton(outtake, intake);
+    //return new SimpleShootAuton(outtake, intake);
+    return AutoBuilder.buildAuto("CenterLeftSideAuto");  
   }
   public boolean isHubActive() {
     Optional<Alliance> alliance = DriverStation.getAlliance();
