@@ -25,6 +25,7 @@ public class SmartShoot extends Command {
 
   private final boolean oscillate = true;
   private final double boost;
+  private final boolean useIntake;
 
   /** Creates a new SmartShoot. */
   public SmartShoot(Outtake outtake, Intake intake, double RPM, boolean addFeederBoost) {
@@ -39,15 +40,33 @@ public class SmartShoot extends Command {
     else {
       boost = 0;
     }
+    this.useIntake = false;
     addRequirements(outtake, intake);
    }
+
+  public SmartShoot(Outtake outtake, Intake intake, double RPM, boolean addFeederBoost, boolean useIntake) {
+    goalRPM = RPM;
+    this.outtake = outtake;
+    this.intake = intake;
+    timer = new Timer();
+    if (addFeederBoost) {
+      boost = 0.3;
+    }
+    else {
+      boost = 0;
+    }
+    this.useIntake = useIntake;
+    addRequirements(outtake, intake);
+  }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     outtake.spinOuttake(goalRPM);
     timer.restart();
-
+    if (useIntake) {
+      intake.spinIntake(INTAKE_SPEED);
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -79,6 +98,7 @@ public class SmartShoot extends Command {
     outtake.stopOuttake();  
     outtake.spinOuttakeFeeder(0);
     intake.stopConveyor();
+    intake.stopIntake();
     timer.stop();
   }
 

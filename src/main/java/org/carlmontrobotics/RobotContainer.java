@@ -16,6 +16,7 @@ import org.carlmontrobotics.commands.ManipulatorCommands.ShootBalls;
 import org.carlmontrobotics.commands.ManipulatorCommands.SmartShoot;
 import org.carlmontrobotics.commands.ManipulatorCommands.OuttakeFeeder;
 
+import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_PASSING_RPM;
 import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_SHOOTING_RPM;
 
 import java.util.ArrayList;
@@ -33,6 +34,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 import java.util.function.BooleanSupplier;
+
+import javax.print.attribute.standard.MediaSize.NA;
+
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 //auton
@@ -156,7 +160,11 @@ public class RobotContainer implements Sendable {
     }
     //#endregion
     //#region AutoMaking
-    private void RegisterAutoCommands() {}
+    private void RegisterAutoCommands() {
+      NamedCommands.registerCommand("Shoot", new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM, false));
+      NamedCommands.registerCommand("Pass", new SmartShoot(outtake, intake, OUTTAKE_PASSING_RPM, true, true));
+      NamedCommands.registerCommand("Eject", new EjectBalls(intake));
+    }
 
     private void RegisterCustomAutos(){}
     //#endregion
