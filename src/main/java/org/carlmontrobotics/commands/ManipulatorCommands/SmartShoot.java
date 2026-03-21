@@ -17,31 +17,37 @@ import edu.wpi.first.wpilibj2.command.Command;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class SmartShoot extends Command {
 
-  Outtake outtake;
-  Intake intake;
-  double goalRPM;
+  private final Outtake outtake;
+  private final Intake intake;
+  private final double goalRPM;
+  private final double boost;
+
   /** Creates a new SmartShoot. */
-  public SmartShoot(Outtake outtake, Intake intake, double RPM) {
+  public SmartShoot(Outtake outtake, Intake intake, double RPM, boolean addFeederBoost) {
     // Use addRequirements() here to declare subsystem dependencies.
     goalRPM = RPM;
     this.outtake = outtake;
     this.intake = intake;
+    if (addFeederBoost) {
+      boost = 0.3;
+    }
+    else {
+      boost = 0;
+    }
     addRequirements(outtake, intake);
-    SmartDashboard.putNumber("GoalRPMOuttake", goalRPM);
-
    }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    outtake.spinOuttake(SmartDashboard.getNumber("GoalRPMOuttake", goalRPM));
+    outtake.spinOuttake(goalRPM);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(outtake.atVelGoal(SmartDashboard.getNumber("GoalRPMOuttake", goalRPM), OUTTAKE_ESTIMATE_OFFSET)){
-      outtake.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC);
+    if(outtake.atVelGoal(goalRPM, OUTTAKE_ESTIMATE_OFFSET)){
+      outtake.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC+boost);
       intake.spinConveyor(CONVEYOR_SPEED);
     }
   }

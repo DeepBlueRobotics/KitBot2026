@@ -56,7 +56,8 @@ public final class Constants {
 			public static final int INTAKE_CONVEYOR_BUTTON = Button.kB.value;
 			//public static final int OUTTAKE_FEEDER_BUTTON = Button.kRightBumper.value;
             public static final int OUTTAKE_BUTTON = Button.kY.value; 
-			public static final Axis SMART_SHOOT_AXIS = Axis.kRightTrigger;
+			public static final Axis SMART_SHOOT_CLOSE_AXIS = Axis.kRightTrigger;
+			public static final Axis SMART_SHOOT_FAR_AXIS = Axis.kLeftTrigger;
 			public static final int REPEL_BALLS = Button.kA.value;
         }
 
@@ -124,12 +125,12 @@ public final class Constants {
 			new double[] {0,0,0,0};
 
 		public static final double[] turnkS = new double[]{ 0.2, 0.2, 0.2, 0.2};
-		public static final double[] turnkV = new double[] { 2, 2, 2, 2 };//good starting point
+		public static final double[] turnkV = new double[] { 0, 0, 0, 0 };//good starting point
 		public static final double[] turnkA = new double[] { 0, 0, 0, 0 };
 
 		// Order of modules: (FL, FR, BL, BR)
 		public static final double[] drivekP = CONFIG.isHammerHead() ? new double[] {2, 2, 2, 2}:
-			new double[] {3, 3, 3, 3};
+			new double[] {2, 2, 2, 2};
 		public static final double[] drivekI = CONFIG.isHammerHead() ? new double[]{ 0, 0, 0, 0} : 
 			new double[] {0, 0, 0, 0};
 		public static final double[] drivekD = CONFIG.isHammerHead()? new double[] { 0, 0, 0, 0 }:
@@ -146,7 +147,7 @@ public final class Constants {
 
 		//kV
 		public static final double[] kForwardVels = CONFIG.isHammerHead() ? new double[] {2,2,2,2 }:
-			new double[] { 1, 1, 1, 1 };
+			new double[] { 2, 2, 2, 2 };
 		public static final double[] kBackwardVels = kForwardVels;
 
 		//kA
@@ -286,7 +287,7 @@ public final class Constants {
 		public static final MotorConfig OUTTAKE_FOLLOWER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 		public static final MotorConfig OUTTAKE_FEEDER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 
-		public static final double OUTTAKE_SHOOTING_RPM = 2500; //TODO
+		public static final double OUTTAKE_SHOOTING_RPM = 3000; //TODO
 		public static final double OUTTAKE_PASSING_RPM = 5000; //TODO
 		
 		public static final double kP = 0.0004;

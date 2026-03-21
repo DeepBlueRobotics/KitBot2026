@@ -7,8 +7,7 @@ package org.carlmontrobotics;
 
 //199 files
 import org.carlmontrobotics.subsystems.*;
-
-
+import org.carlmontrobotics.commands.AutonCommands.SimpleShootAuton;
 import org.carlmontrobotics.commands.DriveCommands.TeleopDrive;
 import org.carlmontrobotics.commands.ManipulatorCommands.EjectBalls;
 import org.carlmontrobotics.commands.ManipulatorCommands.IntakeBalls;
@@ -138,8 +137,10 @@ public class RobotContainer {
       .whileTrue(new IntakeBalls(intake));
       new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
       .whileTrue(new ShootBalls(outtake));
-      axisTrigger(manipulatorController, Manipulator.SMART_SHOOT_AXIS, OI.JOY_THRESH)
-      .whileTrue(new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM));
+      axisTrigger(manipulatorController, Manipulator.SMART_SHOOT_CLOSE_AXIS, OI.JOY_THRESH)
+      .whileTrue(new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM, false));
+      axisTrigger(manipulatorController, Manipulator.SMART_SHOOT_FAR_AXIS, OI.JOY_THRESH)
+      .whileTrue(new SmartShoot(outtake, intake, 7000, true));
       new JoystickButton(manipulatorController, Manipulator.REPEL_BALLS)
       .whileTrue(new EjectBalls(intake));
     }
@@ -166,7 +167,7 @@ public class RobotContainer {
   //#endregion
   //#region getAutoCommand
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return new SimpleShootAuton(outtake, intake);
   }
   //#endregion
   //#region HelpfulMethods
