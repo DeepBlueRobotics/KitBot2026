@@ -3,6 +3,8 @@ package org.carlmontrobotics.subsystems;
 
 import static org.carlmontrobotics.Constants.LimeLightc.*;
 
+import java.util.random.RandomGenerator.LeapableGenerator;
+
 import org.carlmontrobotics.lib199.vendorLibs.LimelightHelpers;
 
 import edu.wpi.first.math.MathUtil;
@@ -18,8 +20,8 @@ public class Limelight extends SubsystemBase {
   // NEEDS TO SEE: Barge, Reef, Processor, Coral Dropoff
   public Limelight() {
     
-    LimelightHelpers.SetFiducialIDFiltersOverride(FRONT_LL, LL_GENERAL_VALID_IDS);
-    LimelightHelpers.SetFiducialIDFiltersOverride(BACK_LL, LL_GENERAL_VALID_IDS);
+    //LimelightHelpers.SetFiducialIDFiltersOverride(LEFT_LL, LL_GENERAL_VALID_IDS);
+    LimelightHelpers.SetFiducialIDFiltersOverride(RIGHT_LL, LL_GENERAL_VALID_IDS);
 
   }
 
@@ -33,12 +35,12 @@ public class Limelight extends SubsystemBase {
    */
   public void setCrop(boolean shootingCrop) {
     if (shootingCrop) {
-      LimelightHelpers.setCropWindow(FRONT_LL, LL_FRONT_SHOOTING_CROP[0], LL_FRONT_SHOOTING_CROP[1], LL_FRONT_SHOOTING_CROP[2], LL_FRONT_SHOOTING_CROP[3]);
-      LimelightHelpers.setCropWindow(BACK_LL, LL_BACK_SHOOTING_CROP[0], LL_BACK_SHOOTING_CROP[1], LL_BACK_SHOOTING_CROP[2], LL_BACK_SHOOTING_CROP[3]);
+      LimelightHelpers.setCropWindow(RIGHT_LL, LL_FRONT_SHOOTING_CROP[0], LL_FRONT_SHOOTING_CROP[1], LL_FRONT_SHOOTING_CROP[2], LL_FRONT_SHOOTING_CROP[3]);
+      //LimelightHelpers.setCropWindow(LEFT_LL, LL_BACK_SHOOTING_CROP[0], LL_BACK_SHOOTING_CROP[1], LL_BACK_SHOOTING_CROP[2], LL_BACK_SHOOTING_CROP[3]);
     }
     else {
-      LimelightHelpers.setCropWindow(FRONT_LL, LL_FRONT_GENERAL_CROP[0], LL_FRONT_GENERAL_CROP[1], LL_FRONT_GENERAL_CROP[2], LL_FRONT_GENERAL_CROP[3]);
-      LimelightHelpers.setCropWindow(BACK_LL, LL_BACK_GENERAL_CROP[0], LL_BACK_GENERAL_CROP[1], LL_BACK_GENERAL_CROP[2], LL_BACK_GENERAL_CROP[3]);
+      LimelightHelpers.setCropWindow(RIGHT_LL, LL_FRONT_GENERAL_CROP[0], LL_FRONT_GENERAL_CROP[1], LL_FRONT_GENERAL_CROP[2], LL_FRONT_GENERAL_CROP[3]);
+     //LimelightHelpers.setCropWindow(BACK_LL, LL_BACK_GENERAL_CROP[0], LL_BACK_GENERAL_CROP[1], LL_BACK_GENERAL_CROP[2], LL_BACK_GENERAL_CROP[3]);
     }
   }
 
@@ -51,27 +53,27 @@ public class Limelight extends SubsystemBase {
     if (redAlliance) {
       if (shootingFilter) {
         int[] frontFilter = difference(LL_FRONT_SHOOTING_VALID_IDS, LL_IDS_IGNORE_FOR_RED);
-        int[] backFilter = difference(LL_BACK_SHOOTING_VALID_IDS, LL_IDS_IGNORE_FOR_RED);
-        LimelightHelpers.SetFiducialIDFiltersOverride(FRONT_LL, frontFilter);
-        LimelightHelpers.SetFiducialIDFiltersOverride(BACK_LL, backFilter);
+        //int[] backFilter = difference(LL_BACK_SHOOTING_VALID_IDS, LL_IDS_IGNORE_FOR_RED);
+        LimelightHelpers.SetFiducialIDFiltersOverride(RIGHT_LL, frontFilter);
+        //LimelightHelpers.SetFiducialIDFiltersOverride(LEFT_LL, backFilter);
       }
       else {
         int[] filter = difference(LL_GENERAL_VALID_IDS, LL_IDS_IGNORE_FOR_RED);
-        LimelightHelpers.SetFiducialIDFiltersOverride(FRONT_LL, filter);
-        LimelightHelpers.SetFiducialIDFiltersOverride(BACK_LL, filter);
+        LimelightHelpers.SetFiducialIDFiltersOverride(RIGHT_LL, filter);
+        //LimelightHelpers.SetFiducialIDFiltersOverride(LEFT_LL, filter);
       }
     }
     else {
       if (shootingFilter) {
         int[] frontFilter = difference(LL_FRONT_SHOOTING_VALID_IDS, LL_IDS_IGNORE_FOR_BLUE);
-        int[] backFilter = difference(LL_BACK_SHOOTING_VALID_IDS, LL_IDS_IGNORE_FOR_BLUE);
-        LimelightHelpers.SetFiducialIDFiltersOverride(FRONT_LL, frontFilter);
-        LimelightHelpers.SetFiducialIDFiltersOverride(BACK_LL, backFilter);
+        //int[] backFilter = difference(LL_BACK_SHOOTING_VALID_IDS, LL_IDS_IGNORE_FOR_BLUE);
+        LimelightHelpers.SetFiducialIDFiltersOverride(RIGHT_LL, frontFilter);
+        //LimelightHelpers.SetFiducialIDFiltersOverride(LEFT_LL, backFilter);
       }
       else {
         int[] filter = difference(LL_GENERAL_VALID_IDS, LL_IDS_IGNORE_FOR_BLUE);
-        LimelightHelpers.SetFiducialIDFiltersOverride(FRONT_LL, filter);
-        LimelightHelpers.SetFiducialIDFiltersOverride(BACK_LL, filter);
+        LimelightHelpers.SetFiducialIDFiltersOverride(RIGHT_LL, filter);
+       // LimelightHelpers.SetFiducialIDFiltersOverride(LEFT_LL, filter);
       }
     }
   }

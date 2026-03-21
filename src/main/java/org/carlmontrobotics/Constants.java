@@ -82,7 +82,7 @@ public final class Constants {
 		public static final double wheelDiameterMeters = Units.inchesToMeters(4.0);
 																				
 		public static final double mu = 1; /* 70/83.2; */ // coefficient of friction. less means less max acceleration.
-		public static final double ROBOTMASS_KG = Units.lbsToKilograms(104+15);// TODO weigh actual robot with bumpers and battery later
+		public static final double ROBOTMASS_KG = Units.lbsToKilograms(128.1);
 		// moment of inertia, kg/mm
 		// USE ONSHAPE it has a calculator for this
 		public static final double MOI = Math.pow(Units.inchesToMeters(1),2) * Units.lbsToKilograms(1) * 14040.21738; // 14040.21738 in^2 lb 
@@ -256,20 +256,17 @@ public final class Constants {
 	}
 	//#endregion
 	public static class LimeLightc {
-		public static final String FRONT_LL = "FRONT_LL";
-		public static final String BACK_LL = "BACK_LL"; 
+		public static final String LEFT_LL = "LL_LEFT";
+		public static final String RIGHT_LL = "LL_RIGHT"; 
 
 		public static final int[] LL_FRONT_SHOOTING_VALID_IDS = {9,10, 12, 7, 8,5, 11, 2, 18, 27, 21, 24, 25, 26};
-		public static final int[] LL_BACK_SHOOTING_VALID_IDS = {13,14,15,16, 7, 12, 28, 23, 29, 30, 31, 32};
 		public static final int[] LL_GENERAL_VALID_IDS = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32};
 
 		public static final int[] LL_IDS_IGNORE_FOR_BLUE = {15,16,14,13,9,10,7,12};
 		public static final int[] LL_IDS_IGNORE_FOR_RED = {28, 23, 25, 26, 29,30,31,32};
 
 		public static final int[] LL_FRONT_GENERAL_CROP = {0,0,0,0}; //XMin, xMax, yMin, yMax all values (-1,1)
-		public static final int[] LL_BACK_GENERAL_CROP = {0,0,0,0}; //XMin, xMax, yMin, yMax all values (-1,1)
 		public static final int[] LL_FRONT_SHOOTING_CROP = {0,0,0,0}; //XMin, xMax, yMin, yMax all values (-1,1)
-		public static final int[] LL_BACK_SHOOTING_CROP = {0,0,0,0}; //XMin, xMax, yMin, yMax all values (-1,1)
 	}	
 	//#region Manipulator
 	public static final class IntakeC {
