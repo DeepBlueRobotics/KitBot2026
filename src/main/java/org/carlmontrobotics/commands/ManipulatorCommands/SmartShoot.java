@@ -18,11 +18,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class SmartShoot extends Command {
 
-  Outtake outtake;
-  Intake intake;
-  double goalRPM;
-  double oscillateTimeStampForward = -1;
-  double oscillateTimeStampBackward = -1;
+  private final Outtake outtake;
+  private final Intake intake;
+  private final double goalRPM;
+  private final Timer timer;
 
   private final boolean oscillate = true;
   /** Creates a new SmartShoot. */
@@ -31,6 +30,7 @@ public class SmartShoot extends Command {
     goalRPM = RPM;
     this.outtake = outtake;
     this.intake = intake;
+    timer = new Timer();
     addRequirements(outtake, intake);
    }
 
@@ -38,6 +38,8 @@ public class SmartShoot extends Command {
   @Override
   public void initialize() {
     outtake.spinOuttake(goalRPM);
+    timer.restart();
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -46,16 +48,12 @@ public class SmartShoot extends Command {
     if(outtake.atVelGoal(goalRPM, OUTTAKE_ESTIMATE_OFFSET)){
       outtake.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC);
       if (oscillate) {
-        if (oscillateTimeStampForward == -1) {
-        oscillateTimeStampForward = Timer.getFPGATimestamp();
-        intake.spinConveyor(CONVEYOR_SPEED);
-      }
-      else if (Timer.getFPGATimestamp() - oscillateTimeStampForward > 5) {
-        oscillateTimeStampBackward = Timer.getFPGATimestamp();
+        if (timer.get() > 5) {
+        timer.restart();
         intake.spinConveyor(-0.2);
       }
-      else if (Timer.getFPGATimestamp() - oscillateTimeStampBackward > 2) {
-        oscillateTimeStampForward = Timer.getFPGATimestamp();
+      else if (timer.get() > 0.5) {
+        timer.restart();
         intake.spinConveyor(CONVEYOR_SPEED);
       } 
       }
@@ -71,6 +69,7 @@ public class SmartShoot extends Command {
     outtake.stopOuttake();  
     outtake.spinOuttakeFeeder(0);
     intake.stopConveyor();
+    timer.stop();
   }
 
   // Returns true when the command should end.
