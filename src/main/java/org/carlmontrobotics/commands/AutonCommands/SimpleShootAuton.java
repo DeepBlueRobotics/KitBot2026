@@ -32,7 +32,7 @@ public class SimpleShootAuton extends Command {
     shooter.spinOuttake(OUTTAKE_SHOOTING_RPM);
     shooter.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC);
     intake.spinConveyor(CONVEYOR_SPEED);
-    intake.spinIntake(INTAKE_SPEED);
+    //intake.spinIntake(INTAKE_SPEED);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -45,7 +45,7 @@ public class SimpleShootAuton extends Command {
     shooter.stopOuttake();
     shooter.spinOuttakeFeeder(0);
     intake.stopConveyor();
-    intake.stopIntake();
+    //intake.stopIntake();
   }
 
   // Returns true when the command should end.

@@ -24,13 +24,21 @@ public class SmartShoot extends Command {
   private final Timer timer;
 
   private final boolean oscillate = true;
+  private final double boost;
+
   /** Creates a new SmartShoot. */
-  public SmartShoot(Outtake outtake, Intake intake, double RPM) {
+  public SmartShoot(Outtake outtake, Intake intake, double RPM, boolean addFeederBoost) {
     // Use addRequirements() here to declare subsystem dependencies.
     goalRPM = RPM;
     this.outtake = outtake;
     this.intake = intake;
     timer = new Timer();
+    if (addFeederBoost) {
+      boost = 0.3;
+    }
+    else {
+      boost = 0;
+    }
     addRequirements(outtake, intake);
    }
 
@@ -60,6 +68,8 @@ public class SmartShoot extends Command {
       else {
         intake.spinConveyor(CONVEYOR_SPEED);
       } 
+      outtake.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC+boost);
+      intake.spinConveyor(CONVEYOR_SPEED);
     }
   }
 
