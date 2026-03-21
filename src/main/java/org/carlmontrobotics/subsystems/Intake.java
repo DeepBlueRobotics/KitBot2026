@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase {
   SparkBase intakeMotor;
+  SparkBase intakeFollowerMotor;
   SparkBase conveyorMotor;
   SparkClosedLoopController pidC;
   
@@ -26,10 +27,14 @@ public class Intake extends SubsystemBase {
   public Intake() {
     SparkBaseConfig conveyorConfig = MotorControllerFactory.sparkConfig(MotorConfig.NEO_VORTEX);
     SparkBaseConfig intakeConfig = MotorControllerFactory.sparkConfig(MotorConfig.NEO_VORTEX);
-    conveyorConfig.inverted(true)
-                    .smartCurrentLimit(80);
-    intakeConfig.closedLoop.pid(0.0002, 0, 0);
+    conveyorConfig.inverted(true);
+    intakeConfig.smartCurrentLimit(80)
+                  .closedLoop.pid(0.0002, 0, 0);
+    SparkBaseConfig intakeFollowerConfig = MotorControllerFactory.sparkConfig(MotorConfig.NEO_VORTEX);
+    intakeFollowerConfig.apply(intakeConfig)
+                      .follow(IntakeC.INTAKE_ID);
     intakeMotor = MotorControllerFactory.createSpark(IntakeC.INTAKE_ID, MotorConfig.NEO_VORTEX, intakeConfig);
+    intakeFollowerMotor = MotorControllerFactory.createSpark(IntakeC.INTAKE_FOLLOWER_ID, MotorConfig.NEO_VORTEX, intakeFollowerConfig);
     conveyorMotor = MotorControllerFactory.createSpark(IntakeC.CONVEYOR_ID, MotorConfig.NEO_VORTEX, conveyorConfig);
     pidC = intakeMotor.getClosedLoopController();
   }
