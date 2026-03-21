@@ -10,6 +10,7 @@ import static org.carlmontrobotics.Constants.OuttakeC.*;
 import org.carlmontrobotics.subsystems.Intake;
 import org.carlmontrobotics.subsystems.Outtake;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -20,6 +21,9 @@ public class SmartShoot extends Command {
   private final Outtake outtake;
   private final Intake intake;
   private final double goalRPM;
+  private final Timer timer;
+
+  private final boolean oscillate = true;
   private final double boost;
 
   /** Creates a new SmartShoot. */
@@ -28,6 +32,7 @@ public class SmartShoot extends Command {
     goalRPM = RPM;
     this.outtake = outtake;
     this.intake = intake;
+    timer = new Timer();
     if (addFeederBoost) {
       boost = 0.3;
     }
@@ -41,12 +46,28 @@ public class SmartShoot extends Command {
   @Override
   public void initialize() {
     outtake.spinOuttake(goalRPM);
+    timer.restart();
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     if(outtake.atVelGoal(goalRPM, OUTTAKE_ESTIMATE_OFFSET)){
+      outtake.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC);
+      if (oscillate) {
+        if (timer.get() > 5) {
+        timer.restart();
+        intake.spinConveyor(-0.2);
+      }
+      else if (timer.get() > 0.5) {
+        timer.restart();
+        intake.spinConveyor(CONVEYOR_SPEED);
+      } 
+      }
+      else {
+        intake.spinConveyor(CONVEYOR_SPEED);
+      } 
       outtake.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC+boost);
       intake.spinConveyor(CONVEYOR_SPEED);
     }
@@ -58,6 +79,7 @@ public class SmartShoot extends Command {
     outtake.stopOuttake();  
     outtake.spinOuttakeFeeder(0);
     intake.stopConveyor();
+    timer.stop();
   }
 
   // Returns true when the command should end.
