@@ -26,7 +26,8 @@ public class Intake extends SubsystemBase {
   public Intake() {
     SparkBaseConfig conveyorConfig = MotorControllerFactory.sparkConfig(MotorConfig.NEO_VORTEX);
     SparkBaseConfig intakeConfig = MotorControllerFactory.sparkConfig(MotorConfig.NEO_VORTEX);
-    conveyorConfig.inverted(true);
+    conveyorConfig.inverted(true)
+                    .smartCurrentLimit(80);
     intakeConfig.closedLoop.pid(0.0002, 0, 0);
     intakeMotor = MotorControllerFactory.createSpark(IntakeC.INTAKE_ID, MotorConfig.NEO_VORTEX, intakeConfig);
     conveyorMotor = MotorControllerFactory.createSpark(IntakeC.CONVEYOR_ID, MotorConfig.NEO_VORTEX, conveyorConfig);
