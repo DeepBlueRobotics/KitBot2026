@@ -10,6 +10,7 @@ import org.carlmontrobotics.lib199.MotorControllerFactory;
 import org.carlmontrobotics.lib199.SensorFactory;
 import org.carlmontrobotics.lib199.swerve.SwerveModule;
 import org.carlmontrobotics.lib199.swerve.SwerveModuleSim;
+import org.carlmontrobotics.lib199.vendorLibs.Elastic;
 
 import static org.carlmontrobotics.Config.CONFIG;
 
@@ -412,68 +413,42 @@ public class Drivetrain extends SubsystemBase {
         }
     }
 
+    private double timeStampLatestGyroError = 0;
+    private double timeStampLatestGyroWarning = 0;
+    private Elastic.Notification notification = new Elastic.Notification();
+
     @Override
     public void periodic() {
         detectCollision(); //This does nothing
         PathPlannerLogging.logCurrentPose(getPose());
-
-        //maybe add the field with the position of the robot with only limelight and the field with the position of the robot with only odometry?
-        //We can compare the two fields to see if odometry is causing the pose to be inaccurate when it hits the reef.
-
-        // SmartDashboard.getNumber("GoalPos", turnEncoders[0].getVelocity().getValueAsDouble());
-        // SmartDashboard.putNumber("FL Motor Val", turnMotors[0].getEncoder().getPosition());
-        // double goal = SmartDashboard.getNumber("GoalPos", 0);
-        // PIDController pid = new PIDController(kP, kI, kD);
-        // kP = SmartDashboard.getNumber("kP", 0);
-        // kI = SmartDashboard.getNumber("kI", 0);
-        // kD = SmartDashboard.getNumber("kD", 0);
-        //pid.setIZone(20);
-        //SmartDashboard.putBoolean("atgoal", pid.atSetpoint());
-        // SparkMaxConfig config = new SparkMaxConfig();
-        
-        //config.closedLoop.feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder);
-        // System.out.println(kP);
-        // config.closedLoop.pid(kP ,kI,kD);
-        // config.encoder.positionConversionFactor(360/Constants.Drivetrainc.turnGearing);
-        // turnMotors[0].configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-        // //moduleFL.move(0.0000001, 180);
-        //moduleFL.move(0.01, 180);
-        // moduleFR.move(0.000000001, 0);
-        // moduleBR.move(0.0000001, 0);
-        // moduleFL.move(0.000001, 0);
-        // moduleBL.move(0.000001, 0);
-        // turnPidControllers[0].setReference(goal
-
-        // , ControlType.kPosition, ClosedLoopSlot.kSlot0);
-        
-        
-        // 167 -> -200
-        // 138 -> 360
-        // for (CANcoder coder : turnEncoders) {
-        //     SignalLogger.writeDouble("Regular position " + coder.toString(),
-        //     coder.getPosition().getValue().baseUnitMagnitude());
-        //     SignalLogger.writeDouble("Velocity " + coder.toString(),
-        //     coder.getVelocity().getValue().baseUnitMagnitude());
-        //     SignalLogger.writeDouble("Absolute position " + coder.toString(),
-        //     coder.getAbsolutePosition().getValue().baseUnitMagnitude());
-        // }
-        // String out=""; int i=0;
-        // for (CANcoder coder : turnEncoders) {
-        //     out+=String.format("[i] Abs Pos: %.3f Goal Pos: %.3f ", coder.getAbsolutePosition().getValue().baseUnitMagnitude(),0);
-        //     i++;
-        // }
-        // lobotomized to prevent ucontrollabe swerve behavior
-        // turnMotors[2].setVoltage(SmartDashboard.getNumber("kS", 0));
-        // moduleFL.periodic();
-        // moduleFR.periodic();
-        // moduleBL.periodic();
-        // moduleBR.periodic();
         double goal = SmartDashboard.getNumber("bigoal", 0);
         for (SwerveModule module : modules) {
           // module.turnPeriodic();
           // module.turnPeriodic();
           module.periodic();
         }
+        if (!gyro.isConnected()) {
+            if (fieldOriented) {
+                if (Timer.getFPGATimestamp() - timeStampLatestGyroError > 5) {
+                    Elastic.sendNotification(notification.withLevel(Elastic.NotificationLevel.ERROR)
+                                                        .withDisplaySeconds(5)
+                                                        .withTitle("GYRO")
+                                                        .withDescription("The NavX Gyro is currently disconnected while driving in field oriented"));
+                    timeStampLatestGyroError = Timer.getFPGATimestamp();
+
+                }
+            }
+            else {
+                if (Timer.getFPGATimestamp() - timeStampLatestGyroWarning > 60) {
+                    Elastic.sendNotification(notification.withDisplaySeconds(5)
+                                                        .withTitle("GYRO")
+                                                        .withDescription("The NavX Gyro is currently disconnected")
+                                                        .withLevel(Elastic.NotificationLevel.WARNING));
+                    timeStampLatestGyroWarning = Timer.getFPGATimestamp();
+                }
+            }
+        }
+
 
         // field.setRobotPose(odometry.getPoseMeters());
 

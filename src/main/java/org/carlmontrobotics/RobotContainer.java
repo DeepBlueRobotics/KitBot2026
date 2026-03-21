@@ -20,13 +20,18 @@ import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_SHOOTING_RPM;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
 import java.util.function.BooleanSupplier;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
@@ -73,10 +78,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 
-public class RobotContainer {
+public class RobotContainer implements Sendable {
     
     public final GenericHID driverController = new GenericHID(Driver.port);
-    public final XboxController driverRumble = new XboxController(Driver.port); //For rumbling the controller
     public final GenericHID manipulatorController = new GenericHID(Manipulator.port);
 
     public final Limelight limelight = new Limelight();
@@ -87,21 +91,26 @@ public class RobotContainer {
 
 
     private SendableChooser<Command> autoChooser = new SendableChooser<>();   
-    public boolean alignOverride = true;
     public boolean autoScoring = true;
-
     public static int intakeCounter;
+    private boolean assumeAutoWin = false;
+    private String gameData;
 
     public RobotContainer() {
+
+      
+
         //#region AutoRegistration
         RegisterAutoCommands();
+        //
+        //
+        
+        
         autoChooser = AutoBuilder.buildAutoChooser();
 
         SmartDashboard.putData("Auto Chooser", autoChooser); 
 
-        SmartDashboard.putBoolean("AlignOverride", alignOverride);
         SmartDashboard.putBoolean("AutoScoring", autoScoring);
-        SmartDashboard.putBoolean("AlignOverride", true);
         //#endregion
         setDefaultCommands();
         setBindingsDriver();
@@ -113,6 +122,7 @@ public class RobotContainer {
         SmartDashboard.putString("Location", DriverStation.getLocation().toString());
         SmartDashboard.putBoolean("Connected to FMS?", DriverStation.isFMSAttached());
         SmartDashboard.putString("Station", DriverStation.getAlliance().toString() + " " + DriverStation.getLocation().toString());
+        SmartDashboard.putData("Hub", this);
 
     }
    
@@ -134,7 +144,7 @@ public class RobotContainer {
       .whileTrue(new RunConveyor(intake)); //could be toggle mode instead
    // .whileTrue(new OuttakeFeeder(outtake)); //could be toggle mode instead
      new JoystickButton(manipulatorController, Manipulator.INTAKE_BUTTON)
-      .whileTrue(new IntakeBalls(intake));
+      .whileTrue(new IntakeBalls(intake, manipulatorController));
       new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
       .whileTrue(new ShootBalls(outtake));
       axisTrigger(manipulatorController, Manipulator.SMART_SHOOT_CLOSE_AXIS, OI.JOY_THRESH)
@@ -162,13 +172,202 @@ public class RobotContainer {
       () -> SmartDashboard.getBoolean("Baby Mode", Config.CONFIG.isBabyMode())
       ));
 
-      intake.setDefaultCommand(new IntakeBalls(intake));
+      intake.setDefaultCommand(new IntakeBalls(intake, manipulatorController));
     }
   //#endregion
   //#region getAutoCommand
   public Command getAutonomousCommand() {
     return new SimpleShootAuton(outtake, intake);
   }
+  public boolean isHubActive() {
+    Optional<Alliance> alliance = DriverStation.getAlliance();
+    // If we have no alliance, we cannot be enabled, therefore no hub.
+    if (alliance.isEmpty()) {
+      return false;
+    }
+    // Hub is always enabled in autonomous.
+    if (DriverStation.isAutonomousEnabled()) {
+      return true;
+    }
+    //Hub is technically on during disabled period
+    if (!DriverStation.isTeleopEnabled()) {
+      return true;
+    }
+
+    // We're teleop enabled, compute.
+    double matchTime = DriverStation.getMatchTime();
+    gameData = DriverStation.getGameSpecificMessage();
+    boolean shift1Active;
+    // If we have no game data, we cannot compute, assume hub is active, as its likely early in teleop.
+    if (gameData.isEmpty()) {
+      shift1Active = !assumeAutoWin;
+    }
+    else {
+      boolean redInactiveFirst = false;
+      switch (gameData.charAt(0)) {
+        case 'R' -> {
+          redInactiveFirst = true;
+          // Shift was is active for blue if red won auto, or red if blue won auto.
+          shift1Active = switch (alliance.get()) {
+            case Red -> !redInactiveFirst;
+            case Blue -> redInactiveFirst;
+          };
+        }
+        case 'B' -> {
+          redInactiveFirst = false; 
+          // Shift was is active for blue if red won auto, or red if blue won auto.
+          shift1Active = switch (alliance.get()) {
+            case Red -> !redInactiveFirst;
+            case Blue -> redInactiveFirst;
+          };
+        }
+        default -> {
+          // If we have invalid game data, assume hub is active.
+          shift1Active = !assumeAutoWin;
+        }
+      }
+    }
+
+    if (matchTime > 130) {
+      // Transition shift, hub is active.
+      return true;
+    } 
+    else if (matchTime > 105) {
+      // Shift 1
+      return shift1Active;
+    } 
+    else if (matchTime > 80) {
+      // Shift 2
+      return !shift1Active;
+    } 
+    else if (matchTime > 55) {
+      // Shift 3
+      return shift1Active;
+    } 
+    else if (matchTime > 30) {
+      // Shift 4
+      return !shift1Active;
+    } 
+    else {
+      // End game, hub always active.
+      return true;
+    }
+  }
+  public double hubTimeLeft(){ //Gets time left until hub is active/inactive
+    double matchTime = DriverStation.getMatchTime();
+    Optional<Alliance> alliance = DriverStation.getAlliance();
+    if (alliance.isEmpty()) {
+      return -1;
+    }
+    if (DriverStation.isAutonomous()) {
+      return assumeAutoWin ? matchTime + 10 : matchTime + 35;
+    }
+    gameData = DriverStation.getGameSpecificMessage();
+    boolean shift1Active;
+    // If we have no game data, we cannot compute, assume hub is active, as its likely early in teleop.
+    if (gameData.isEmpty()) {
+      shift1Active = !assumeAutoWin;
+    }
+    else {
+      boolean redInactiveFirst = false;
+      switch (gameData.charAt(0)) {
+        case 'R' -> {
+          redInactiveFirst = true;
+          // Shift was is active for blue if red won auto, or red if blue won auto.
+          shift1Active = switch (alliance.get()) {
+            case Red -> !redInactiveFirst;
+            case Blue -> redInactiveFirst;
+          };
+        }
+        case 'B' -> {
+          redInactiveFirst = false; 
+          // Shift was is active for blue if red won auto, or red if blue won auto.
+          shift1Active = switch (alliance.get()) {
+            case Red -> !redInactiveFirst;
+            case Blue -> redInactiveFirst;
+          };
+        }
+        default -> {
+          // If we have invalid game data, assume hub is active.
+          shift1Active = !assumeAutoWin;
+        }
+      }
+    }
+    if (matchTime > 130) {
+      // Transition shift, hub is active.
+      return shift1Active ? matchTime - 105 : matchTime - 130;
+    } 
+    else if (matchTime > 105) {
+      // Shift 1
+      return matchTime - 105;
+    } 
+    else if (matchTime > 80) {
+      // Shift 2
+      return matchTime - 80;
+    } 
+    else if (matchTime > 55) {
+      // Shift 3
+      return matchTime - 55;
+    } 
+    else if (matchTime > 30) {
+      // Shift 4
+      return shift1Active ? matchTime - 30 : matchTime;
+    } 
+    else {
+      // End game, hub always active.
+      return matchTime;
+    }
+  }
+
+  public boolean getAssumeAutoWin() {
+    return assumeAutoWin;
+  }
+
+  public void setAssumeAutoWin(boolean assumption) {
+    assumeAutoWin = assumption;
+  }
+
+  private int shiftNumber() {
+    if (DriverStation.isAutonomous()) {
+      return 0;
+    }
+    if (DriverStation.isTeleop()) {
+      double matchTime = DriverStation.getMatchTime();
+      if (matchTime > 130) {
+      // Transition shift
+      return 0;
+      } 
+      else if (matchTime > 105) {
+        // Shift 1
+        return 1;
+      } 
+      else if (matchTime > 80) {
+        // Shift 2
+        return 2;
+      } 
+      else if (matchTime > 55) {
+        // Shift 3
+        return 3;
+      } 
+      else if (matchTime > 30) {
+        // Shift 4
+        return 4;
+      } 
+      else {
+        // End game
+        return 5;
+      }
+    }
+    return 0;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder){
+    builder.addBooleanProperty("Hub Active (T/F)", this::isHubActive, null);
+    builder.addDoubleProperty("Hub Time Left", this::hubTimeLeft, null);
+    builder.addBooleanProperty("Assume Won Auto", this::getAssumeAutoWin, this::setAssumeAutoWin);
+    builder.addDoubleProperty("Active shift", this::shiftNumber, null);
+  } 
   //#endregion
   //#region HelpfulMethods
   //TODO: integrate these methods into lib199
