@@ -109,7 +109,7 @@ public final class Constants {
 		// Determine correct turnZero constants (FL, FR, BL, BR)
 		public static final double[] turnZeroDeg = RobotBase.isSimulation() ? new double[] {-90.0, -90.0, -90.0, -90.0 }
 		: (CONFIG.isHammerHead() ? new double[] { 85.7812, 85.0782, -96.9433, -162.9492 }
-			: new double[] { -40.341796875, -155.830078125, -8.61328125, -43.06640625});/* real values here */
+			: new double[] { -41.044921875, -155.830078125, -10.72265625, -43.06640625});/* real values here */
 			
 
 		// kP, kI, and kD constants for turn motor controllers in the order of
@@ -154,7 +154,7 @@ public final class Constants {
 		public static final double[] kForwardAccels = { 0, 0, 0, 0 };
 		public static final double[] kBackwardAccels = kForwardAccels;
 
-		public static final double autoMaxSpeedMps = 4.3 ; // Meters / second
+		public static final double autoMaxSpeedMps = 2 ; // Meters / second
 		public static final double autoMaxAccelMps2 = mu * g; // Meters / seconds^2
 		public static final double autoMaxAmps = 40.0; 
 		// The maximum acceleration the robot can achieve is equal to the coefficient of
@@ -270,8 +270,8 @@ public final class Constants {
 	}	
 	//#region Manipulator
 	public static final class IntakeC {
-		public static final int INTAKE_ID = 21;
-		public static final int INTAKE_FOLLOWER_ID = 24;
+		public static final int INTAKE_ID = 24;
+		public static final int INTAKE_FOLLOWER_ID = 21;
 		public static final int CONVEYOR_ID = 22;
 		public static final double INTAKE_SPEED = 3000; //TODO
 		public static final double CONVEYOR_SPEED = 0.6; //TODO
