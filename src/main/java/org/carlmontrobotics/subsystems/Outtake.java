@@ -72,6 +72,10 @@ public class Outtake extends SubsystemBase {
     pidController.setSetpoint(input, ControlType.kVelocity);
   }
 
+  public void spinOuttakeWithVoltage(double input) {
+    pidController.setSetpoint(input, ControlType.kDutyCycle);
+  }
+
   public void spinOuttakeFeeder(double feederSpeed){
     outtakeFeeder.set(feederSpeed);
   }
@@ -86,6 +90,10 @@ public class Outtake extends SubsystemBase {
 
   public boolean atVelGoal(double goal, double erorrMargin) {
     return Math.abs(goal - outtakeMasterEncoder.getVelocity()) < erorrMargin;
+  }
+
+  public double getOuttakeVelocity() {
+    return outtakeMasterEncoder.getVelocity();
   }
   @Override
   public void initSendable(SendableBuilder builder){

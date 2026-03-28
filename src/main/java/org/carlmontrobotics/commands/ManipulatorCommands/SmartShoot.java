@@ -24,40 +24,21 @@ public class SmartShoot extends Command {
   private final Timer timer;
 
   private final boolean oscillate = true;
-  private final double boost;
   private final boolean useIntake;
+  private boolean backwards = false;
+  private final boolean fasterSpinUp = true;
 
   /** Creates a new SmartShoot. */
-  public SmartShoot(Outtake outtake, Intake intake, double RPM, boolean addFeederBoost) {
+  public SmartShoot(Outtake outtake, Intake intake, double RPM) {
     // Use addRequirements() here to declare subsystem dependencies.
-    goalRPM = RPM;
+    goalRPM = Math.min(RPM, 5500);
     this.outtake = outtake;
     this.intake = intake;
     timer = new Timer();
-    if (addFeederBoost) {
-      boost = 0.3;
-    }
-    else {
-      boost = 0;
-    }
     this.useIntake = false;
     addRequirements(outtake, intake);
    }
 
-  public SmartShoot(Outtake outtake, Intake intake, double RPM, boolean addFeederBoost, boolean useIntake) {
-    goalRPM = RPM;
-    this.outtake = outtake;
-    this.intake = intake;
-    timer = new Timer();
-    if (addFeederBoost) {
-      boost = 0.3;
-    }
-    else {
-      boost = 0;
-    }
-    this.useIntake = useIntake;
-    addRequirements(outtake, intake);
-  }
 
   // Called when the command is initially scheduled.
   @Override
@@ -72,22 +53,35 @@ public class SmartShoot extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    if (fasterSpinUp) {
+      if (outtake.getOuttakeVelocity() < 2000) {
+        outtake.spinOuttakeWithVoltage(1);
+        SmartDashboard.putBoolean("Working", true);
+      }
+      else {
+        outtake.spinOuttake(goalRPM);
+        SmartDashboard.putBoolean("Working", false);
+      }
+    }
+
     if(outtake.atVelGoal(goalRPM, OUTTAKE_ESTIMATE_OFFSET)){
       outtake.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC);
       if (oscillate) {
-        if (timer.get() > 5) {
+        if (timer.get() > 5 && !backwards) {
         timer.restart();
         intake.spinConveyor(-0.2);
+        backwards = true;
       }
-      else if (timer.get() > 0.5) {
+      else if (timer.get() > 0.5 && backwards) {
         timer.restart();
         intake.spinConveyor(CONVEYOR_SPEED);
+        backwards = false;
       } 
       }
       else {
         intake.spinConveyor(CONVEYOR_SPEED);
       } 
-      outtake.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC+boost);
+      outtake.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC);
       intake.spinConveyor(CONVEYOR_SPEED);
     }
   }
