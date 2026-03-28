@@ -135,35 +135,35 @@ public class RobotContainer implements Sendable {
     private void setBindingsDriver() {
         new JoystickButton(driverController, Driver.resetFieldOrientationButton)
             .onTrue(new InstantCommand(drivetrain::resetFieldOrientation));
-        axisTrigger(driverController, Driver.RIGHT_TRIGGER_BUTTON, 0.2)
-            .onTrue(new InstantCommand(()->drivetrain.setFieldOriented(false)))
-            .onFalse(new InstantCommand(()->drivetrain.setFieldOriented(true)));
+        // axisTrigger(driverController, Driver.RIGHT_TRIGGER_BUTTON, 0.2)
+        //     .onTrue(new InstantCommand(()->drivetrain.setFieldOriented(false)))
+        //     .onFalse(new InstantCommand(()->drivetrain.setFieldOriented(true)));
 
-        axisTrigger(driverController, Driver.LEFT_TRIGGER_BUTTON, 0.2)
-            .onTrue(new InstantCommand(() -> drivetrain.setExtraSpeedMult(.5)))//normal max turn is .5
-            .onFalse(new InstantCommand(() -> drivetrain.setExtraSpeedMult(0)));        
+        // axisTrigger(driverController, Driver.LEFT_TRIGGER_BUTTON, 0.2)
+        //     .onTrue(new InstantCommand(() -> drivetrain.setExtraSpeedMult(.5)))//normal max turn is .5
+        //     .onFalse(new InstantCommand(() -> drivetrain.setExtraSpeedMult(0)));        
     }
 
     private void setBindingsManipulator() {
-      new JoystickButton(manipulatorController, Manipulator.INTAKE_CONVEYOR_BUTTON)
+      new JoystickButton(driverController, Manipulator.INTAKE_CONVEYOR_BUTTON)
       .whileTrue(new RunConveyor(intake)); //could be toggle mode instead
    // .whileTrue(new OuttakeFeeder(outtake)); //could be toggle mode instead
-     new JoystickButton(manipulatorController, Manipulator.INTAKE_BUTTON)
+     new JoystickButton(driverController, Manipulator.INTAKE_BUTTON)
       .whileTrue(new IntakeBalls(intake, manipulatorController));
-      new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
+      new JoystickButton(driverController, Manipulator.OUTTAKE_BUTTON)
       .whileTrue(new ShootBalls(outtake));
-      axisTrigger(manipulatorController, Manipulator.SMART_SHOOT_CLOSE_AXIS, OI.JOY_THRESH)
-      .whileTrue(new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM, false));
-      axisTrigger(manipulatorController, Manipulator.SMART_SHOOT_FAR_AXIS, OI.JOY_THRESH)
-      .whileTrue(new SmartShoot(outtake, intake, 7000, true));
-      new JoystickButton(manipulatorController, Manipulator.REPEL_BALLS)
+      axisTrigger(driverController, Manipulator.SMART_SHOOT_CLOSE_AXIS, OI.JOY_THRESH)
+      .whileTrue(new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM));
+      axisTrigger(driverController, Manipulator.SMART_SHOOT_FAR_AXIS, OI.JOY_THRESH)
+      .whileTrue(new SmartShoot(outtake, intake, 7000));
+      new JoystickButton(driverController, Manipulator.REPEL_BALLS)
       .whileTrue(new EjectBalls(intake));
     }
     //#endregion
     //#region AutoMaking
     private void RegisterAutoCommands() {
-      NamedCommands.registerCommand("Shoot", new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM, false));
-      NamedCommands.registerCommand("Pass", new SmartShoot(outtake, intake, OUTTAKE_PASSING_RPM, true, true));
+      NamedCommands.registerCommand("Shoot", new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM));
+      NamedCommands.registerCommand("Pass", new SmartShoot(outtake, intake, OUTTAKE_PASSING_RPM));
       NamedCommands.registerCommand("Eject", new EjectBalls(intake));
     }
 
@@ -187,9 +187,10 @@ public class RobotContainer implements Sendable {
   //#region getAutoCommand
   public Command getAutonomousCommand() {
     if (SmartDashboard.getBoolean("LeftSideAutoShoot", true)) {
-      return AutoBuilder.buildAuto("LeftSideAutoShoot");  
+      DriverStation.reportWarning("Auto running", false);
+      return new SimpleShootAuton(drivetrain, outtake, intake);
     }
-    return new SimpleShootAuton(outtake, intake);
+    return new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM);
   }
   public boolean isHubActive() {
     Optional<Alliance> alliance = DriverStation.getAlliance();

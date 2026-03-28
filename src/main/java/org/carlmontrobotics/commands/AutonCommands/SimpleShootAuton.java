@@ -9,35 +9,65 @@ import static org.carlmontrobotics.Constants.IntakeC.INTAKE_SPEED;
 import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_FEEDER_VOLT_PERC;
 import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_SHOOTING_RPM;
 
+import org.carlmontrobotics.subsystems.Drivetrain;
 import org.carlmontrobotics.subsystems.Intake;
 import org.carlmontrobotics.subsystems.Outtake;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class SimpleShootAuton extends Command {
+  private final Drivetrain dt;
   private final Outtake shooter;
   private final Intake intake;
+  private final Timer timer;
   /** Creates a new SimpleShootAuton. */
-  public SimpleShootAuton(Outtake shooter, Intake intake) {
+  public SimpleShootAuton(Drivetrain dt, Outtake shooter, Intake intake) {
     this.shooter = shooter;
     this.intake = intake;
-    addRequirements(shooter, intake);
+    this.dt = dt;
+    timer = new Timer();
+    addRequirements(shooter, intake, dt);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    shooter.spinOuttake(OUTTAKE_SHOOTING_RPM);
-    shooter.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC);
-    intake.spinConveyor(CONVEYOR_SPEED);
-    //intake.spinIntake(INTAKE_SPEED);
+    timer.restart();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    if (timer.get() > 6.25) {
+      dt.drive(0,0,1);
+    }
+    if (timer.get() > 5.25) {
+      shooter.stopOuttake();
+      shooter.spinOuttakeFeeder(0);
+      intake.spinConveyor(0);
+      intake.spinIntake(INTAKE_SPEED);
+      dt.drive(3, 0, 0);
+    }
+    else if (timer.get() > 4.5) {
+      shooter.stopOuttake();
+      shooter.spinOuttakeFeeder(0);
+      intake.spinConveyor(0);
+      intake.spinIntake(INTAKE_SPEED);
+      dt.drive(0, -2, 0);
+    }
+    else if (timer.get() > 0.5) {
+      shooter.spinOuttakeFeeder(0.7);
+      intake.spinConveyor(CONVEYOR_SPEED);
+    }
+    else {
+      shooter.spinOuttake(OUTTAKE_SHOOTING_RPM);
+      intake.spinIntake(0);
+    }
+  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -45,6 +75,7 @@ public class SimpleShootAuton extends Command {
     shooter.stopOuttake();
     shooter.spinOuttakeFeeder(0);
     intake.stopConveyor();
+    dt.stop();
     //intake.stopIntake();
   }
 
