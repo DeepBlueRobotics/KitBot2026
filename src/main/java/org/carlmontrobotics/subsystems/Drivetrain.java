@@ -458,8 +458,10 @@ public class Drivetrain extends SubsystemBase {
 
 
 
-        poseEstimator.update(gyro.getRotation2d(), getModulePositions());
-        poseEstimator.addVisionMeasurement(LimelightHelpers.getBotPose2d(RIGHT_LL), Timer.getFPGATimestamp());
+        poseEstimator.updateWithTime(Timer.getFPGATimestamp(), gyro.getRotation2d(), getModulePositions());
+        if (LimelightHelpers.getTV(RIGHT_LL)) {
+            poseEstimator.addVisionMeasurement(LimelightHelpers.getBotPose2d(RIGHT_LL), Timer.getFPGATimestamp());
+        }
         //odometry.update(Rotation2d.fromDegrees(getHeading()), getModulePositions());
 
         // updateMT2PoseEstimator();
@@ -597,10 +599,10 @@ public class Drivetrain extends SubsystemBase {
                 //Supplier<ChassisSpeeds> robotRelativeSpeedsSupplier,
                 this::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 //BiConsumer<ChassisSpeeds,DriveFeedforwards> output,
-                (speeds, feedforwards) -> drive(kinematics.toSwerveModuleStates(speeds)), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+                (speeds) -> drive(kinematics.toSwerveModuleStates(speeds)), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
                 //PathFollowingController controller,
                 new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                        new PIDConstants(3
+                        new PIDConstants(2
                         , ppKiDrive, ppKdDrive), // Translation PID constants
                         new PIDConstants(1, ppKiTurn, ppKdTurn)
                 ),

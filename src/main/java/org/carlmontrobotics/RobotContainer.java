@@ -186,11 +186,15 @@ public class RobotContainer implements Sendable {
   //#endregion
   //#region getAutoCommand
   public Command getAutonomousCommand() {
-    if (SmartDashboard.getBoolean("LeftSideAutoShoot", true)) {
-      DriverStation.reportWarning("Auto running", false);
-      return new SimpleShootAuton(drivetrain, outtake, intake);
+    try {
+      PathPlannerPath path = PathPlannerPath.fromPathFile("Test");
+      System.out.println("test running");
+      return AutoBuilder.followPath(path);
     }
-    return new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM);
+    catch (Exception e) {
+      DriverStation.reportError("bad: " + e.getMessage(), e.getStackTrace());
+      return Commands.none();
+    }
   }
   public boolean isHubActive() {
     Optional<Alliance> alliance = DriverStation.getAlliance();

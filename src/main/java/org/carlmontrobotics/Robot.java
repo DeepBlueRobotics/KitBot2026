@@ -57,6 +57,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_robotContainer.drivetrain.resetPoseEstimator();
+    m_robotContainer.drivetrain.setFieldOriented(false);
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -78,6 +80,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    m_robotContainer.drivetrain.setFieldOriented(true);
     m_robotContainer.drivetrain.resetFieldOrientationWithAngle(m_robotContainer.drivetrain.getPoseEstimator().getEstimatedPosition().getRotation().getDegrees());
   }
 

@@ -15,6 +15,7 @@ import org.carlmontrobotics.subsystems.Outtake;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -23,6 +24,15 @@ public class SimpleShootAuton extends Command {
   private final Outtake shooter;
   private final Intake intake;
   private final Timer timer;
+
+  private double startShoot = 0.5;
+  private double endshoot = 4;
+  private double endStrafe = 1;
+  private double endFastDrive = 1.5;
+  private double endSlowDrive = 2;
+  private double endRotation = 0.5;
+  private double endStrafeDrive = 3;
+
   /** Creates a new SimpleShootAuton. */
   public SimpleShootAuton(Drivetrain dt, Outtake shooter, Intake intake) {
     this.shooter = shooter;
@@ -30,36 +40,58 @@ public class SimpleShootAuton extends Command {
     this.dt = dt;
     timer = new Timer();
     addRequirements(shooter, intake, dt);
+    SmartDashboard.putNumber("startShoot", startShoot);
+    SmartDashboard.putNumber("endshoot", endshoot);
+    SmartDashboard.putNumber("endStrafe", endStrafe);
+    SmartDashboard.putNumber("endFastDrive", endFastDrive);
+    SmartDashboard.putNumber("endSlowDrive", endSlowDrive);
+    SmartDashboard.putNumber("endRotation", endRotation);
+    SmartDashboard.putNumber("endStrafeDrive", endStrafeDrive);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    dt.resetFieldOrientation();
+    dt.setFieldOriented(true);
     timer.restart();
+    startShoot = SmartDashboard.getNumber("startShoot", startShoot);
+    endshoot = SmartDashboard.getNumber("endshoot", endshoot);
+   endStrafe =  SmartDashboard.getNumber("endStrafe", endStrafe);
+    endFastDrive = SmartDashboard.getNumber("endFastDrive", endFastDrive);
+    endSlowDrive = SmartDashboard.getNumber("endSlowDrive", endSlowDrive);
+    endRotation = SmartDashboard.getNumber("endRotation", endRotation);
+    endStrafeDrive= SmartDashboard.getNumber("endStrafeDrive", endStrafeDrive);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (timer.get() > 6.25) {
-      dt.drive(0,0,1);
+    double currentTime = timer.get();
+    if (currentTime > startShoot+endshoot+endStrafe+endFastDrive+endSlowDrive+endRotation+endStrafeDrive) {
+      dt.drive(0,0,0);
     }
-    if (timer.get() > 5.25) {
-      shooter.stopOuttake();
-      shooter.spinOuttakeFeeder(0);
-      intake.spinConveyor(0);
-      intake.spinIntake(INTAKE_SPEED);
+    else if (currentTime > startShoot+endshoot+endStrafe+endFastDrive+endSlowDrive+endRotation) {
+      dt.drive(0,1,0);
+    }
+    else if (currentTime > startShoot+endshoot+endStrafe+endFastDrive+endSlowDrive) {
+      dt.drive(0,0,-3.4);
+    }
+    else if (currentTime > startShoot+endshoot+endStrafe+endFastDrive) {
+      dt.drive(1.3,0,0);
+    }
+    else if (currentTime > startShoot+endshoot+endStrafe) {
       dt.drive(3, 0, 0);
     }
-    else if (timer.get() > 4.5) {
+    else if (currentTime > startShoot+endshoot) {
       shooter.stopOuttake();
       shooter.spinOuttakeFeeder(0);
       intake.spinConveyor(0);
       intake.spinIntake(INTAKE_SPEED);
-      dt.drive(0, -2, 0);
+      dt.drive(-0.2, -2, 0);
     }
-    else if (timer.get() > 0.5) {
+    else if (currentTime > startShoot) {
       shooter.spinOuttakeFeeder(0.7);
       intake.spinConveyor(CONVEYOR_SPEED);
     }

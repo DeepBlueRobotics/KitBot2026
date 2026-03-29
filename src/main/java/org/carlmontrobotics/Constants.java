@@ -109,7 +109,7 @@ public final class Constants {
 		// Determine correct turnZero constants (FL, FR, BL, BR)
 		public static final double[] turnZeroDeg = RobotBase.isSimulation() ? new double[] {-90.0, -90.0, -90.0, -90.0 }
 		: (CONFIG.isHammerHead() ? new double[] { 85.7812, 85.0782, -96.9433, -162.9492 }
-			: new double[] { -41.044921875, -155.830078125, -10.72265625, -43.06640625});/* real values here */
+			: new double[] { 144.580078125, -155.830078125, -10.72265625, -43.06640625});/* real values here */
 			
 
 		// kP, kI, and kD constants for turn motor controllers in the order of
@@ -250,7 +250,7 @@ public final class Constants {
 			// 0.8 // error spike threshold, in meters, that will cause the path to be
 			// replanned
 			// );
-			public static final PathConstraints pathConstraints = new PathConstraints(3.5, 2.5, Math.PI-0.5, Math.PI-0.5); // The constraints for this path. If using a differential drivetrain, the
+			public static final PathConstraints pathConstraints = new PathConstraints(3.5, 1, Math.PI-0.5, Math.PI-0.5); // The constraints for this path. If using a differential drivetrain, the
 									// angular constraints have no effect.
 		}
 	}
@@ -285,7 +285,7 @@ public final class Constants {
 		public static final MotorConfig OUTTAKE_FOLLOWER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 		public static final MotorConfig OUTTAKE_FEEDER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 
-		public static final double OUTTAKE_SHOOTING_RPM = 2400; //TODO
+		public static final double OUTTAKE_SHOOTING_RPM = 2500; //TODO
 		public static final double OUTTAKE_PASSING_RPM = 5000; //TODO
 		
 		public static final double kP = 0.0004;
