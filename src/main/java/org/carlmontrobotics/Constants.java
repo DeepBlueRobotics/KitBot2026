@@ -137,7 +137,7 @@ public final class Constants {
 			new double[] { 0,0,0,0 };
 		public static final boolean[] driveInversion = (CONFIG.isHammerHead()
 		? new boolean[] { true, false, true, false }
-		: new boolean[] { false, true, false, true });
+		: new boolean[] { true, true, false, true });
 		public static final boolean[] turnInversion = { false, false, false, false };
 		
 		// kS

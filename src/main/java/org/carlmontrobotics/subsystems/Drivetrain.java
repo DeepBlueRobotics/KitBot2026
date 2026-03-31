@@ -3,6 +3,7 @@ package org.carlmontrobotics.subsystems;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 //lib199
 import org.carlmontrobotics.lib199.MotorConfig;
@@ -303,7 +304,7 @@ public class Drivetrain extends SubsystemBase {
                 coder.getVelocity().setUpdateFrequency(500);
             }
            
-            //SmartDashboard.putData("Field", field);
+            SmartDashboard.putData("Field", field);
             //SmartDashboard.putData("Odometry Field", odometryField);
             //martDashboard.putData("Pose with Limelight Field", poseWithLimelightField);
 
@@ -427,6 +428,7 @@ public class Drivetrain extends SubsystemBase {
 
     @Override
     public void periodic() {
+        field.setRobotPose(poseEstimator.getEstimatedPosition());
         //detectCollision(); //This does nothing
         PathPlannerLogging.logCurrentPose(getPose());
         for (SwerveModule module : modules) {
@@ -569,7 +571,11 @@ public class Drivetrain extends SubsystemBase {
     public void drive(double forward, double strafe, double rotation) {
         drive(getSwerveStates(forward, strafe, rotation));
     }
-    
+    public void logWhileDriving(SwerveModuleState[] moduleStates) {
+        SmartDashboard.putNumber("RequestedSpeed", moduleStates[1].speedMetersPerSecond);
+        drive(moduleStates);
+    }
+
     /**
      * Implements the provided SwerveStates for all 4 modules to get the wanted outcome
      * @param moduleStates SwerveModuleState[]
@@ -599,7 +605,7 @@ public class Drivetrain extends SubsystemBase {
                 //Supplier<ChassisSpeeds> robotRelativeSpeedsSupplier,
                 this::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 //BiConsumer<ChassisSpeeds,DriveFeedforwards> output,
-                (speeds) -> drive(kinematics.toSwerveModuleStates(speeds)), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+                (speeds) -> logWhileDriving(kinematics.toSwerveModuleStates(speeds)), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
                 //PathFollowingController controller,
                 new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
                         new PIDConstants(2

@@ -187,9 +187,10 @@ public class RobotContainer implements Sendable {
   //#region getAutoCommand
   public Command getAutonomousCommand() {
     try {
-      PathPlannerPath path = PathPlannerPath.fromPathFile("Test");
-      System.out.println("test running");
-      return AutoBuilder.followPath(path);
+      // PathPlannerPath path = PathPlannerPath.fromPathFile("Test");
+      // System.out.println("test running");
+      // return AutoBuilder.followPath(path);
+      return new PathPlannerAuto("CoolAuto");
     }
     catch (Exception e) {
       DriverStation.reportError("bad: " + e.getMessage(), e.getStackTrace());
