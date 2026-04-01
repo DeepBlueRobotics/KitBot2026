@@ -109,9 +109,8 @@ public class RobotContainer implements Sendable {
 
         //#region AutoRegistration
         RegisterAutoCommands();
-        RegisterCustomAutos();
-             
         autoChooser = AutoBuilder.buildAutoChooser();
+        RegisterCustomAutos();
 
         SmartDashboard.putData("Auto Chooser", autoChooser); 
         //#endregion
@@ -143,18 +142,18 @@ public class RobotContainer implements Sendable {
     }
 
     private void setBindingsManipulator() {
-      new JoystickButton(driverController, Manipulator.INTAKE_CONVEYOR_BUTTON)
+      new JoystickButton(manipulatorController, Manipulator.INTAKE_CONVEYOR_BUTTON)
       .whileTrue(new RunConveyor(intake)); //could be toggle mode instead
    // .whileTrue(new OuttakeFeeder(outtake)); //could be toggle mode instead
-     new JoystickButton(driverController, Manipulator.INTAKE_BUTTON)
+     new JoystickButton(manipulatorController, Manipulator.INTAKE_BUTTON)
       .whileTrue(new IntakeBalls(intake, manipulatorController));
-      new JoystickButton(driverController, Manipulator.OUTTAKE_BUTTON)
+      new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
       .whileTrue(new ShootBalls(outtake));
-      axisTrigger(driverController, Manipulator.SMART_SHOOT_CLOSE_AXIS, OI.JOY_THRESH)
+      axisTrigger(manipulatorController, Manipulator.SMART_SHOOT_CLOSE_AXIS, OI.JOY_THRESH)
       .whileTrue(new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM));
-      axisTrigger(driverController, Manipulator.SMART_SHOOT_FAR_AXIS, OI.JOY_THRESH)
-      .whileTrue(new SmartShoot(outtake, intake, 7000));
-      new JoystickButton(driverController, Manipulator.REPEL_BALLS)
+      axisTrigger(manipulatorController, Manipulator.SMART_SHOOT_FAR_AXIS, OI.JOY_THRESH)
+      .whileTrue(new SmartShoot(outtake, intake, 7000, true));
+      new JoystickButton(manipulatorController, Manipulator.REPEL_BALLS)
       .whileTrue(new EjectBalls(intake));
     }
     //#endregion
@@ -166,11 +165,11 @@ public class RobotContainer implements Sendable {
     }
 
     private void RegisterCustomAutos(){
-      autoChooser.addOption("CenterLeftNeutral", new CenterLeftNeutralAuto(drivetrain, outtake, intake));
-      autoChooser.addOption("CenterRightNeutral", new CenterRightNeutralAuto(drivetrain, outtake, intake));
-      autoChooser.addOption("LeftNeutralAuto", new LeftNeutralAuto(drivetrain, outtake, intake));
-      autoChooser.addOption("RightNeutralAuto", new RightNeutralAuto(drivetrain, outtake, intake));
-      autoChooser.addOption("Center Auto", new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM));
+      autoChooser.addOption("Center to Left Neutral", new CenterLeftNeutralAuto(drivetrain, outtake, intake));
+      autoChooser.addOption("Center to Right Neutral", new CenterRightNeutralAuto(drivetrain, outtake, intake));
+      autoChooser.addOption("At Bump to Left Neutral Auto", new LeftNeutralAuto(drivetrain, outtake, intake));
+      autoChooser.addOption("At Bump to RightNeutral Auto", new RightNeutralAuto(drivetrain, outtake, intake));
+      autoChooser.setDefaultOption("Center Auto NO MOVE", new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM));
     }
     //#endregion
     //#region DefualtCommands
@@ -190,16 +189,7 @@ public class RobotContainer implements Sendable {
   //#endregion
   //#region getAutoCommand
   public Command getAutonomousCommand() {
-    try {
-      // PathPlannerPath path = PathPlannerPath.fromPathFile("Test");
-      // System.out.println("test running");
-      // return AutoBuilder.followPath(path);
-      return new PathPlannerAuto("CoolAuto");
-    }
-    catch (Exception e) {
-      DriverStation.reportError("bad: " + e.getMessage(), e.getStackTrace());
-      return Commands.none();
-    }
+    return autoChooser.getSelected();
   }
   public boolean isHubActive() {
     Optional<Alliance> alliance = DriverStation.getAlliance();
