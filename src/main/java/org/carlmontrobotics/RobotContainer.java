@@ -7,7 +7,10 @@ package org.carlmontrobotics;
 
 //199 files
 import org.carlmontrobotics.subsystems.*;
-import org.carlmontrobotics.commands.AutonCommands.SimpleShootAuton;
+import org.carlmontrobotics.commands.AutonCommands.CenterLeftNeutralAuto;
+import org.carlmontrobotics.commands.AutonCommands.CenterRightNeutralAuto;
+import org.carlmontrobotics.commands.AutonCommands.LeftNeutralAuto;
+import org.carlmontrobotics.commands.AutonCommands.RightNeutralAuto;
 import org.carlmontrobotics.commands.DriveCommands.TeleopDrive;
 import org.carlmontrobotics.commands.ManipulatorCommands.EjectBalls;
 import org.carlmontrobotics.commands.ManipulatorCommands.IntakeBalls;
@@ -106,16 +109,11 @@ public class RobotContainer implements Sendable {
 
         //#region AutoRegistration
         RegisterAutoCommands();
-        //
-        //
-        
-        
+        RegisterCustomAutos();
+             
         autoChooser = AutoBuilder.buildAutoChooser();
 
         SmartDashboard.putData("Auto Chooser", autoChooser); 
-        SmartDashboard.putBoolean("LeftSideAutoShoot", true);
-
-        SmartDashboard.putBoolean("AutoScoring", autoScoring);
         //#endregion
         setDefaultCommands();
         setBindingsDriver();
@@ -167,7 +165,13 @@ public class RobotContainer implements Sendable {
       NamedCommands.registerCommand("Eject", new EjectBalls(intake));
     }
 
-    private void RegisterCustomAutos(){}
+    private void RegisterCustomAutos(){
+      autoChooser.addOption("CenterLeftNeutral", new CenterLeftNeutralAuto(drivetrain, outtake, intake));
+      autoChooser.addOption("CenterRightNeutral", new CenterRightNeutralAuto(drivetrain, outtake, intake));
+      autoChooser.addOption("LeftNeutralAuto", new LeftNeutralAuto(drivetrain, outtake, intake));
+      autoChooser.addOption("RightNeutralAuto", new RightNeutralAuto(drivetrain, outtake, intake));
+      autoChooser.addOption("Center Auto", new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM));
+    }
     //#endregion
     //#region DefualtCommands
   private void setDefaultCommands() {

@@ -39,6 +39,15 @@ public class SmartShoot extends Command {
     addRequirements(outtake, intake);
    }
 
+   public SmartShoot(Outtake outtake, Intake intake, double RPM, boolean useIntake) {
+    goalRPM = Math.min(RPM, 5500);
+    this.outtake = outtake;
+    this.intake = intake;
+    timer = new Timer();
+    this.useIntake = useIntake;
+    addRequirements(outtake, intake);
+   }
+
 
   // Called when the command is initially scheduled.
   @Override
