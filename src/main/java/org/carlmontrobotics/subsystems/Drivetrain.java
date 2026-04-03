@@ -608,7 +608,7 @@ public class Drivetrain extends SubsystemBase {
                 (speeds) -> logWhileDriving(kinematics.toSwerveModuleStates(speeds)), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
                 //PathFollowingController controller,
                 new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                        new PIDConstants(2
+                        new PIDConstants(4
                         , ppKiDrive, ppKdDrive), // Translation PID constants
                         new PIDConstants(1, ppKiTurn, ppKdTurn)
                 ),
@@ -870,6 +870,10 @@ public class Drivetrain extends SubsystemBase {
     public void coast() {
         for (SwerveModule module : modules)
             module.coast();
+    }
+
+    public double getBusVoltage() {
+        return driveMotors[0].getBusVoltage();
     }
 
 

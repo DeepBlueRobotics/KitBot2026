@@ -175,7 +175,8 @@ public class RobotContainer implements Sendable {
       drivetrain,
       () -> ProcessedAxisValue(driverController, Axis.kLeftY),//.06 drift purple, .10 drift black
       () -> ProcessedAxisValue(driverController, Axis.kLeftX),
-      () -> ProcessedAxisValue(driverController, Axis.kRightX),
+      () -> MathUtil.clamp(
+        ProcessedAxisValue(driverController, Axis.kRightX) + ProcessedAxisValue(manipulatorController, Axis.kRightX),-1,1),
       () -> driverController.getRawButton(OI.Driver.slowDriveButton),
       manipulatorController,
       () -> SmartDashboard.getBoolean("Baby Mode", Config.CONFIG.isBabyMode())
