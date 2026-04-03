@@ -73,7 +73,7 @@ public class CenterRightNeutralAuto extends Command {
       dt.drive(0,0,0);
     }
     else if (currentTime > startShoot+endshoot+endStrafe+endFastDrive+endSlowDrive+endRotation) {
-      dt.drive(0,-1,0);
+      dt.drive(0,-0.8,0);
     }
     else if (currentTime > startShoot+endshoot+endStrafe+endFastDrive+endSlowDrive) {
       dt.drive(0,0,3.4);
@@ -88,7 +88,7 @@ public class CenterRightNeutralAuto extends Command {
       shooter.stopOuttake();
       shooter.spinOuttakeFeeder(0);
       intake.spinConveyor(0);
-      intake.spinIntake(INTAKE_SPEED);
+      intake.spinIntake(INTAKE_SPEED+500);
       dt.drive(-0.2, 2, 0);
     }
     else if (currentTime > startShoot) {

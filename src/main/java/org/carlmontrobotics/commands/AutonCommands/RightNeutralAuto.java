@@ -73,7 +73,7 @@ public class RightNeutralAuto extends Command {
       dt.drive(0,0,0);
     }
     else if (currentTime > endFastDrive+endSlowDrive+endRotation) {
-      dt.drive(0,-1,0);
+      dt.drive(0,-0.8,0);
     }
     else if (currentTime > endFastDrive+endSlowDrive) {
       dt.drive(0,0,3.4);
@@ -83,7 +83,7 @@ public class RightNeutralAuto extends Command {
     }
     else {
       dt.drive(3, 0, 0);
-      intake.spinIntake(INTAKE_SPEED);
+      intake.spinIntake(INTAKE_SPEED+500);
     }
   }
 

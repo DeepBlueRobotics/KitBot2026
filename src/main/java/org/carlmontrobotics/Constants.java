@@ -274,7 +274,7 @@ public final class Constants {
 		public static final int INTAKE_FOLLOWER_ID = 21;
 		public static final int CONVEYOR_ID = 22;
 		public static final double INTAKE_SPEED = 3000; //TODO
-		public static final double CONVEYOR_SPEED = 0.5; //TODO
+		public static final double CONVEYOR_SPEED = 0.7; //TODO
 	}	
 	public static final class OuttakeC { 
 		public static final int OUTTAKE_ID = 31;

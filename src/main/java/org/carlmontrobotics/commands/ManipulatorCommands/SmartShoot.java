@@ -65,23 +65,21 @@ public class SmartShoot extends Command {
     if (fasterSpinUp) {
       if (outtake.getOuttakeVelocity() < 2000) {
         outtake.spinOuttakeWithVoltage(1);
-        SmartDashboard.putBoolean("Working", true);
       }
       else {
         outtake.spinOuttake(goalRPM);
-        SmartDashboard.putBoolean("Working", false);
       }
     }
 
     if(outtake.atVelGoal(goalRPM, OUTTAKE_ESTIMATE_OFFSET)){
       outtake.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC);
       if (oscillate) {
-        if (timer.get() > 5 && !backwards) {
+        if (timer.get() > 3 && !backwards) {
         timer.restart();
         intake.spinConveyor(-0.2);
         backwards = true;
       }
-      else if (timer.get() > 0.5 && backwards) {
+      else if (timer.get() > 0.3 && backwards) {
         timer.restart();
         intake.spinConveyor(CONVEYOR_SPEED);
         backwards = false;
@@ -90,8 +88,6 @@ public class SmartShoot extends Command {
       else {
         intake.spinConveyor(CONVEYOR_SPEED);
       } 
-      outtake.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC);
-      intake.spinConveyor(CONVEYOR_SPEED);
     }
   }
 
