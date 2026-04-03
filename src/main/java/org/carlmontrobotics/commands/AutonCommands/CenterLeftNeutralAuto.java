@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class SimpleShootAuton extends Command {
+public class CenterLeftNeutralAuto extends Command {
   private final Drivetrain dt;
   private final Outtake shooter;
   private final Intake intake;
@@ -34,19 +34,19 @@ public class SimpleShootAuton extends Command {
   private double endStrafeDrive = 3;
 
   /** Creates a new SimpleShootAuton. */
-  public SimpleShootAuton(Drivetrain dt, Outtake shooter, Intake intake) {
+  public CenterLeftNeutralAuto(Drivetrain dt, Outtake shooter, Intake intake) {
     this.shooter = shooter;
     this.intake = intake;
     this.dt = dt;
     timer = new Timer();
     addRequirements(shooter, intake, dt);
-    SmartDashboard.putNumber("startShoot", startShoot);
-    SmartDashboard.putNumber("endshoot", endshoot);
-    SmartDashboard.putNumber("endStrafe", endStrafe);
-    SmartDashboard.putNumber("endFastDrive", endFastDrive);
-    SmartDashboard.putNumber("endSlowDrive", endSlowDrive);
-    SmartDashboard.putNumber("endRotation", endRotation);
-    SmartDashboard.putNumber("endStrafeDrive", endStrafeDrive);
+    // SmartDashboard.putNumber("startShoot", startShoot);
+    // SmartDashboard.putNumber("endshoot", endshoot);
+    // SmartDashboard.putNumber("endStrafe", endStrafe);
+    // SmartDashboard.putNumber("endFastDrive", endFastDrive);
+    // SmartDashboard.putNumber("endSlowDrive", endSlowDrive);
+    // SmartDashboard.putNumber("endRotation", endRotation);
+    // SmartDashboard.putNumber("endStrafeDrive", endStrafeDrive);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -56,13 +56,13 @@ public class SimpleShootAuton extends Command {
     dt.resetFieldOrientation();
     dt.setFieldOriented(true);
     timer.restart();
-    startShoot = SmartDashboard.getNumber("startShoot", startShoot);
-    endshoot = SmartDashboard.getNumber("endshoot", endshoot);
-   endStrafe =  SmartDashboard.getNumber("endStrafe", endStrafe);
-    endFastDrive = SmartDashboard.getNumber("endFastDrive", endFastDrive);
-    endSlowDrive = SmartDashboard.getNumber("endSlowDrive", endSlowDrive);
-    endRotation = SmartDashboard.getNumber("endRotation", endRotation);
-    endStrafeDrive= SmartDashboard.getNumber("endStrafeDrive", endStrafeDrive);
+  //   startShoot = SmartDashboard.getNumber("startShoot", startShoot);
+  //   endshoot = SmartDashboard.getNumber("endshoot", endshoot);
+  //  endStrafe =  SmartDashboard.getNumber("endStrafe", endStrafe);
+  //   endFastDrive = SmartDashboard.getNumber("endFastDrive", endFastDrive);
+  //   endSlowDrive = SmartDashboard.getNumber("endSlowDrive", endSlowDrive);
+  //   endRotation = SmartDashboard.getNumber("endRotation", endRotation);
+  //   endStrafeDrive= SmartDashboard.getNumber("endStrafeDrive", endStrafeDrive);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
