@@ -149,11 +149,11 @@ public class RobotContainer implements Sendable {
       .whileTrue(new IntakeBalls(intake, manipulatorController));
       new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
       .whileTrue(new ShootBalls(outtake));
-      axisTrigger(manipulatorController, Manipulator.SMART_SHOOT_CLOSE_AXIS, OI.JOY_THRESH)
+      axisTrigger(driverController, Manipulator.SMART_SHOOT_CLOSE_AXIS, OI.JOY_THRESH)
       .whileTrue(new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM));
       axisTrigger(manipulatorController, Manipulator.SMART_SHOOT_FAR_AXIS, OI.JOY_THRESH)
       .whileTrue(new SmartShoot(outtake, intake, 7000, true));
-      new JoystickButton(manipulatorController, Manipulator.REPEL_BALLS)
+      new JoystickButton(driverController, Manipulator.REPEL_BALLS)
       .whileTrue(new EjectBalls(intake));
     }
     //#endregion
