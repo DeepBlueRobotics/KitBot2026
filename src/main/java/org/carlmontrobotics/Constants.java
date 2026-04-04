@@ -274,7 +274,7 @@ public final class Constants {
 		public static final int INTAKE_FOLLOWER_ID = 21;
 		public static final int CONVEYOR_ID = 22;
 		public static final double INTAKE_SPEED = 3000; //TODO
-		public static final double CONVEYOR_SPEED = 0.7; //TODO
+		public static final double CONVEYOR_SPEED = 0.9; //TODO
 	}	
 	public static final class OuttakeC { 
 		public static final int OUTTAKE_ID = 31;
@@ -285,7 +285,7 @@ public final class Constants {
 		public static final MotorConfig OUTTAKE_FOLLOWER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 		public static final MotorConfig OUTTAKE_FEEDER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 
-		public static final double OUTTAKE_SHOOTING_RPM = 3000; //TODO
+		public static final double OUTTAKE_SHOOTING_RPM = 2450; //TODO
 		public static final double OUTTAKE_PASSING_RPM = 5000; //TODO
 		
 		public static final double kP = 0.0004;
@@ -293,7 +293,7 @@ public final class Constants {
 		public static final double kD = 0;
 		public static final double kV = 0.0018;
 		public static final double OUTTAKE_FEEDER_VOLT_PERC = 1;
-		public static final double OUTTAKE_ESTIMATE_OFFSET = 50; //+- range for atGoal
+		public static final double OUTTAKE_ESTIMATE_OFFSET = 100; //+- range for atGoal
 	}
 }
 //#endregion

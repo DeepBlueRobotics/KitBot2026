@@ -25,7 +25,7 @@ public class SmartShoot extends Command {
 
   private final boolean oscillate = true;
   private final boolean useIntake;
-  private boolean backwards = false;
+  private boolean backwards = true;
   private final boolean fasterSpinUp = true;
 
   /** Creates a new SmartShoot. */
@@ -57,6 +57,7 @@ public class SmartShoot extends Command {
     if (useIntake) {
       intake.spinIntake(INTAKE_SPEED);
     }
+    backwards = true;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -74,9 +75,9 @@ public class SmartShoot extends Command {
     if(outtake.atVelGoal(goalRPM, OUTTAKE_ESTIMATE_OFFSET)){
       outtake.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC);
       if (oscillate) {
-        if (timer.get() > 3 && !backwards) {
+        if (timer.get() > 4 && !backwards) {
         timer.restart();
-        intake.spinConveyor(-0.2);
+        intake.spinConveyor(0);
         backwards = true;
       }
       else if (timer.get() > 0.3 && backwards) {

@@ -28,10 +28,10 @@ public class RightNeutralAuto extends Command {
   private double startShoot = 0.5;
   private double endshoot = 4;
   private double endStrafe = 1;
-  private double endFastDrive = 1.5;
-  private double endSlowDrive = 2;
-  private double endRotation = 0.5;
-  private double endStrafeDrive = 3;
+  private double endFastDrive = 2.4;
+  private double endSlowDrive = 0.1;
+  private double endRotation = 0.6;
+  private double endStrafeDrive = 5;
 
   /** Creates a new SimpleShootAuton. */
   public RightNeutralAuto(Drivetrain dt, Outtake shooter, Intake intake) {
