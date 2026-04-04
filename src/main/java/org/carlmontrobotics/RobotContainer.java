@@ -132,6 +132,10 @@ public class RobotContainer implements Sendable {
     private void setBindingsDriver() {
         new JoystickButton(driverController, Driver.resetFieldOrientationButton)
             .onTrue(new InstantCommand(drivetrain::resetFieldOrientation));
+        new JoystickButton(driverController, Manipulator.OUTTAKE_BUTTON)
+          .whileTrue(new ShootBalls(outtake));
+        axisTrigger(driverController, Manipulator.SMART_SHOOT_CLOSE_AXIS, OI.JOY_THRESH)
+          .whileTrue(new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM));
         // axisTrigger(driverController, Driver.RIGHT_TRIGGER_BUTTON, 0.2)
         //     .onTrue(new InstantCommand(()->drivetrain.setFieldOriented(false)))
         //     .onFalse(new InstantCommand(()->drivetrain.setFieldOriented(true)));
@@ -149,6 +153,7 @@ public class RobotContainer implements Sendable {
       .whileTrue(new IntakeBalls(intake, manipulatorController));
       new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
       .whileTrue(new ShootBalls(outtake));
+
       axisTrigger(manipulatorController, Manipulator.SMART_SHOOT_CLOSE_AXIS, OI.JOY_THRESH)
       .whileTrue(new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM));
       axisTrigger(manipulatorController, Manipulator.SMART_SHOOT_FAR_AXIS, OI.JOY_THRESH)
