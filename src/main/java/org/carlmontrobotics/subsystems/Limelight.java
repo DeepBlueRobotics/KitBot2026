@@ -3,15 +3,12 @@ package org.carlmontrobotics.subsystems;
 
 import static org.carlmontrobotics.Constants.LimeLightc.*;
 
-import java.util.random.RandomGenerator.LeapableGenerator;
-
 import org.carlmontrobotics.lib199.vendorLibs.LimelightHelpers;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Limelight extends SubsystemBase {
@@ -136,7 +133,6 @@ public class Limelight extends SubsystemBase {
     return LimelightHelpers.getTX(name);
   }
 
-  //TODO: TEST WHICH ONE IS MORE ACCURATE
 
   public double getRotateAngleRadMT2(String limelightName) {
     Pose3d targetPoseRobotSpace = LimelightHelpers.getTargetPose3d_RobotSpace(limelightName); // pose of the target

@@ -6,11 +6,7 @@ package org.carlmontrobotics.commands.ManipulatorCommands;
 
 import static org.carlmontrobotics.Constants.IntakeC.CONVEYOR_SPEED;
 import static org.carlmontrobotics.Constants.IntakeC.INTAKE_SPEED;
-import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_FEEDER_VOLT_PERC;
-
 import org.carlmontrobotics.subsystems.Intake;
-import org.carlmontrobotics.subsystems.Outtake;
-
 import edu.wpi.first.wpilibj2.command.Command;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */

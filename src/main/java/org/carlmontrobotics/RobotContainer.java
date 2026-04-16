@@ -17,20 +17,13 @@ import org.carlmontrobotics.commands.ManipulatorCommands.IntakeBalls;
 import org.carlmontrobotics.commands.ManipulatorCommands.RunConveyor;
 import org.carlmontrobotics.commands.ManipulatorCommands.ShootBalls;
 import org.carlmontrobotics.commands.ManipulatorCommands.SmartShoot;
-import org.carlmontrobotics.commands.ManipulatorCommands.OuttakeFeeder;
 
 import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_PASSING_RPM;
 import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_SHOOTING_RPM;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -38,46 +31,27 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 import java.util.function.BooleanSupplier;
 
-import javax.print.attribute.standard.MediaSize.NA;
-
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
 //auton
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.GoalEndState;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.auto.NamedCommands;
 
 //controllers
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
-import edu.wpi.first.wpilibj.XboxController.Button;
 
 //commands
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
+
 //control bindings
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 //constants
 import org.carlmontrobotics.Constants.OI;
 import org.carlmontrobotics.Constants.OI.Driver;
 import org.carlmontrobotics.Constants.OI.Manipulator;
-import org.carlmontrobotics.Constants.OuttakeC;
-import org.carlmontrobotics.Constants.Drivetrainc.Autoc;
+
 
 //smartdashboard/elastic
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -119,7 +93,6 @@ public class RobotContainer implements Sendable {
         setBindingsManipulator();
 
         SmartDashboard.putBoolean("Baby Mode", Config.CONFIG.isBabyMode());
-        // SmartDashboard.putData("Rotate Command",new RotateToTag(drivetrain, limelight));
         SmartDashboard.putString("Alliance", DriverStation.getAlliance().toString());
         SmartDashboard.putString("Location", DriverStation.getLocation().toString());
         SmartDashboard.putBoolean("Connected to FMS?", DriverStation.isFMSAttached());

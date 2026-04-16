@@ -11,7 +11,6 @@ import org.carlmontrobotics.subsystems.Intake;
 import org.carlmontrobotics.subsystems.Outtake;
 
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 
@@ -30,7 +29,6 @@ public class SmartShoot extends Command {
 
   /** Creates a new SmartShoot. */
   public SmartShoot(Outtake outtake, Intake intake, double RPM) {
-    // Use addRequirements() here to declare subsystem dependencies.
     goalRPM = Math.min(RPM, 5500);
     this.outtake = outtake;
     this.intake = intake;

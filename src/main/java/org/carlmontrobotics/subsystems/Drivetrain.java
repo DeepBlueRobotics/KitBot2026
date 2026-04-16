@@ -17,7 +17,7 @@ import org.carlmontrobotics.lib199.vendorLibs.LimelightHelpers;
 import static org.carlmontrobotics.Config.CONFIG;
 
 import edu.wpi.first.hal.SimDouble;
-
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 
@@ -109,10 +109,7 @@ import static edu.wpi.first.units.Units.Meters;
 
 //Constants
 import org.carlmontrobotics.Constants;
-import org.carlmontrobotics.Constants.Drivetrainc;
-import org.carlmontrobotics.Constants.Drivetrainc.Autoc;
-import org.carlmontrobotics.Robot;
-import org.carlmontrobotics.subsystems.Limelight;
+
 import org.carlmontrobotics.commands.DriveCommands.RotateToFieldRelativeAngle;
 import org.carlmontrobotics.commands.DriveCommands.TeleopDrive;
 import static org.carlmontrobotics.Constants.Drivetrainc.*;
@@ -145,8 +142,6 @@ public class Drivetrain extends SubsystemBase {
     private SwerveModule moduleBR;
 
     private final Field2d field = new Field2d();
-    private final Field2d odometryField = new Field2d();
-    private final Field2d poseWithLimelightField = new Field2d();
 
     public double ppKpDrive = 5.0;
     public double ppKiDrive = 0;
@@ -166,9 +161,11 @@ public class Drivetrain extends SubsystemBase {
     public double extraSpeedMult = 0;
 
     private double lastSetX = 0, lastSetY = 0, lastSetTheta = 0;
+
     double kP = 0;
     double kI = 0;
     double kD = 0;
+
     public enum Mode {
     coast,
     brake,
@@ -176,22 +173,11 @@ public class Drivetrain extends SubsystemBase {
     }
 
     public final Limelight ll;
+
+
     public Drivetrain(Limelight ll) {
         this.ll = ll;
         AutoBuilder();
-        //SmartDashboard.putNumber("Goal Velocity", 0);
-        //SmartDashboard.putNumber("kP", 0);
-        //SmartDashboard.putNumber("kI", 0);
-        //SmartDashboard.putNumber("kD", 0);
-
-        // SmartDashboard.putNumber("Pose Estimator t x (m)", lastSetX);
-        // SmartDashboard.putNumber("Pose Estimator set y (m)", lastSetY);
-        // SmartDashboard.putNumber("Pose Estimator set rotation (deg)",
-        // lastSetTheta);
-
-        // SmartDashboard.putNumber("pose estimator std dev x", STD_DEV_X_METERS);
-        // SmartDashboard.putNumber("pose estimator std dev y", STD_DEV_Y_METERS);
-        //SmartDashboard.putNumber("GoalPos", 0);
         // Calibrate Gyro
         {
 
@@ -269,12 +255,7 @@ public class Drivetrain extends SubsystemBase {
                 };
                 gyroYawSim = new SimDeviceSim("navX-Sensor[0]").getDouble("Yaw");
             }
-            SmartDashboard.putData("Module FL",moduleFL);
-            SmartDashboard.putData("Module FR",moduleFR);
-            SmartDashboard.putData("Module BL",moduleBL);
-            SmartDashboard.putData("Module BR",moduleBR);
             
-            SmartDashboard.putNumber("bigoal", 0);
 
             SparkMaxConfig driveConfig = new SparkMaxConfig();
             driveConfig.openLoopRampRate(secsPer12Volts);
@@ -304,10 +285,6 @@ public class Drivetrain extends SubsystemBase {
                 coder.getVelocity().setUpdateFrequency(500);
             }
            
-            SmartDashboard.putData("Field", field);
-            //SmartDashboard.putData("Odometry Field", odometryField);
-            //martDashboard.putData("Pose with Limelight Field", poseWithLimelightField);
-
             accelX = gyro.getWorldLinearAccelX(); // Acceleration along the X-axis
             accelY = gyro.getWorldLinearAccelY(); // Acceleration along the Y-axis
             accelXY = Math.sqrt(gyro.getWorldLinearAccelX() * gyro.getWorldLinearAccelX() + gyro.getWorldLinearAccelY() * gyro.getWorldLinearAccelY());
@@ -330,17 +307,7 @@ public class Drivetrain extends SubsystemBase {
                 Rotation2d.fromDegrees(getHeading()),
                 getModulePositions(),
                 new Pose2d());
-
-        // Setup autopath builder
-        //configurePPLAutoBuilder();
-        // SmartDashboard.putNumber("chassis speeds x", 0);
-        //                 SmartDashboard.putNumber("chassis speeds y", 0);
-
-        //                             SmartDashboard.putNumber("chassis speeds theta", 0);
-        SmartDashboard.putData(this); // For seeing drivetrain data in SmartDashboard
-
     }
-
 
 
     public boolean isAtAngle(double desiredAngleDeg, double toleranceDeg){
@@ -466,15 +433,6 @@ public class Drivetrain extends SubsystemBase {
         }
         //odometry.update(Rotation2d.fromDegrees(getHeading()), getModulePositions());
 
-        // updateMT2PoseEstimator();
-
-        // double currSetX =
-        // SmartDashboard.getNumber("Pose Estimator set x (m)", lastSetX);
-        // double currSetY =
-        // SmartDashboard.getNumber("Pose Estimator set y (m)", lastSetY);
-        // double currSetTheta = SmartDashboard
-        // .getNumber("Pose Estimator set rotation (deg)", lastSetTheta);
-
         // if (lastSetX != currSetX || lastSetY != currSetY
         // || lastSetTheta != currSetTheta) {
         // setPose(new Pose2d(currSetX, currSetY,
@@ -484,33 +442,6 @@ public class Drivetrain extends SubsystemBase {
         // setPose(new Pose2d(getPose().getTranslation().getX(),
         // getPose().getTranslation().getY(),
         // Rotation2d.fromDegrees(getHeading())));
-
-
-        // SmartDashboard.putNumber("X position with limelight", getPoseWithLimelight().getX());
-        // SmartDashboard.putNumber("Y position with limelight", getPoseWithLimelight().getY());
-        SmartDashboard.putNumber("X position with gyro", getPose().getX());
-        SmartDashboard.putNumber("Y position with gyro", getPose().getY());
-        SmartDashboard.putData(CONFIG);
-        
-        //For finding acceleration of drivetrain for collision detector
-        SmartDashboard.putNumber("Accel X", accelX);
-        SmartDashboard.putNumber("Accel Y", accelY);
-        SmartDashboard.putNumber("2D Acceleration ", accelXY);
-
-        // // // SmartDashboard.putNumber("Pitch", gyro.getPitch());
-        // // // SmartDashboard.putNumber("Roll", gyro.getRoll());
-        // SmartDashboard.putNumber("Raw gyro angle", gyro.getAngle());
-        // SmartDashboard.putNumber("Robot Heading", getHeading());
-        // // // SmartDashboard.putNumber("AdjRoll", gyro.getPitch() - initPitch);
-        // // // SmartDashboard.putNumber("AdjPitch", gyro.getRoll() - initRoll);
-        // SmartDashboard.putBoolean("Field Oriented", fieldOriented);
-        // SmartDashboard.putNumber("Gyro Compass Heading", gyro.getCompassHeading());
-        // SmartDashboard.putNumber("Compass Offset", compassOffset);
-        // SmartDashboard.putBoolean("Current Magnetic Field Disturbance", gyro.isMagneticDisturbance());
-        SmartDashboard.putNumber("front left encoder", moduleFL.getModuleAngle());
-        SmartDashboard.putNumber("front right encoder", moduleFR.getModuleAngle());
-        SmartDashboard.putNumber("back left encoder", moduleBL.getModuleAngle());
-        SmartDashboard.putNumber("back right encoder", moduleBR.getModuleAngle());
     }
 
     @Override
@@ -571,10 +502,6 @@ public class Drivetrain extends SubsystemBase {
     public void drive(double forward, double strafe, double rotation) {
         drive(getSwerveStates(forward, strafe, rotation));
     }
-    public void logWhileDriving(SwerveModuleState[] moduleStates) {
-        SmartDashboard.putNumber("RequestedSpeed", moduleStates[1].speedMetersPerSecond);
-        drive(moduleStates);
-    }
 
     /**
      * Implements the provided SwerveStates for all 4 modules to get the wanted outcome
@@ -585,9 +512,7 @@ public class Drivetrain extends SubsystemBase {
         double max = maxSpeed;
         SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, max);
         for (int i = 0; i < 4; i++) {
-            // SmartDashboard.putNumber("moduleIn" + Integer.toString(i), moduleStates[i].angle.getDegrees());
             moduleStates[i].optimize(Rotation2d.fromDegrees(modules[i].getModuleAngle()));
-            // SmartDashboard.putNumber("moduleOT" + Integer.toString(i), moduleStates[i].angle.getDegrees());
             modules[i].move(moduleStates[i].speedMetersPerSecond, moduleStates[i].angle.getDegrees());
         }
     }
@@ -605,7 +530,7 @@ public class Drivetrain extends SubsystemBase {
                 //Supplier<ChassisSpeeds> robotRelativeSpeedsSupplier,
                 this::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 //BiConsumer<ChassisSpeeds,DriveFeedforwards> output,
-                (speeds) -> logWhileDriving(kinematics.toSwerveModuleStates(speeds)), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+                (speeds) -> drive(kinematics.toSwerveModuleStates(speeds)), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
                 //PathFollowingController controller,
                 new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
                         new PIDConstants(4
@@ -739,27 +664,6 @@ public class Drivetrain extends SubsystemBase {
         //odometry.resetPosition(Rotation2d.fromDegrees(getHeading()), getModulePositions(), initialPose);
     }
 
-    //This method will set the pose using limelight if it sees a tag and if not it is supposed to run like setPose()
-    public void setPoseWithLimelight(Pose2d backupPose){ //the pose will be set to backupPose if no tag is seen
-    //     Rotation2d gyroRotation = gyro.getRotation2d();
-    //     Pose2d pose;
-
-    //     if (LimelightHelpers.getTV(REEF_LL)) {
-            
-    //         pose = LimelightHelpers.getBotPose2d_wpiBlue(REEF_LL);
-
-    //     } else if (LimelightHelpers.getTV(CORAL_LL)) {
-
-    //         pose = LimelightHelpers.getBotPose2d_wpiBlue(CORAL_LL);
-    //     }
-    //     else {
-    //         pose = backupPose;
-    //     }
-
-    //     poseEstimator.resetPosition(gyroRotation, getModulePositions(), pose);
-    //     simGyroOffset = pose.getRotation().minus(gyroRotation);
-        
-    }
     /**
      * Detects if the robot has experienced a collision based on acceleration thresholds.
      * @return true if a 2D acceleration greater than the {@link #COLLISION_ACCELERATION_THRESHOLD} false otherwise.
@@ -1109,10 +1013,6 @@ public class Drivetrain extends SubsystemBase {
                 m_revs[i] = Rotation.mutable(0);
                 m_revs_vel[i] = RotationsPerSecond.mutable(0);
             }
-
-            // SmartDashboard.putNumber("Desired Angle", 0);
-
-            // SmartDashboard.putNumber("kS", 0);
         }
     }
 
