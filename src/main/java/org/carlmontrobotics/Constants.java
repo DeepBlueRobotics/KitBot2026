@@ -145,6 +145,7 @@ public final class Constants {
 		// Angular velocity = Tangential speed / radius
 		public static final double maxRCW = maxSpeed / swerveRadius;
 		
+		public static final double autoMaxSpeedMps = 2 ; // Meters / second
 		public static final double autoMaxAccelMps2 = mu * g; // Meters / seconds^2
 		public static final double autoMaxAmps = 40.0; 
 		// The maximum acceleration the robot can achieve is equal to the coefficient of
