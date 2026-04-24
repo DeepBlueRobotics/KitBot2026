@@ -109,7 +109,7 @@ public final class Constants {
 		// Determine correct turnZero constants (FL, FR, BL, BR)
 		public static final double[] turnZeroDeg = RobotBase.isSimulation() ? new double[] {-90.0, -90.0, -90.0, -90.0 }
 		: (CONFIG.isHammerHead() ? new double[] { 85.7812, 85.0782, -96.9433, -162.9492 }
-			: new double[] { 144.580078125, -155.830078125, -10.72265625, -43.06640625});/* real values here */
+			: new double[] {-37.08984375, -156.708984375,-135.263671875, 81.474609375});/* real values here */
 			
 
 		// kP, kI, and kD constants for turn motor controllers in the order of
@@ -137,7 +137,7 @@ public final class Constants {
 			new double[] { 0,0,0,0 };
 		public static final boolean[] driveInversion = (CONFIG.isHammerHead()
 		? new boolean[] { true, false, true, false }
-		: new boolean[] { true, true, false, true });
+		: new boolean[] { true, true, false, false });
 		public static final boolean[] turnInversion = { false, false, false, false };
 		
 		// kS
