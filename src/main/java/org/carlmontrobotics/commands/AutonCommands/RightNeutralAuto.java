@@ -4,18 +4,13 @@
 
 package org.carlmontrobotics.commands.AutonCommands;
 
-import static org.carlmontrobotics.Constants.IntakeC.CONVEYOR_SPEED;
 import static org.carlmontrobotics.Constants.IntakeC.INTAKE_SPEED;
-import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_FEEDER_VOLT_PERC;
-import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_SHOOTING_RPM;
 
 import org.carlmontrobotics.subsystems.Drivetrain;
 import org.carlmontrobotics.subsystems.Intake;
 import org.carlmontrobotics.subsystems.Outtake;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -25,9 +20,6 @@ public class RightNeutralAuto extends Command {
   private final Intake intake;
   private final Timer timer;
 
-  private double startShoot = 0.5;
-  private double endshoot = 4;
-  private double endStrafe = 1;
   private double endFastDrive = 2.4;
   private double endSlowDrive = 0.1;
   private double endRotation = 0.6;
@@ -40,14 +32,6 @@ public class RightNeutralAuto extends Command {
     this.dt = dt;
     timer = new Timer();
     addRequirements(shooter, intake, dt);
-    // SmartDashboard.putNumber("startShoot", startShoot);
-    // SmartDashboard.putNumber("endshoot", endshoot);
-    // SmartDashboard.putNumber("endStrafe", endStrafe);
-    // SmartDashboard.putNumber("endFastDrive", endFastDrive);
-    // SmartDashboard.putNumber("endSlowDrive", endSlowDrive);
-    // SmartDashboard.putNumber("endRotation", endRotation);
-    // SmartDashboard.putNumber("endStrafeDrive", endStrafeDrive);
-    // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
@@ -56,13 +40,6 @@ public class RightNeutralAuto extends Command {
     dt.resetFieldOrientation();
     dt.setFieldOriented(true);
     timer.restart();
-  //   startShoot = SmartDashboard.getNumber("startShoot", startShoot);
-  //   endshoot = SmartDashboard.getNumber("endshoot", endshoot);
-  //  endStrafe =  SmartDashboard.getNumber("endStrafe", endStrafe);
-  //   endFastDrive = SmartDashboard.getNumber("endFastDrive", endFastDrive);
-  //   endSlowDrive = SmartDashboard.getNumber("endSlowDrive", endSlowDrive);
-  //   endRotation = SmartDashboard.getNumber("endRotation", endRotation);
-  //   endStrafeDrive= SmartDashboard.getNumber("endStrafeDrive", endStrafeDrive);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -94,7 +71,6 @@ public class RightNeutralAuto extends Command {
     shooter.spinOuttakeFeeder(0);
     intake.stopConveyor();
     dt.stop();
-    //intake.stopIntake();
   }
 
   // Returns true when the command should end.

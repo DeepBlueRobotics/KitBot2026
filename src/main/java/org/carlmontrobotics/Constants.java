@@ -16,7 +16,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.XboxController.Button;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.math.util.Units;
 import static org.carlmontrobotics.Config.CONFIG;
 
@@ -273,8 +272,8 @@ public final class Constants {
 		public static final int INTAKE_ID = 24;
 		public static final int INTAKE_FOLLOWER_ID = 21;
 		public static final int CONVEYOR_ID = 22;
-		public static final double INTAKE_SPEED = 3000; //TODO
-		public static final double CONVEYOR_SPEED = 0.9; //TODO
+		public static final double INTAKE_SPEED = 3000;
+		public static final double CONVEYOR_SPEED = 0.9;
 	}	
 	public static final class OuttakeC { 
 		public static final int OUTTAKE_ID = 31;
@@ -285,8 +284,8 @@ public final class Constants {
 		public static final MotorConfig OUTTAKE_FOLLOWER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 		public static final MotorConfig OUTTAKE_FEEDER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 
-		public static final double OUTTAKE_SHOOTING_RPM = 2450; //TODO
-		public static final double OUTTAKE_PASSING_RPM = 5000; //TODO
+		public static final double OUTTAKE_SHOOTING_RPM = 2450;
+		public static final double OUTTAKE_PASSING_RPM = 5000;
 		
 		public static final double kP = 0.0004;
 		public static final double kI = 0;

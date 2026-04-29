@@ -8,7 +8,6 @@ import static org.carlmontrobotics.Constants.IntakeC.*;
 
 import org.carlmontrobotics.subsystems.Intake;
 
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;

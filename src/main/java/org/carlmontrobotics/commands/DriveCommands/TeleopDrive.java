@@ -6,18 +6,15 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.carlmontrobotics.Constants;
-import org.carlmontrobotics.Robot;
 import org.carlmontrobotics.subsystems.Drivetrain;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class TeleopDrive extends Command {
 
-  private static double robotPeriod = Robot.kDefaultPeriod;
+  //private static double robotPeriod = Robot.kDefaultPeriod;
   private final Drivetrain drivetrain;
   private DoubleSupplier fwd;
   private DoubleSupplier str;
@@ -25,7 +22,7 @@ public class TeleopDrive extends Command {
   private BooleanSupplier slow;
   private double currentForwardVel = 0;
   private double currentStrafeVel = 0;
-  private double prevTimestamp;
+  //private double prevTimestamp;
   GenericHID manipulatorController;
   BooleanSupplier babyModeSupplier;
 
@@ -46,33 +43,20 @@ public class TeleopDrive extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    // SmartDashboard.putNumber("slow turn const", kSlowDriveRotation);
-    // SmartDashboard.putNumber("slow speed const", kSlowDriveSpeed);
-    // SmartDashboard.putNumber("normal turn const", kNormalDriveRotation);
-    // SmartDashboard.putNumber("normal speed const", kNormalDriveSpeed);
-    prevTimestamp = Timer.getFPGATimestamp();
+    //prevTimestamp = Timer.getFPGATimestamp();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double currentTime = Timer.getFPGATimestamp();
-    robotPeriod = currentTime - prevTimestamp;
+    //double currentTime = Timer.getFPGATimestamp();
+    //robotPeriod = currentTime - prevTimestamp;
     if (!hasDriverInput()) {
       drivetrain.drive(0,0,0);
     }
     else {
-    double[] speeds = getRequestedSpeeds();
-    // SmartDashboard.putNumber("Elapsed time", currentTime - prevTimestamp);
-    prevTimestamp = currentTime;
-    // kSlowDriveRotation = SmartDashboard.getNumber("slow turn const", kSlowDriveRotation);
-    // kSlowDriveSpeed = SmartDashboard.getNumber("slow speed const", kSlowDriveSpeed);
-    // kNormalDriveRotation = SmartDashboard.getNumber("normal turn const", kNormalDriveRotation);
-    // kNormalDriveSpeed = SmartDashboard.getNumber("normal speed const", kNormalDriveSpeed);
-
-    // SmartDashboard.putNumber("fwd", speeds[0]);
-    // SmartDashboard.putNumber("strafe", speeds[1]);
-    // SmartDashboard.putNumber("turn", speeds[2]);
+      double[] speeds = getRequestedSpeeds();
+      //prevTimestamp = currentTime;
       drivetrain.drive(speeds[0], speeds[1], speeds[2]);
     }
   }
@@ -85,27 +69,17 @@ public class TeleopDrive extends Command {
     double forward = fwd.getAsDouble();
     double strafe = str.getAsDouble();
     double rotateClockwise = rcw.getAsDouble();
-    // SmartDashboard.putNumber("fwdIN", forward);
-    // SmartDashboard.putNumber("strafeIN", strafe);
-    // SmartDashboard.putNumber("turnIN", rotateClockwise);
-    // System.out.println("fwd str rcw: "+forward+", "+strafe+", "+rotateClockwise);
-    boolean slow2 = slow.getAsBoolean();
     forward *= maxForward;
     strafe *= maxStrafe;
     rotateClockwise *= maxRCW;
 
-    // System.out.println("teleopDrive ExtraSpeedMult%: "+drivetrain.extraSpeedMult);
     double driveMultiplier = (slow.getAsBoolean() ? kSlowDriveSpeed : kNormalDriveSpeed);
     double rotationMultiplier = drivetrain.extraSpeedMult + (slow.getAsBoolean() ? kSlowDriveRotation : kNormalDriveRotation);
-    // double driveMultiplier = (slow.getAsBoolean() ? kSlowDriveSpeed : kNormalDriveSpeed);
-    // double rotationMultiplier = (slow.getAsBoolean() ? kSlowDriveRotation : kNormalDriveRotation);
     
     if(babyModeSupplier.getAsBoolean()){
       driveMultiplier = kBabyDriveSpeed; 
       rotationMultiplier = kBabyDriveRotation;
     }
-    // double driveMultiplier = kNormalDriveSpeed;
-    // double rotationMultiplier = kNormalDriveRotation;
 
     forward *= driveMultiplier;
     strafe *= driveMultiplier;

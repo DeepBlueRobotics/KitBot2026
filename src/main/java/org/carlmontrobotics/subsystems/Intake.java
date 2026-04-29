@@ -40,18 +40,32 @@ public class Intake extends SubsystemBase {
     pidC = intakeMotor.getClosedLoopController();
   }
 
+  /**
+   * Spins intake using PID control
+   * @param intakeSpeed RPM speed
+   */
   public void spinIntake(double intakeSpeed) {
     pidC.setSetpoint(intakeSpeed, ControlType.kVelocity);
   }
 
+  /**
+   * Spins conveyor using voltage percentage control
+   * @param conveyorSpeed voltage percentage: -1.0 to 1.0
+   */
   public void spinConveyor(double conveyorSpeed) {
     conveyorMotor.set(conveyorSpeed);
   }
 
+  /**
+   * Stops the intake
+   */
   public void stopIntake(){
     intakeMotor.set(0);
   }
 
+  /**
+   * Stops the conveyor
+   */
   public void stopConveyor(){
     conveyorMotor.set(0);
   }
