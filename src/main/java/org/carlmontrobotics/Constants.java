@@ -137,7 +137,8 @@ public final class Constants {
 			new double[] { 0,0,0,0 };
 		public static final boolean[] driveInversion = (CONFIG.isHammerHead()
 		? new boolean[] { true, false, true, false }
-		: new boolean[] { true, true, false, false });
+		: new boolean[] { false, true, false, 
+			true});
 		public static final boolean[] turnInversion = { false, false, false, false };
 		
 		// kS
@@ -273,7 +274,7 @@ public final class Constants {
 		public static final int INTAKE_ID = 24;
 		public static final int INTAKE_FOLLOWER_ID = 21;
 		public static final int CONVEYOR_ID = 22;
-		public static final double INTAKE_SPEED = 3000; //TODO
+		public static final double INTAKE_SPEED = 2000; //TODO
 		public static final double CONVEYOR_SPEED = 0.9; //TODO
 	}	
 	public static final class OuttakeC { 

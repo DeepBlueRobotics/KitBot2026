@@ -84,6 +84,7 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
     m_robotContainer.drivetrain.setFieldOriented(true);
+    m_robotContainer.drivetrain.setDrivingIdleMode(false);
 
     if (!atComp) {
       m_robotContainer.drivetrain.resetFieldOrientation();

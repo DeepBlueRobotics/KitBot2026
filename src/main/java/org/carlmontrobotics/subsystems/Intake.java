@@ -60,6 +60,8 @@ public class Intake extends SubsystemBase {
   public void initSendable(SendableBuilder builder){
     super.initSendable(builder);
     builder.addDoubleProperty("Intake Speed perc", () -> intakeMotor.get(), this::spinIntake);
+    builder.addDoubleProperty("Intake applied output", () -> intakeMotor.getAppliedOutput(), null);
+    builder.addDoubleProperty("Intake follower applied output", () -> intakeMotor.getAppliedOutput(), null);
     builder.addDoubleProperty("Conveyor Speed perc", () -> conveyorMotor.get(), this::spinConveyor);
     builder.addDoubleProperty("Intake Speed rpm actual", () -> intakeMotor.getEncoder().getVelocity(), this::spinIntake);
   }

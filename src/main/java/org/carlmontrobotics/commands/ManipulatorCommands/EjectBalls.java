@@ -25,7 +25,7 @@ public class EjectBalls extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    intake.spinConveyor(-CONVEYOR_SPEED);
+    intake.spinConveyor(-0.5);
     intake.spinIntake(-INTAKE_SPEED);
   }
 
