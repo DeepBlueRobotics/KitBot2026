@@ -419,11 +419,25 @@ public class Drivetrain extends SubsystemBase {
     private double timeStampLatestGyroWarning = 0;
     private Elastic.Notification notification = new Elastic.Notification();
 
-    public void resetPoseEstimator() {
-        poseEstimator.resetPose(LimelightHelpers.getBotPose2d(RIGHT_LL));
-    }
-    public void resetPoseEstimator(Pose2d pose) {
-        poseEstimator.resetPose(pose);
+    public void setPoseWithLimelight(Pose2d backupPose){ //the pose will be set to backupPose if no tag is seen
+        Rotation2d gyroRotation = gyro.getRotation2d();
+        Pose2d pose;
+
+        if (LimelightHelpers.getTV(RIGHT_LL)) {
+            
+            pose = LimelightHelpers.getBotPose2d_wpiBlue(RIGHT_LL);
+
+        } else if (LimelightHelpers.getTV(LEFT_LL)) {
+
+            pose = LimelightHelpers.getBotPose2d_wpiBlue(LEFT_LL);
+        }
+        else {
+            pose = backupPose;
+        }
+
+        poseEstimator.resetPosition(gyroRotation, getModulePositions(), pose);
+        simGyroOffset = pose.getRotation().minus(gyroRotation);
+        
     }
 
     @Override
@@ -601,7 +615,7 @@ public class Drivetrain extends SubsystemBase {
                 //Supplier<Pose2d> poseSupplier,
                 this::getPose, // Robot pose supplier
                 //Consumer<Pose2d> resetPose,
-                this::resetPoseEstimator, // Method to reset odometry (will be called if your auto has a starting pose)
+                this::setPoseWithLimelight, // Method to reset odometry (will be called if your auto has a starting pose)
                 //Supplier<ChassisSpeeds> robotRelativeSpeedsSupplier,
                 this::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 //BiConsumer<ChassisSpeeds,DriveFeedforwards> output,
@@ -739,27 +753,6 @@ public class Drivetrain extends SubsystemBase {
         //odometry.resetPosition(Rotation2d.fromDegrees(getHeading()), getModulePositions(), initialPose);
     }
 
-    //This method will set the pose using limelight if it sees a tag and if not it is supposed to run like setPose()
-    public void setPoseWithLimelight(Pose2d backupPose){ //the pose will be set to backupPose if no tag is seen
-    //     Rotation2d gyroRotation = gyro.getRotation2d();
-    //     Pose2d pose;
-
-    //     if (LimelightHelpers.getTV(REEF_LL)) {
-            
-    //         pose = LimelightHelpers.getBotPose2d_wpiBlue(REEF_LL);
-
-    //     } else if (LimelightHelpers.getTV(CORAL_LL)) {
-
-    //         pose = LimelightHelpers.getBotPose2d_wpiBlue(CORAL_LL);
-    //     }
-    //     else {
-    //         pose = backupPose;
-    //     }
-
-    //     poseEstimator.resetPosition(gyroRotation, getModulePositions(), pose);
-    //     simGyroOffset = pose.getRotation().minus(gyroRotation);
-        
-    }
     /**
      * Detects if the robot has experienced a collision based on acceleration thresholds.
      * @return true if a 2D acceleration greater than the {@link #COLLISION_ACCELERATION_THRESHOLD} false otherwise.
