@@ -52,13 +52,13 @@ public final class Constants {
 
 		public static final class Manipulator {
 			public static final int port = 1;
-			public static final int INTAKE_BUTTON = Button.kX.value;
 			public static final int INTAKE_CONVEYOR_BUTTON = Button.kB.value;
 			//public static final int OUTTAKE_FEEDER_BUTTON = Button.kRightBumper.value;
             public static final int OUTTAKE_BUTTON = Button.kY.value; 
 			public static final Axis SMART_SHOOT_CLOSE_AXIS = Axis.kRightTrigger;
 			public static final Axis SMART_SHOOT_FAR_AXIS = Axis.kLeftTrigger;
 			public static final int REPEL_BALLS = Button.kA.value;
+			public static final int INTAKE_ARM = Button.kX.value;
         }
 
 		public static final double JOY_THRESH = 0.13;
@@ -271,8 +271,13 @@ public final class Constants {
 	}	
 	//#region Manipulator
 	public static final class IntakeC {
-		public static final int INTAKE_ID = 24;
-		public static final int INTAKE_FOLLOWER_ID = 21;
+		public static final int INTAKE_ID = 41;
+		public static final int INTAKE_FOLLOWER_ID = 42;
+		public static final int INTAKE_ARM_MOTOR_ID = 43;
+		public static final double INTAKE_ARM_UP_POSITION = 0;
+		public static final double INTAKE_ARM_DOWN_POSITION = 0;
+		public static final double ARM_BIG_ESTIMATE_OFFSET = 0;
+		public static final double ARM_SMALL_ESTIMATE_OFFSET = 0;
 		public static final int CONVEYOR_ID = 22;
 		public static final double INTAKE_SPEED = 2000; //TODO
 		public static final double CONVEYOR_SPEED = 0.9; //TODO

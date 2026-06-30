@@ -18,6 +18,8 @@ import org.carlmontrobotics.commands.ManipulatorCommands.RunConveyor;
 import org.carlmontrobotics.commands.ManipulatorCommands.ShootBalls;
 import org.carlmontrobotics.commands.ManipulatorCommands.SmartShoot;
 import org.carlmontrobotics.commands.ManipulatorCommands.OuttakeFeeder;
+import org.carlmontrobotics.commands.ManipulatorCommands.RaiseIntake;
+import org.carlmontrobotics.commands.ManipulatorCommands.DeployIntake;
 
 import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_PASSING_RPM;
 import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_SHOOTING_RPM;
@@ -149,8 +151,6 @@ public class RobotContainer implements Sendable {
       new JoystickButton(manipulatorController, Manipulator.INTAKE_CONVEYOR_BUTTON)
       .whileTrue(new RunConveyor(intake)); //could be toggle mode instead
    // .whileTrue(new OuttakeFeeder(outtake)); //could be toggle mode instead
-     new JoystickButton(manipulatorController, Manipulator.INTAKE_BUTTON)
-      .whileTrue(new IntakeBalls(intake, manipulatorController));
       new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
       .whileTrue(new ShootBalls(outtake));
 
@@ -160,6 +160,10 @@ public class RobotContainer implements Sendable {
       .whileTrue(new SmartShoot(outtake, intake, 7000, true));
       new JoystickButton(manipulatorController, Manipulator.REPEL_BALLS)
       .whileTrue(new EjectBalls(intake));
+      new JoystickButton(manipulatorController, Manipulator.INTAKE_ARM)
+      .whileTrue(new RaiseIntake(intake));
+      new JoystickButton(manipulatorController, Manipulator.INTAKE_ARM)
+      .whileTrue(new DeployIntake(intake));
     }
     //#endregion
     //#region AutoMaking
