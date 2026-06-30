@@ -105,7 +105,7 @@ public class Intake extends SubsystemBase {
   }
 
   public Boolean intakeDown(){
-    if(Math.abs(INTAKE_ARM_UP_POSITION - intakeArmMotor.getEncoder().getPosition()) < ARM_SMALL_ESTIMATE_OFFSET){
+    if(Math.abs(INTAKE_ARM_DOWN_POSITION - intakeArmMotor.getEncoder().getPosition()) < ARM_SMALL_ESTIMATE_OFFSET){
       return true;
     }
     else return false;
