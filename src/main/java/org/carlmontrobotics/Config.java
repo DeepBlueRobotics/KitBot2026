@@ -25,6 +25,7 @@ public abstract class Config implements Sendable {
     protected boolean vortexDrive = false;
     protected boolean hammerHead = false;
     protected boolean setupSysId = false;
+    protected boolean useNewIntake = true;
     protected boolean useSmartDashboardControl = false; // whether to control arm position + rpm of
                                                        // outtake through SmartDashboard
                                                        // Note: disables joystick control of arm and

@@ -4,10 +4,9 @@
 
 package org.carlmontrobotics.commands.ManipulatorCommands;
 
-import static org.carlmontrobotics.Constants.IntakeC.*;
+import static org.carlmontrobotics.Constants.IntakeC.NewIntakeC.RollerC.*;
 
 import org.carlmontrobotics.subsystems.Intake;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -29,7 +28,7 @@ public class IntakeBalls extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    intake.spinIntake(INTAKE_SPEED);
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -48,7 +47,6 @@ public class IntakeBalls extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    intake.stopIntake();
     manipulatorRumble.setRumble(RumbleType.kRightRumble, 0);
   }
 
@@ -59,6 +57,6 @@ public class IntakeBalls extends Command {
   }
 
   private boolean checkIfJammed() {
-    return intake.getIntakeVelocity() < 20;
+    return intake.getSetpoint() != 0 && intake.getVelocityRPM() < 20;
   }
 }

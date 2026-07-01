@@ -4,29 +4,37 @@
 
 package org.carlmontrobotics.commands.ManipulatorCommands;
 
-import static org.carlmontrobotics.Constants.IntakeC.CONVEYOR_SPEED;
-import static org.carlmontrobotics.Constants.IntakeC.INTAKE_SPEED;
-import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_FEEDER_VOLT_PERC;
+import static org.carlmontrobotics.Constants.ConveyorC.CONVEYOR_SPEED;
+import static org.carlmontrobotics.Constants.IntakeC.NewIntakeC.RollerC.INTAKE_SPEED;
 
+import org.carlmontrobotics.subsystems.ArmIntake;
+import org.carlmontrobotics.subsystems.Conveyor;
 import org.carlmontrobotics.subsystems.Intake;
-import org.carlmontrobotics.subsystems.Outtake;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class EjectBalls extends Command {
   private final Intake intake;
+  private final Conveyor conveyor;
+  private final ArmIntake arm;
+  private double oldPos;
+
   /** Creates a new EjectBalls. */
-  public EjectBalls(Intake intake) {
+  public EjectBalls(Intake intake, Conveyor conveyor, ArmIntake arm) {
     this.intake = intake;
-    addRequirements(intake);
+    this.conveyor = conveyor;
+    this.arm = arm;
+    addRequirements(intake, conveyor, arm);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    intake.spinConveyor(-0.5);
-    intake.spinIntake(-INTAKE_SPEED);
+    oldPos = arm.getIntakeArmSetpoint();
+    conveyor.setThrottle(-CONVEYOR_SPEED);
+    intake.setRPM(-INTAKE_SPEED);
+    arm.deployIntake();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -38,8 +46,9 @@ public class EjectBalls extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    intake.spinConveyor(0);
-    intake.spinIntake(0);
+    conveyor.stop();
+    intake.stop();
+    arm.setPosManual(oldPos);
   }
 
   // Returns true when the command should end.

@@ -4,14 +4,16 @@
 
 package org.carlmontrobotics.commands.ManipulatorCommands;
 
-import static org.carlmontrobotics.Constants.IntakeC.*;
+import static org.carlmontrobotics.Constants.IntakeC.NewIntakeC.RollerC.*;
+import static org.carlmontrobotics.Constants.ConveyorC.*;
 import static org.carlmontrobotics.Constants.OuttakeC.*;
 
+import org.carlmontrobotics.subsystems.ArmIntake;
+import org.carlmontrobotics.subsystems.Conveyor;
 import org.carlmontrobotics.subsystems.Intake;
 import org.carlmontrobotics.subsystems.Outtake;
 
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 
@@ -20,6 +22,8 @@ public class SmartShoot extends Command {
 
   private final Outtake outtake;
   private final Intake intake;
+  private final Conveyor conveyor;
+  private final ArmIntake arm;
   private final double goalRPM;
   private final Timer timer;
 
@@ -29,23 +33,26 @@ public class SmartShoot extends Command {
   private final boolean fasterSpinUp = true;
 
   /** Creates a new SmartShoot. */
-  public SmartShoot(Outtake outtake, Intake intake, double RPM) {
-    // Use addRequirements() here to declare subsystem dependencies.
-    goalRPM = Math.min(RPM, 5500);
+  public SmartShoot(Outtake outtake, Intake intake, Conveyor conveyor, ArmIntake arm, double RPM) {
+    goalRPM = RPM;
     this.outtake = outtake;
     this.intake = intake;
+    this.conveyor = conveyor;
+    this.arm = arm;
     timer = new Timer();
     this.useIntake = false;
-    addRequirements(outtake, intake);
+    addRequirements(outtake, intake, arm, conveyor);
    }
 
-   public SmartShoot(Outtake outtake, Intake intake, double RPM, boolean useIntake) {
-    goalRPM = Math.min(RPM, 5500);
+   public SmartShoot(Outtake outtake, Intake intake, Conveyor conveyor, ArmIntake arm, double RPM, boolean useIntake) {
+    goalRPM = RPM;
     this.outtake = outtake;
     this.intake = intake;
+    this.conveyor = conveyor;
+    this.arm = arm;
     timer = new Timer();
     this.useIntake = useIntake;
-    addRequirements(outtake, intake);
+    addRequirements(outtake, intake, arm, conveyor);
    }
 
 
@@ -55,7 +62,8 @@ public class SmartShoot extends Command {
     outtake.spinOuttake(goalRPM);
     timer.restart();
     if (useIntake) {
-      intake.spinIntake(INTAKE_SPEED);
+      arm.deployIntake();
+      intake.setRPM(INTAKE_SPEED);
     }
     backwards = true;
   }
@@ -77,17 +85,17 @@ public class SmartShoot extends Command {
       if (oscillate) {
         if (timer.get() > 4 && !backwards) {
         timer.restart();
-        intake.spinConveyor(0);
+        conveyor.setThrottle(0);
         backwards = true;
       }
       else if (timer.get() > 0.3 && backwards) {
         timer.restart();
-        intake.spinConveyor(CONVEYOR_SPEED);
+        conveyor.setThrottle(CONVEYOR_SPEED);
         backwards = false;
       } 
       }
       else {
-        intake.spinConveyor(CONVEYOR_SPEED);
+        conveyor.setThrottle(CONVEYOR_SPEED);
       } 
     }
   }
@@ -97,8 +105,8 @@ public class SmartShoot extends Command {
   public void end(boolean interrupted) {
     outtake.stopOuttake();  
     outtake.spinOuttakeFeeder(0);
-    intake.stopConveyor();
-    intake.stopIntake();
+    conveyor.stop();
+    intake.stop();
     timer.stop();
   }
 

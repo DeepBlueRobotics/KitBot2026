@@ -16,6 +16,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.XboxController.Button;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.math.util.Units;
 import static org.carlmontrobotics.Config.CONFIG;
@@ -52,17 +53,24 @@ public final class Constants {
 
 		public static final class Manipulator {
 			public static final int port = 1;
-			public static final int INTAKE_CONVEYOR_BUTTON = Button.kB.value;
-			//public static final int OUTTAKE_FEEDER_BUTTON = Button.kRightBumper.value;
-            public static final int OUTTAKE_BUTTON = Button.kY.value; 
 			public static final Axis SMART_SHOOT_CLOSE_AXIS = Axis.kRightTrigger;
 			public static final Axis SMART_SHOOT_FAR_AXIS = Axis.kLeftTrigger;
-			public static final int REPEL_BALLS = Button.kA.value;
-			public static final int INTAKE_ARM = Button.kX.value;
-        }
+
+			public static final int DEPLOY_INTAKE_POV = 180;
+			public static final int COLLAPSE_INTAKE_POV = 0;
+
+			public static final int RAISE_INTAKE_BUMP_TOGGLE_BUTTON = Button.kLeftBumper.value;
+			public static final int PREPARE_SHOOTER_BUTTON = Button.kRightBumper.value;
+
+			public static final int INTAKE_CONVEYOR_BUTTON = Button.kB.value;
+			public static final int REPEL_BALLS_BUTTON = Button.kA.value;
+
+
+			public static final int OUTTAKE_FEEDER_BUTTON = Button.kY.value;
+		}
 
 		public static final double JOY_THRESH = 0.13;
-		public static final double MIN_AXIS_TRIGGER_VALUE = 0.2;// woah, this is high.
+		public static final double MIN_AXIS_TRIGGER_VALUE = 0.2;
 
 	}
 
@@ -271,17 +279,43 @@ public final class Constants {
 	}	
 	//#region Manipulator
 	public static final class IntakeC {
-		public static final int INTAKE_ID = 41;
-		public static final int INTAKE_FOLLOWER_ID = 42;
-		public static final int INTAKE_ARM_MOTOR_ID = 43;
-		public static final double INTAKE_ARM_UP_POSITION = 0;
-		public static final double INTAKE_ARM_DOWN_POSITION = 0;
-		public static final double ARM_BIG_ESTIMATE_OFFSET = 0;
-		public static final double ARM_SMALL_ESTIMATE_OFFSET = 0;
-		public static final int CONVEYOR_ID = 22;
-		public static final double INTAKE_SPEED = 2000; //TODO
-		public static final double CONVEYOR_SPEED = 0.9; //TODO
+		public static final class OldIntakeC {
+			public static final int INTAKE_ID = 24;
+			public static final int INTAKE_FOLLOWER_ID = 21;
+			public static final double INTAKE_SPEED = 2000;
+			public static final double kP = 0.0002;
+			public static final double kI = 0;
+			public static final double kD = 0;
+			public static final int smartCurrentLimit = 80;
+		}
+		public static final class NewIntakeC {
+			public static final class ArmC {
+				public static final int INTAKE_ARM_MOTOR_ID = 43;
+				public static final double INTAKE_ARM_UP_POSITION = 0; //TODO
+				public static final double INTAKE_ARM_BUMP_UP_POSITION = 0; //TODO
+				public static final double INTAKE_ARM_DOWN_POSITION = 0; //TODO
+				public static final double ARM_BIG_ESTIMATE_OFFSET = 0; //TODO
+				public static final double ARM_SMALL_ESTIMATE_OFFSET = 0; //TODO
+				public static final double kP = 0; //TODO
+				public static final double kI = 0;
+				public static final double kD = 0;
+			}
+			public static final class RollerC {
+				public static final int INTAKE_ID = 41;
+				public static final int INTAKE_FOLLOWER_ID = 42;
+				public static final double INTAKE_SPEED = 2000; //TODO
+				public static final double kP = 0.0002; //TODO
+				public static final double kI = 0;
+				public static final double kD = 0;
+				public static final int smartCurrentLimit = 80;
+			}
+		}
 	}	
+
+	public static final class ConveyorC {
+		public static final int CONVEYOR_ID = 22;
+		public static final double CONVEYOR_SPEED = 0.9;
+	}
 	public static final class OuttakeC { 
 		public static final int OUTTAKE_ID = 31;
 		public static final int OUTTAKE_FOLLOWER_ID = 32;

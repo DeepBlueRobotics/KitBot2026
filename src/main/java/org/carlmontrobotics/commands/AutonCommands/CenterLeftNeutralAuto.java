@@ -4,18 +4,17 @@
 
 package org.carlmontrobotics.commands.AutonCommands;
 
-import static org.carlmontrobotics.Constants.IntakeC.CONVEYOR_SPEED;
-import static org.carlmontrobotics.Constants.IntakeC.INTAKE_SPEED;
-import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_FEEDER_VOLT_PERC;
+import static org.carlmontrobotics.Constants.ConveyorC.CONVEYOR_SPEED;
+import static org.carlmontrobotics.Constants.IntakeC.NewIntakeC.RollerC.INTAKE_SPEED;
 import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_SHOOTING_RPM;
 
+import org.carlmontrobotics.subsystems.ArmIntake;
+import org.carlmontrobotics.subsystems.Conveyor;
 import org.carlmontrobotics.subsystems.Drivetrain;
 import org.carlmontrobotics.subsystems.Intake;
 import org.carlmontrobotics.subsystems.Outtake;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -23,6 +22,8 @@ public class CenterLeftNeutralAuto extends Command {
   private final Drivetrain dt;
   private final Outtake shooter;
   private final Intake intake;
+  private final Conveyor conveyor;
+  private final ArmIntake arm;
   private final Timer timer;
 
   private double startShoot = 0.0;
@@ -34,12 +35,14 @@ public class CenterLeftNeutralAuto extends Command {
   private double endStrafeDrive = 5;
 
   /** Creates a new SimpleShootAuton. */
-  public CenterLeftNeutralAuto(Drivetrain dt, Outtake shooter, Intake intake) {
+  public CenterLeftNeutralAuto(Drivetrain dt, Outtake shooter, Intake intake, Conveyor conveyor, ArmIntake arm) {
     this.shooter = shooter;
     this.intake = intake;
     this.dt = dt;
+    this.conveyor = conveyor;
+    this.arm = arm;
     timer = new Timer();
-    addRequirements(shooter, intake, dt);
+    addRequirements(shooter, intake, dt, arm, conveyor);
     // SmartDashboard.putNumber("startShoot", startShoot);
     // SmartDashboard.putNumber("endshoot", endshoot);
     // SmartDashboard.putNumber("endStrafe", endStrafe);
@@ -56,6 +59,8 @@ public class CenterLeftNeutralAuto extends Command {
     dt.resetFieldOrientation();
     dt.setFieldOriented(true);
     timer.restart();
+    arm.raiseIntakeFullyUp();
+    intake.stop();
   //   startShoot = SmartDashboard.getNumber("startShoot", startShoot);
   //   endshoot = SmartDashboard.getNumber("endshoot", endshoot);
   //  endStrafe =  SmartDashboard.getNumber("endStrafe", endStrafe);
@@ -80,6 +85,8 @@ public class CenterLeftNeutralAuto extends Command {
     }
     else if (currentTime > startShoot+endshoot+endStrafe+endFastDrive) {
       dt.drive(1.3,0,0);
+      arm.deployIntake();
+      intake.setRPM(INTAKE_SPEED+500);
     }
     else if (currentTime > startShoot+endshoot+endStrafe) {
       dt.drive(3, 0, 0);
@@ -87,17 +94,15 @@ public class CenterLeftNeutralAuto extends Command {
     else if (currentTime > startShoot+endshoot) {
       shooter.stopOuttake();
       shooter.spinOuttakeFeeder(0);
-      intake.spinConveyor(0);
-      intake.spinIntake(INTAKE_SPEED+500);
+      conveyor.stop();
       dt.drive(-0.2, -2, 0);
     }
     else if (currentTime > startShoot) {
       shooter.spinOuttakeFeeder(0.7);
-      intake.spinConveyor(CONVEYOR_SPEED);
+      conveyor.setThrottle(CONVEYOR_SPEED);
     }
     else {
       shooter.spinOuttake(OUTTAKE_SHOOTING_RPM);
-      intake.spinIntake(0);
     }
   }
 
@@ -106,7 +111,7 @@ public class CenterLeftNeutralAuto extends Command {
   public void end(boolean interrupted) {
     shooter.stopOuttake();
     shooter.spinOuttakeFeeder(0);
-    intake.stopConveyor();
+    conveyor.stop();
     dt.stop();
     //intake.stopIntake();
   }

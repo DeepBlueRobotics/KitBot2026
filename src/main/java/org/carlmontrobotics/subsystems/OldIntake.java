@@ -4,51 +4,49 @@
 
 package org.carlmontrobotics.subsystems;
 
-import static org.carlmontrobotics.Constants.IntakeC.NewIntakeC.RollerC.*;
-
+import static org.carlmontrobotics.Constants.IntakeC.OldIntakeC.*;
 import org.carlmontrobotics.lib199.MotorConfig;
 import org.carlmontrobotics.lib199.MotorControllerFactory;
 
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkLowLevel.PeriodicStatus9;
 import com.revrobotics.spark.config.SparkBaseConfig;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Intake extends SubsystemBase {
-    private SparkBase intakeMotor;
-    private SparkBase intakeFollowerMotor;
-    private RelativeEncoder intakeEncoder;
-    private SparkClosedLoopController intakePID;
-    
-    /** Creates a new Intake. */
-    public Intake() {
-      SparkBaseConfig intakeConfig = MotorControllerFactory.sparkConfig(MotorConfig.NEO_VORTEX);
-      intakeConfig.smartCurrentLimit(smartCurrentLimit)
-                    .inverted(true)
-                    .closedLoop.pid(kP, kI, kD);
-      SparkBaseConfig intakeFollowerConfig = MotorControllerFactory.sparkConfig(MotorConfig.NEO_VORTEX);
-      intakeFollowerConfig.apply(intakeConfig)
-                          .follow(INTAKE_ID, true);
-      intakeMotor = MotorControllerFactory.createSpark(INTAKE_ID, MotorConfig.NEO_VORTEX, intakeConfig);
-      intakeFollowerMotor = MotorControllerFactory.createSpark(INTAKE_FOLLOWER_ID, MotorConfig.NEO_VORTEX, intakeFollowerConfig);
-      intakePID = intakeMotor.getClosedLoopController();
-      intakeEncoder = intakeMotor.getEncoder();
+public class OldIntake extends SubsystemBase {
+  SparkBase intakeMotor;
+  SparkBase intakeFollowerMotor;
+  SparkBase conveyorMotor;
+  SparkClosedLoopController intakePID;
+  
+  /** Creates a new Intake. */
+  public OldIntake() {
+    SparkBaseConfig conveyorConfig = MotorControllerFactory.sparkConfig(MotorConfig.NEO_VORTEX);
+    SparkBaseConfig intakeConfig = MotorControllerFactory.sparkConfig(MotorConfig.NEO_VORTEX);
+    conveyorConfig.inverted(true);
+    intakeConfig.smartCurrentLimit(80)
+                  .inverted(true)
+                  .closedLoop.pid(0.0002, 0, 0);
+    SparkBaseConfig intakeFollowerConfig = MotorControllerFactory.sparkConfig(MotorConfig.NEO_VORTEX);
+    intakeFollowerConfig.apply(intakeConfig)
+                        .follow(INTAKE_ID, true);
+    intakeMotor = MotorControllerFactory.createSpark(INTAKE_ID, MotorConfig.NEO_VORTEX, intakeConfig);
+    intakeFollowerMotor = MotorControllerFactory.createSpark(INTAKE_FOLLOWER_ID, MotorConfig.NEO_VORTEX, intakeFollowerConfig);
+    intakePID = intakeMotor.getClosedLoopController();
   }
 
   public void setRPM(double intakeSpeed) {
     intakePID.setSetpoint(intakeSpeed, ControlType.kVelocity);
   }
 
-  public void stop(){
+
+  public void stopIntake(){
     intakeMotor.set(0);
   }
-
 
   @Override
   public void initSendable(SendableBuilder builder){
@@ -69,7 +67,7 @@ public class Intake extends SubsystemBase {
    * @return Number the RPM of the motor
    */
   public double getVelocityRPM() {
-    return intakeEncoder.getVelocity();
+    return intakeMotor.getEncoder().getVelocity();
   }
 
   /**
@@ -87,9 +85,4 @@ public class Intake extends SubsystemBase {
   public double getAppliedOutput() {
     return intakeMotor.getAppliedOutput();
   }
-
-  public double getSetpoint() {
-    return intakePID.getSetpoint();
-  }
-
 }

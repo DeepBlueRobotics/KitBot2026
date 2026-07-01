@@ -18,7 +18,8 @@ import org.carlmontrobotics.commands.ManipulatorCommands.RunConveyor;
 import org.carlmontrobotics.commands.ManipulatorCommands.ShootBalls;
 import org.carlmontrobotics.commands.ManipulatorCommands.SmartShoot;
 import org.carlmontrobotics.commands.ManipulatorCommands.OuttakeFeeder;
-import org.carlmontrobotics.commands.ManipulatorCommands.RaiseIntake;
+import org.carlmontrobotics.commands.ManipulatorCommands.RaiseForBump;
+import org.carlmontrobotics.commands.ManipulatorCommands.RaiseIntakeFullyUp;
 import org.carlmontrobotics.commands.ManipulatorCommands.DeployIntake;
 
 import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_PASSING_RPM;
@@ -95,7 +96,10 @@ public class RobotContainer implements Sendable {
     public final Limelight limelight = new Limelight();
     public final Drivetrain drivetrain =  new Drivetrain(limelight);
 
-    public final Intake intake = new Intake();
+    public final Intake intake = new Intake(); //change to OLD INTAKE IF BAD STUFF HAPPENS
+    public final Conveyor conveyor = new Conveyor();
+    public final ArmIntake arm = new ArmIntake();
+
     public final Outtake outtake = new Outtake();
 
 
@@ -134,51 +138,57 @@ public class RobotContainer implements Sendable {
     private void setBindingsDriver() {
         new JoystickButton(driverController, Driver.resetFieldOrientationButton)
             .onTrue(new InstantCommand(drivetrain::resetFieldOrientation));
-        new JoystickButton(driverController, Manipulator.OUTTAKE_BUTTON)
-          .whileTrue(new ShootBalls(outtake));
-        axisTrigger(driverController, Manipulator.SMART_SHOOT_CLOSE_AXIS, OI.JOY_THRESH)
-          .whileTrue(new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM));
-        // axisTrigger(driverController, Driver.RIGHT_TRIGGER_BUTTON, 0.2)
-        //     .onTrue(new InstantCommand(()->drivetrain.setFieldOriented(false)))
-        //     .onFalse(new InstantCommand(()->drivetrain.setFieldOriented(true)));
 
-        // axisTrigger(driverController, Driver.LEFT_TRIGGER_BUTTON, 0.2)
-        //     .onTrue(new InstantCommand(() -> drivetrain.setExtraSpeedMult(.5)))//normal max turn is .5
-        //     .onFalse(new InstantCommand(() -> drivetrain.setExtraSpeedMult(0)));        
+        new JoystickButton(driverController, Manipulator.REPEL_BALLS_BUTTON)
+          .whileTrue(new EjectBalls(intake, conveyor, arm));
+
+        axisTrigger(driverController, Manipulator.SMART_SHOOT_CLOSE_AXIS, OI.JOY_THRESH)
+          .whileTrue(new SmartShoot(outtake, intake, conveyor, arm, OUTTAKE_SHOOTING_RPM));
     }
 
     private void setBindingsManipulator() {
-      new JoystickButton(manipulatorController, Manipulator.INTAKE_CONVEYOR_BUTTON)
-      .whileTrue(new RunConveyor(intake)); //could be toggle mode instead
-   // .whileTrue(new OuttakeFeeder(outtake)); //could be toggle mode instead
-      new JoystickButton(manipulatorController, Manipulator.OUTTAKE_BUTTON)
-      .whileTrue(new ShootBalls(outtake));
+      axisTrigger(manipulatorController, Manipulator.SMART_SHOOT_CLOSE_AXIS, OI.JOY_THRESH)
+      .whileTrue(new SmartShoot(outtake, intake, conveyor, arm, OUTTAKE_SHOOTING_RPM));
 
       axisTrigger(manipulatorController, Manipulator.SMART_SHOOT_CLOSE_AXIS, OI.JOY_THRESH)
-      .whileTrue(new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM));
-      axisTrigger(manipulatorController, Manipulator.SMART_SHOOT_FAR_AXIS, OI.JOY_THRESH)
-      .whileTrue(new SmartShoot(outtake, intake, 7000, true));
-      new JoystickButton(manipulatorController, Manipulator.REPEL_BALLS)
-      .whileTrue(new EjectBalls(intake));
-      new JoystickButton(manipulatorController, Manipulator.INTAKE_ARM)
-      .whileTrue(new RaiseIntake(intake));
-      new JoystickButton(manipulatorController, Manipulator.INTAKE_ARM)
-      .whileTrue(new DeployIntake(intake));
+      .whileTrue(new SmartShoot(outtake, intake, conveyor, arm, OUTTAKE_PASSING_RPM));
+
+      new JoystickButton(manipulatorController, Manipulator.RAISE_INTAKE_BUMP_TOGGLE_BUTTON)
+      .whileTrue(new RaiseForBump(intake, arm));
+
+      new JoystickButton(manipulatorController, Manipulator.PREPARE_SHOOTER_BUTTON)
+      .whileTrue(new ShootBalls(outtake));
+
+      new JoystickButton(manipulatorController, Manipulator.OUTTAKE_FEEDER_BUTTON)
+      .whileTrue(new OuttakeFeeder(outtake));
+
+      new JoystickButton(manipulatorController, Manipulator.INTAKE_CONVEYOR_BUTTON)
+      .whileTrue(new RunConveyor(conveyor));
+
+      new JoystickButton(manipulatorController, Manipulator.REPEL_BALLS_BUTTON)
+      .whileTrue(new EjectBalls(intake, conveyor, arm));  
+
+      new POVButton(manipulatorController, Manipulator.COLLAPSE_INTAKE_POV)
+      .onTrue(new RaiseIntakeFullyUp(intake, arm));
+
+      new POVButton(manipulatorController, Manipulator.DEPLOY_INTAKE_POV)
+      .onTrue(new DeployIntake(intake, arm));
+
     }
     //#endregion
     //#region AutoMaking
     private void RegisterAutoCommands() {
-      NamedCommands.registerCommand("Shoot", new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM));
-      NamedCommands.registerCommand("Pass", new SmartShoot(outtake, intake, OUTTAKE_PASSING_RPM));
-      NamedCommands.registerCommand("Eject", new EjectBalls(intake));
+      NamedCommands.registerCommand("Shoot", new SmartShoot(outtake, intake, conveyor, arm, OUTTAKE_SHOOTING_RPM));
+      NamedCommands.registerCommand("Pass", new SmartShoot(outtake, intake, conveyor, arm, OUTTAKE_PASSING_RPM));
+      NamedCommands.registerCommand("Eject", new EjectBalls(intake, conveyor, arm));
     }
 
     private void RegisterCustomAutos(){
-      autoChooser.addOption("Center to Left Neutral", new CenterLeftNeutralAuto(drivetrain, outtake, intake));
-      autoChooser.addOption("Center to Right Neutral", new CenterRightNeutralAuto(drivetrain, outtake, intake));
-      autoChooser.addOption("At Bump to Left Neutral Auto", new LeftNeutralAuto(drivetrain, outtake, intake));
-      autoChooser.addOption("At Bump to RightNeutral Auto", new RightNeutralAuto(drivetrain, outtake, intake));
-      autoChooser.setDefaultOption("Center Auto NO MOVE", new SmartShoot(outtake, intake, OUTTAKE_SHOOTING_RPM));
+      autoChooser.addOption("Center to Left Neutral", new CenterLeftNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
+      autoChooser.addOption("Center to Right Neutral", new CenterRightNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
+      autoChooser.addOption("At Bump to Left Neutral Auto", new LeftNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
+      autoChooser.addOption("At Bump to RightNeutral Auto", new RightNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
+      autoChooser.setDefaultOption("Center Auto NO MOVE", new SmartShoot(outtake, intake, conveyor, arm, OUTTAKE_SHOOTING_RPM));
     }
     //#endregion
     //#region DefualtCommands
@@ -201,6 +211,8 @@ public class RobotContainer implements Sendable {
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
   }
+  //#endregion
+  //#region Hub Math
   public boolean isHubActive() {
     Optional<Alliance> alliance = DriverStation.getAlliance();
     // If we have no alliance, we cannot be enabled, therefore no hub.
