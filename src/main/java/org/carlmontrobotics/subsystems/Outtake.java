@@ -54,12 +54,7 @@ public class Outtake extends SubsystemBase {
 
     outtakeFollowerConfig = MotorControllerFactory.sparkConfig(OUTTAKE_FOLLOWER_MOTOR_CONFIG);
     outtakeFollowerConfig.apply(outtakeConfig)
-                          .follow(OUTTAKE_ID, true);                                     
-
-    outtakeFollowerConfig = MotorControllerFactory.sparkConfig(OUTTAKE_FOLLOWER_MOTOR_CONFIG);
-    outtakeFollowerConfig.apply(outtakeConfig)
                           .follow(OUTTAKE_ID, true);
-                          
 
     outtakeFeederConfig = MotorControllerFactory.sparkConfig(OUTTAKE_FEEDER_MOTOR_CONFIG);
     outtakeFeederConfig.inverted(true);

@@ -37,7 +37,7 @@ public class ArmIntake extends SubsystemBase {
                     .closedLoop.pid(kP, kI, kD);
     intakeArmConfig.encoder
                     .positionConversionFactor(40) //converts to degs for ARM not motor 
-                    .velocityConversionFactor(40/60); //converts to deg/s
+                    .velocityConversionFactor(40.0/60); //converts to deg/s
     intakeArmMotor = MotorControllerFactory.createSpark(INTAKE_ARM_MOTOR_ID, MotorConfig.NEO_VORTEX, intakeArmConfig);
     intakeArmEncoder = intakeArmMotor.getEncoder();
     armPID = intakeArmMotor.getClosedLoopController();
