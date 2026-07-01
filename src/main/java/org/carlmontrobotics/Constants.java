@@ -292,8 +292,8 @@ public final class Constants {
 			public static final class ArmC {
 				public static final int INTAKE_ARM_MOTOR_ID = 43;
 				public static final double INTAKE_ARM_UP_POSITION = 0; //TODO
-				public static final double INTAKE_ARM_BUMP_UP_POSITION = 0; //TODO
-				public static final double INTAKE_ARM_DOWN_POSITION = 0; //TODO
+				public static final double INTAKE_ARM_BUMP_UP_POSITION = 105; //TODO
+				public static final double INTAKE_ARM_DOWN_POSITION = 136.747; //TODO
 				public static final double ARM_BIG_ESTIMATE_OFFSET = 0; //TODO
 				public static final double ARM_SMALL_ESTIMATE_OFFSET = 0; //TODO
 				public static final double kP = 0; //TODO
