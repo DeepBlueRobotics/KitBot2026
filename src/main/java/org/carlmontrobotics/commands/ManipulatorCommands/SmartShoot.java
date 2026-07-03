@@ -66,7 +66,7 @@ public class SmartShoot extends Command {
     conveyorTimer.restart();
     shootingTimer.restart();
     if (useIntake) {
-      arm.deployIntake();
+      arm.deploy();
       intake.setRPM(INTAKE_SPEED);
     }
     backwards = true;

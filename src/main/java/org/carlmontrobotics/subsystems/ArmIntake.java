@@ -66,7 +66,7 @@ public class ArmIntake extends SubsystemBase {
     intakeArmMotor.set(0);
   }
 
-  public void raiseIntakeFullyUp() {
+  public void collapse() {
     armPID.setSetpoint(ARM_kStowedAngle, ControlType.kPosition);
   }
 
@@ -74,7 +74,7 @@ public class ArmIntake extends SubsystemBase {
     armPID.setSetpoint(ARM_kClearanceBumpAngle - 10, ControlType.kPosition); //-10 degrees to clear the level by 10 
   }
 
-  public void deployIntake(){
+  public void deploy(){
     armPID.setSetpoint(ARM_kDeployedAngle, ControlType.kPosition);
   }
 

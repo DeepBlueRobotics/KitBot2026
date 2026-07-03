@@ -43,7 +43,7 @@ public final class Constants {
 			public static final int SLOW_DRIVE_BUTTON = Button.kLeftBumper.value;
 			public static final int RESET_FIELD_ORIENTATION_BUTTON = Button.kRightBumper.value;
 
-			public static final int LOCK_WHEELS_BUTTON = Button.kLeftStick.value;
+			public static final int LOCK_WHEELS_BUTTON = Button.kX.value;
 
 			public static final Axis RIGHT_TRIGGER_BUTTON = Axis.kRightTrigger;
 			public static final Axis LEFT_TRIGGER_BUTTON = Axis.kLeftTrigger;
@@ -51,7 +51,6 @@ public final class Constants {
 			public static final int y = Button.kY.value;
 			public static final int b = Button.kB.value;
 			public static final int a = Button.kA.value;
-			public static final int x = Button.kX.value;
 		}
 
 		public static final class Manipulator {

@@ -34,7 +34,7 @@ public class EjectBalls extends Command {
     oldPos = arm.getIntakeArmSetpoint();
     conveyor.setThrottle(-CONVEYOR_SPEED);
     intake.setRPM(-INTAKE_SPEED);
-    arm.deployIntake();
+    arm.deploy();
   }
 
   // Called every time the scheduler runs while the command is scheduled.

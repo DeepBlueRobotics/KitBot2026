@@ -34,7 +34,7 @@ public class CenterToRightNeutralAuto extends SequentialCommandGroup {
       new InstantCommand(() -> { // Intialize
             drivetrain.resetFieldOrientation();
             drivetrain.setFieldOriented(true);
-            arm.raiseIntakeFullyUp();
+            arm.collapse();
             intake.stop();
           }),
           new ParallelRaceGroup( //Shoot while pumping balls, wait for shooter to speed up
@@ -82,7 +82,7 @@ public class CenterToRightNeutralAuto extends SequentialCommandGroup {
             ),
             new SequentialCommandGroup(
               new WaitCommand(1.5),
-              new InstantCommand(arm::deployIntake),
+              new InstantCommand(arm::deploy),
               new WaitUntilCommand(arm::isIntakeDown),
               new InstantCommand(() -> intake.setRPM(INTAKE_SPEED))
             )

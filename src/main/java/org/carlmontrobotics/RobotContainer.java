@@ -7,6 +7,7 @@ package org.carlmontrobotics;
 
 //199 files
 import org.carlmontrobotics.subsystems.*;
+import org.carlmontrobotics.commands.AutonCommands.CenterAutoNoMove;
 import org.carlmontrobotics.commands.AutonCommands.CenterToLeftNeutralAuto;
 import org.carlmontrobotics.commands.AutonCommands.CenterToRightNeutralAuto;
 
@@ -153,7 +154,7 @@ public class RobotContainer implements Sendable {
       axisTrigger(manipulatorController, Manipulator.SMART_SHOOT_CLOSE_AXIS, OI.JOY_THRESH)
       .whileTrue(new SmartShoot(outtake, intake, conveyor, arm, OUTTAKE_SHOOTING_RPM));
 
-      axisTrigger(manipulatorController, Manipulator.SMART_SHOOT_CLOSE_AXIS, OI.JOY_THRESH)
+      axisTrigger(manipulatorController, Manipulator.SMART_SHOOT_FAR_AXIS, OI.JOY_THRESH)
       .whileTrue(new SmartShoot(outtake, intake, conveyor, arm, OUTTAKE_PASSING_RPM));
 
       new JoystickButton(manipulatorController, Manipulator.RAISE_INTAKE_BUMP_TOGGLE_BUTTON)
@@ -210,7 +211,7 @@ public class RobotContainer implements Sendable {
               new WaitCommand(0.5),
               new InstantCommand(() -> arm.setPosManual(ARM_kPartialIn)),
               new WaitUntilCommand(arm::isIntakeAtPos),
-              new InstantCommand(arm::deployIntake),
+              new InstantCommand(arm::deploy),
               new WaitUntilCommand(arm::isIntakeDown), 
               new InstantCommand(() -> intake.setRPM(INTAKE_SPEED))
             )
@@ -235,7 +236,7 @@ public class RobotContainer implements Sendable {
       autoChooser.addOption("Center to Right Neutral", new CenterToRightNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
       autoChooser.addOption("At Bump to Left Neutral Auto", new ToLeftNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
       autoChooser.addOption("At Bump to RightNeutral Auto", new ToRightNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
-      autoChooser.setDefaultOption("Center Auto NO MOVE", new SmartShoot(outtake, intake, conveyor, arm, OUTTAKE_SHOOTING_RPM));
+      autoChooser.setDefaultOption("Center Auto NO MOVE", new CenterAutoNoMove(outtake, conveyor, arm, intake)); 
     }
     //#endregion
     //#region DefualtCommands

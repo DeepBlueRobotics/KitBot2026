@@ -36,7 +36,7 @@ public class ToRightNeutralAuto extends SequentialCommandGroup {
       new InstantCommand(() -> { // Intialize
             drivetrain.resetFieldOrientation();
             drivetrain.setFieldOriented(true);
-            arm.raiseIntakeFullyUp();
+            arm.collapse();
             intake.stop();
           }),
           new InstantCommand(() -> drivetrain.drive(3, 0, 0)), //Go over bump quick!
@@ -60,7 +60,7 @@ public class ToRightNeutralAuto extends SequentialCommandGroup {
             ),
             new SequentialCommandGroup(
               new WaitCommand(1.5),
-              new InstantCommand(arm::deployIntake),
+              new InstantCommand(arm::deploy),
               new WaitUntilCommand(arm::isIntakeDown),
               new InstantCommand(() -> intake.setRPM(INTAKE_SPEED))
             )
