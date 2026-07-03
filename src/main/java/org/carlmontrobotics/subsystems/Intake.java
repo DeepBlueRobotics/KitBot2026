@@ -43,10 +43,17 @@ public class Intake extends SubsystemBase {
       SmartDashboard.putData(this);
   }
 
+  /**
+   * Sets the speed of the intake using PID
+   * @param intakeSpeed RPM of the roller
+   */
   public void setRPM(double intakeSpeed) {
     intakePID.setSetpoint(intakeSpeed, ControlType.kVelocity);
   }
 
+  /**
+   * Stops the rollers
+   */
   public void stop(){
     intakeMotor.set(0);
   }
@@ -68,7 +75,7 @@ public class Intake extends SubsystemBase {
 
   /**
    * 
-   * @return Number the RPM of the motor
+   * @return RPM of the rollers
    */
   public double getVelocityRPM() {
     return intakeEncoder.getVelocity();
@@ -90,6 +97,9 @@ public class Intake extends SubsystemBase {
     return intakeMotor.getAppliedOutput();
   }
 
+  /** 
+   * Current RPM setpoint
+  */
   public double getSetpoint() {
     return intakePID.getSetpoint();
   }

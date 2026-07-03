@@ -25,7 +25,8 @@ public class Conveyor extends SubsystemBase {
   /** Creates a new Conveyor. */
   public Conveyor() {
     SparkBaseConfig conveyorConfig = MotorControllerFactory.sparkConfig(MotorConfig.NEO_VORTEX);
-    conveyorConfig.inverted(true);
+    conveyorConfig.inverted(true)
+                  .encoder.velocityConversionFactor(1.0/3*0.1524/60); //Linear speed in m/s
     conveyorMotor = MotorControllerFactory.createSpark(CONVEYOR_ID, MotorConfig.NEO_VORTEX, conveyorConfig);
     conveyorEncoder = conveyorMotor.getEncoder();
 
@@ -44,14 +45,24 @@ public class Conveyor extends SubsystemBase {
     builder.addDoubleProperty("Velocity", this::getVelocity, null);
   }
 
+  /**
+   * Sets the speed of the conveyor
+   * @param conveyorSpeed In the range of [-1, 1]
+   */
   public void setThrottle(double conveyorSpeed) {
     conveyorMotor.set(conveyorSpeed);
   }
 
+  /**
+   * Stops the conveyor
+   */
   public void stop(){
     conveyorMotor.set(0);
   }
 
+  /**
+   * @return linear speed of the conveyor belt (m/s)
+   */
   public double getVelocity() {
     return conveyorEncoder.getVelocity();
   }

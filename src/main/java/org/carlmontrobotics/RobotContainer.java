@@ -179,10 +179,10 @@ public class RobotContainer implements Sendable {
       .onTrue(new DeployIntake(intake, arm));
 
       //TESTING
-      new JoystickButton(manipulatorController, Manipulator.TESTING).whileTrue(
-        new ParallelCommandGroup(
+      new JoystickButton(manipulatorController, Manipulator.TESTING).whileTrue( //New SMART SHOOT
+        new ParallelCommandGroup( //Runs shooter, conveyor, and intake side by side
 
-            new SequentialCommandGroup( //Shooter
+            new SequentialCommandGroup( //Shooter waits to spin up, and starts feeding
               new InstantCommand(() -> outtake.spinOuttakeWithVoltage(1)),
               new WaitUntilCommand(() -> outtake.getOuttakeVelocity() > OUTTAKE_SHOOTING_RPM - 250),
               new InstantCommand(() -> outtake.setRPM(OUTTAKE_SHOOTING_RPM)),
@@ -190,7 +190,7 @@ public class RobotContainer implements Sendable {
               new InstantCommand(() -> outtake.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC))
             ),
 
-            new RepeatCommand( //Conveyor
+            new RepeatCommand( //Conveyor on constant cycle of moving balls forward, suddenly stopping and continuing to counteract static friction 
               new SequentialCommandGroup(
                 new InstantCommand(() -> conveyor.setThrottle(CONVEYOR_SPEED)),
                 new WaitCommand(3),
@@ -200,7 +200,7 @@ public class RobotContainer implements Sendable {
             ),
 
             new SequentialCommandGroup( //Literally how citrus does it we will see how it goes
-              new InstantCommand(intake::stop),
+              new InstantCommand(intake::stop), //Waits a bit and goes in deep, goes out, goes in, goes out, waits and returns intake back
               new WaitCommand(ARM_timeToStartContract),
               new InstantCommand(() -> arm.setPosManual(ARM_kMorePartialIn)),
               new WaitUntilCommand(arm::isIntakeAtPos),
@@ -215,8 +215,8 @@ public class RobotContainer implements Sendable {
               new WaitUntilCommand(arm::isIntakeDown), 
               new InstantCommand(() -> intake.setRPM(INTAKE_SPEED))
             )
-        ).handleInterrupt(() -> {
-          outtake.stopOuttake();  
+        ).handleInterrupt(() -> { //What to do when users stops pressing the button
+          outtake.stopOuttake(); 
           outtake.spinOuttakeFeeder(0);
           conveyor.stop();
         })

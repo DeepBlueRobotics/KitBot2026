@@ -18,6 +18,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -57,57 +58,95 @@ public class ArmIntake extends SubsystemBase {
     super.initSendable(builder);
     builder.addDoubleProperty("Position (deg)", this::getIntakeArmPosition, null);
     builder.addBooleanProperty("is Deployed", this::isIntakeDown, null);
-    builder.addBooleanProperty("is Collapsed", this::isIntakeFullyUp, null);
+    builder.addBooleanProperty("is Collapsed", this::isIntakeCollapsed, null);
     builder.addBooleanProperty("Clearance for BUMP", this::isIntakeBumpUp, null);
-    builder.addBooleanProperty("BrakeMode", () -> isBrake, this::changeIdleMode);
+    builder.addBooleanProperty("BrakeMode", () -> isBrake, this::setIdleMode);
   }
 
+  /**
+   * Cancels any setpoint set, stops the motor in place
+   */
   public void stopIntakeArm(){
-    intakeArmMotor.set(0);
+    armPID.setSetpoint(0, ControlType.kDutyCycle);
   }
 
+  /**
+   * Collapses arm fully inward
+   */
   public void collapse() {
     armPID.setSetpoint(ARM_kStowedAngle, ControlType.kPosition);
   }
 
+  /**
+   * Raises arm 10 degrees above the clearance angle of 25 degrees
+   */
   public void raiseIntakeToBump() {
     armPID.setSetpoint(ARM_kClearanceBumpAngle - 10, ControlType.kPosition); //-10 degrees to clear the level by 10 
   }
 
+  /**
+   * Deploys the arm
+   */
   public void deploy(){
     armPID.setSetpoint(ARM_kDeployedAngle, ControlType.kPosition);
   }
 
+  /**
+   * Allows for setting the arm angle manually, is controlled between the limits
+   * @param pos angle to which the arm is going
+   */
   public void setPosManual(double pos) {
-    armPID.setSetpoint(pos, ControlType.kPosition);
+    armPID.setSetpoint(MathUtil.clamp(pos, ARM_kStowedAngle, ARM_kDeployedAngle), ControlType.kPosition);
   }
 
+  /**
+   * @return if intake is deployed
+   */
   public boolean isIntakeDown(){
     return Math.abs(ARM_kDeployedAngle - intakeArmEncoder.getPosition()) < ARM_SMALL_ESTIMATE_OFFSET;
   }
 
-  public boolean isIntakeFullyUp(){
+  /**
+   * @return if intake is stowed
+   */
+  public boolean isIntakeCollapsed(){
     return Math.abs(ARM_kStowedAngle - intakeArmEncoder.getPosition()) < ARM_SMALL_ESTIMATE_OFFSET;
   }
 
+  /**
+   * @return if intake is clearing the bump
+   */
   public boolean isIntakeBumpUp() {
     return intakeArmEncoder.getPosition() < ARM_kClearanceBumpAngle; //Assuming that when fully collapsed is 0 and goes +
   }
 
+  /**
+   * @return current position of arm (deg)
+   */
   public double getIntakeArmPosition(){
     return intakeArmEncoder.getPosition();
   }
 
+  /**
+   * @return desired position of arm (deg)
+   */
   public double getIntakeArmSetpoint() {
     return armPID.getSetpoint();
   }
 
+  /**
+   * @return if intake is at desired position within tolerance
+   */
   public boolean isIntakeAtPos() {
     return Math.abs(getIntakeArmSetpoint() - intakeArmEncoder.getPosition()) < ARM_SMALL_ESTIMATE_OFFSET;
   }
 
-  //For in case something happened with motor and we just want it work as a passive intake
-  private void changeIdleMode(boolean idleMode) {
+  /**
+   * Sets idleMode of the arm.
+   * Allows the intake be passive or motorized
+   * @param idleMode true for BRAKE, false for COAST
+   */
+  private void setIdleMode(boolean idleMode) {
     if (idleMode) {
       intakeArmConfig.idleMode(IdleMode.kBrake);
     }
