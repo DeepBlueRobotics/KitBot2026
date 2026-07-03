@@ -28,9 +28,9 @@ public class Outtake extends SubsystemBase {
   private SparkBaseConfig outtakeFeederConfig;
   private SparkClosedLoopController pidController;
   RelativeEncoder outtakeMasterEncoder;
+  RelativeEncoder outtakeFeederEncoder;
   /** Creates a new Outtake. */
   public Outtake() {
-
     configureMotors();
     outtakeMaster = MotorControllerFactory.createSpark(OUTTAKE_ID, OUTTAKE_MASTER_MOTOR_CONFIG, outtakeConfig);
     outtakeFollower = MotorControllerFactory.createSpark(OUTTAKE_FOLLOWER_ID, OUTTAKE_FOLLOWER_MOTOR_CONFIG, outtakeFollowerConfig);
@@ -39,16 +39,17 @@ public class Outtake extends SubsystemBase {
     pidController = outtakeMaster.getClosedLoopController();
 
     outtakeMasterEncoder = outtakeMaster.getEncoder();
+    outtakeFeederEncoder = outtakeFeeder.getEncoder();
     SmartDashboard.putData(this);
-
    }
 
   private void configureMotors(){
     outtakeConfig = MotorControllerFactory.sparkConfig(OUTTAKE_MASTER_MOTOR_CONFIG);
     outtakeConfig.idleMode(IdleMode.kCoast)
-                      .inverted(true)
+                  .inverted(true)
+                  .smartCurrentLimit(80)
                   .encoder.quadratureAverageDepth(2)
-                          .quadratureMeasurementPeriod(10);
+                          .quadratureMeasurementPeriod(8);
     outtakeConfig.closedLoop.pid(kP, kI, kD)
                             .feedForward.kV(kV);
 
@@ -57,7 +58,8 @@ public class Outtake extends SubsystemBase {
                           .follow(OUTTAKE_ID, true);
 
     outtakeFeederConfig = MotorControllerFactory.sparkConfig(OUTTAKE_FEEDER_MOTOR_CONFIG);
-    outtakeFeederConfig.inverted(true);
+    outtakeFeederConfig.inverted(true)
+                        .encoder.velocityConversionFactor(1.0/60/16);
   }
   /**
    * 
@@ -93,12 +95,19 @@ public class Outtake extends SubsystemBase {
   @Override
   public void initSendable(SendableBuilder builder){
     super.initSendable(builder);
-    builder.addDoubleProperty("Outtake master Speed perc", () -> outtakeMaster.getAppliedOutput(), null);
+    builder.addDoubleProperty("Shooter Input percentage", () -> outtakeMaster.getAppliedOutput(), null);
     builder.addDoubleProperty("Outtake master Velocity", () -> outtakeMasterEncoder.getVelocity(), null);
     builder.addDoubleProperty("Outtake master setpoint", () -> pidController.getSetpoint(), this::spinOuttake);
 
-    builder.addDoubleProperty("Outtake Feeder Speed perc", () -> outtakeFeeder.getAppliedOutput(), this::spinOuttakeFeeder);
+    builder.addDoubleProperty("Feeder Input percentage", () -> outtakeFeeder.getAppliedOutput(), this::spinOuttakeFeeder);
+    builder.addDoubleProperty("Feeder Velocity (balls/second)", this::feedingSpeed, null);
   }
+
+  //Theoritical balls per second
+  private double feedingSpeed() {
+    return outtakeFeederEncoder.getVelocity()/6;//6 flaps? Test this out could be useful
+  }
+
   @Override
   public void periodic() {}
     // This method will be called once per scheduler run

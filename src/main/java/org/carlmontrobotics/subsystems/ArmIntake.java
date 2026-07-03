@@ -19,6 +19,7 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ArmIntake extends SubsystemBase {
@@ -41,6 +42,8 @@ public class ArmIntake extends SubsystemBase {
     intakeArmMotor = MotorControllerFactory.createSpark(INTAKE_ARM_MOTOR_ID, MotorConfig.NEO_VORTEX, intakeArmConfig);
     intakeArmEncoder = intakeArmMotor.getEncoder();
     armPID = intakeArmMotor.getClosedLoopController();
+
+    SmartDashboard.putData(this);
 
   } 
 

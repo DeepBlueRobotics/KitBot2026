@@ -14,6 +14,7 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import static org.carlmontrobotics.Constants.ConveyorC.*;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Conveyor extends SubsystemBase {
@@ -27,6 +28,8 @@ public class Conveyor extends SubsystemBase {
     conveyorConfig.inverted(true);
     conveyorMotor = MotorControllerFactory.createSpark(CONVEYOR_ID, MotorConfig.NEO_VORTEX, conveyorConfig);
     conveyorEncoder = conveyorMotor.getEncoder();
+
+    SmartDashboard.putData(this);
   }
 
   @Override
