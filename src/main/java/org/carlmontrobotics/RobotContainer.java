@@ -7,10 +7,11 @@ package org.carlmontrobotics;
 
 //199 files
 import org.carlmontrobotics.subsystems.*;
-import org.carlmontrobotics.commands.AutonCommands.CenterLeftNeutralAuto;
-import org.carlmontrobotics.commands.AutonCommands.CenterRightNeutralAuto;
-import org.carlmontrobotics.commands.AutonCommands.LeftNeutralAuto;
-import org.carlmontrobotics.commands.AutonCommands.RightNeutralAuto;
+import org.carlmontrobotics.commands.AutonCommands.CenterToLeftNeutralAuto;
+import org.carlmontrobotics.commands.AutonCommands.CenterToRightNeutralAuto;
+
+import org.carlmontrobotics.commands.AutonCommands.ToLeftNeutralAuto;
+import org.carlmontrobotics.commands.AutonCommands.ToRightNeutralAuto;
 import org.carlmontrobotics.commands.DriveCommands.TeleopDrive;
 import org.carlmontrobotics.commands.ManipulatorCommands.EjectBalls;
 import org.carlmontrobotics.commands.ManipulatorCommands.IntakeBalls;
@@ -22,18 +23,15 @@ import org.carlmontrobotics.commands.ManipulatorCommands.RaiseForBump;
 import org.carlmontrobotics.commands.ManipulatorCommands.RaiseIntakeFullyUp;
 import org.carlmontrobotics.commands.ManipulatorCommands.DeployIntake;
 
-import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_PASSING_RPM;
-import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_SHOOTING_RPM;
+import static org.carlmontrobotics.Constants.IntakeC.NewIntakeC.RollerC.*;
+import static org.carlmontrobotics.Constants.IntakeC.NewIntakeC.ArmC.*;
+import static org.carlmontrobotics.Constants.ConveyorC.*;
+import static org.carlmontrobotics.Constants.OuttakeC.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -41,9 +39,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 import java.util.function.BooleanSupplier;
 
-import javax.print.attribute.standard.MediaSize.NA;
-
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 //auton
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -67,9 +62,13 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 //control bindings
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -136,7 +135,7 @@ public class RobotContainer implements Sendable {
    
     //#region ButtonBindings
     private void setBindingsDriver() {
-        new JoystickButton(driverController, Driver.resetFieldOrientationButton)
+        new JoystickButton(driverController, Driver.RESET_FIELD_ORIENTATION_BUTTON)
             .onTrue(new InstantCommand(drivetrain::resetFieldOrientation));
 
         new JoystickButton(driverController, Manipulator.REPEL_BALLS_BUTTON)
@@ -144,7 +143,11 @@ public class RobotContainer implements Sendable {
 
         axisTrigger(driverController, Manipulator.SMART_SHOOT_CLOSE_AXIS, OI.JOY_THRESH)
           .whileTrue(new SmartShoot(outtake, intake, conveyor, arm, OUTTAKE_SHOOTING_RPM));
-    }
+
+        new JoystickButton(driverController, Driver.LOCK_WHEELS_BUTTON)
+        .onTrue(new RunCommand(drivetrain::setX, drivetrain)
+        .until(() -> ((TeleopDrive) drivetrain.getDefaultCommand()).hasDriverInput()));
+  }
 
     private void setBindingsManipulator() {
       axisTrigger(manipulatorController, Manipulator.SMART_SHOOT_CLOSE_AXIS, OI.JOY_THRESH)
@@ -174,6 +177,49 @@ public class RobotContainer implements Sendable {
       new POVButton(manipulatorController, Manipulator.DEPLOY_INTAKE_POV)
       .onTrue(new DeployIntake(intake, arm));
 
+      //TESTING
+      new JoystickButton(manipulatorController, Manipulator.TESTING).whileTrue(
+        new ParallelCommandGroup(
+
+            new SequentialCommandGroup( //Shooter
+              new InstantCommand(() -> outtake.spinOuttakeWithVoltage(1)),
+              new WaitUntilCommand(() -> outtake.getOuttakeVelocity() > OUTTAKE_SHOOTING_RPM - 250),
+              new InstantCommand(() -> outtake.setRPM(OUTTAKE_SHOOTING_RPM)),
+              new WaitUntilCommand(() -> outtake.atVelGoal(OUTTAKE_SHOOTING_RPM, OUTTAKE_ESTIMATE_OFFSET)),
+              new InstantCommand(() -> outtake.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC))
+            ),
+
+            new RepeatCommand( //Conveyor
+              new SequentialCommandGroup(
+                new InstantCommand(() -> conveyor.setThrottle(CONVEYOR_SPEED)),
+                new WaitCommand(3),
+                new InstantCommand(conveyor::stop),
+                new WaitCommand(0.2)
+              )
+            ),
+
+            new SequentialCommandGroup( //Literally how citrus does it we will see how it goes
+              new InstantCommand(intake::stop),
+              new WaitCommand(ARM_timeToStartContract),
+              new InstantCommand(() -> arm.setPosManual(ARM_kMorePartialIn)),
+              new WaitUntilCommand(arm::isIntakeAtPos),
+              new InstantCommand(() -> arm.setPosManual(ARM_kLessPartialIn)),
+              new WaitUntilCommand(arm::isIntakeAtPos),
+              new InstantCommand(() -> arm.setPosManual(ARM_kMorePartialIn)),
+              new WaitUntilCommand(arm::isIntakeAtPos),
+              new WaitCommand(0.5),
+              new InstantCommand(() -> arm.setPosManual(ARM_kPartialIn)),
+              new WaitUntilCommand(arm::isIntakeAtPos),
+              new InstantCommand(arm::deployIntake),
+              new WaitUntilCommand(arm::isIntakeDown), 
+              new InstantCommand(() -> intake.setRPM(INTAKE_SPEED))
+            )
+        ).handleInterrupt(() -> {
+          outtake.stopOuttake();  
+          outtake.spinOuttakeFeeder(0);
+          conveyor.stop();
+        })
+      );
     }
     //#endregion
     //#region AutoMaking
@@ -183,11 +229,12 @@ public class RobotContainer implements Sendable {
       NamedCommands.registerCommand("Eject", new EjectBalls(intake, conveyor, arm));
     }
 
+
     private void RegisterCustomAutos(){
-      autoChooser.addOption("Center to Left Neutral", new CenterLeftNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
-      autoChooser.addOption("Center to Right Neutral", new CenterRightNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
-      autoChooser.addOption("At Bump to Left Neutral Auto", new LeftNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
-      autoChooser.addOption("At Bump to RightNeutral Auto", new RightNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
+      autoChooser.addOption("Center to Left Neutral", new CenterToLeftNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
+      autoChooser.addOption("Center to Right Neutral", new CenterToRightNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
+      autoChooser.addOption("At Bump to Left Neutral Auto", new ToLeftNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
+      autoChooser.addOption("At Bump to RightNeutral Auto", new ToRightNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
       autoChooser.setDefaultOption("Center Auto NO MOVE", new SmartShoot(outtake, intake, conveyor, arm, OUTTAKE_SHOOTING_RPM));
     }
     //#endregion
@@ -199,7 +246,7 @@ public class RobotContainer implements Sendable {
       () -> ProcessedAxisValue(driverController, Axis.kLeftX),
       () -> MathUtil.clamp(
         ProcessedAxisValue(driverController, Axis.kRightX) + ProcessedAxisValue(manipulatorController, Axis.kRightX),-1,1),
-      () -> driverController.getRawButton(OI.Driver.slowDriveButton),
+      () -> driverController.getRawButton(OI.Driver.SLOW_DRIVE_BUTTON),
       manipulatorController,
       () -> SmartDashboard.getBoolean("Baby Mode", Config.CONFIG.isBabyMode())
       ));

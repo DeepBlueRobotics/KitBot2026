@@ -39,7 +39,7 @@ public class Intake extends SubsystemBase {
       intakeFollowerMotor = MotorControllerFactory.createSpark(INTAKE_FOLLOWER_ID, MotorConfig.NEO_VORTEX, intakeFollowerConfig);
       intakePID = intakeMotor.getClosedLoopController();
       intakeEncoder = intakeMotor.getEncoder();
-      
+
       SmartDashboard.putData(this);
   }
 

@@ -25,7 +25,8 @@ public class SmartShoot extends Command {
   private final Conveyor conveyor;
   private final ArmIntake arm;
   private final double goalRPM;
-  private final Timer timer;
+  private final Timer conveyorTimer;
+  private final Timer shootingTimer;
 
   private final boolean oscillate = true;
   private final boolean useIntake;
@@ -39,7 +40,8 @@ public class SmartShoot extends Command {
     this.intake = intake;
     this.conveyor = conveyor;
     this.arm = arm;
-    timer = new Timer();
+    conveyorTimer = new Timer();
+    shootingTimer = new Timer();
     this.useIntake = false;
     addRequirements(outtake, intake, arm, conveyor);
    }
@@ -50,7 +52,8 @@ public class SmartShoot extends Command {
     this.intake = intake;
     this.conveyor = conveyor;
     this.arm = arm;
-    timer = new Timer();
+    conveyorTimer = new Timer();
+    shootingTimer = new Timer();
     this.useIntake = useIntake;
     addRequirements(outtake, intake, arm, conveyor);
    }
@@ -59,8 +62,9 @@ public class SmartShoot extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    outtake.spinOuttake(goalRPM);
-    timer.restart();
+    outtake.setRPM(goalRPM);
+    conveyorTimer.restart();
+    shootingTimer.restart();
     if (useIntake) {
       arm.deployIntake();
       intake.setRPM(INTAKE_SPEED);
@@ -76,20 +80,20 @@ public class SmartShoot extends Command {
         outtake.spinOuttakeWithVoltage(1);
       }
       else {
-        outtake.spinOuttake(goalRPM);
+        outtake.setRPM(goalRPM);
       }
     }
 
     if(outtake.atVelGoal(goalRPM, OUTTAKE_ESTIMATE_OFFSET)){
       outtake.spinOuttakeFeeder(OUTTAKE_FEEDER_VOLT_PERC);
       if (oscillate) {
-        if (timer.get() > 4 && !backwards) {
-        timer.restart();
+        if (conveyorTimer.get() > 4 && !backwards) {
+        conveyorTimer.restart();
         conveyor.setThrottle(0);
         backwards = true;
       }
-      else if (timer.get() > 0.3 && backwards) {
-        timer.restart();
+      else if (conveyorTimer.get() > 0.3 && backwards) {
+        conveyorTimer.restart();
         conveyor.setThrottle(CONVEYOR_SPEED);
         backwards = false;
       } 
@@ -107,7 +111,7 @@ public class SmartShoot extends Command {
     outtake.spinOuttakeFeeder(0);
     conveyor.stop();
     intake.stop();
-    timer.stop();
+    conveyorTimer.stop();
   }
 
   // Returns true when the command should end.

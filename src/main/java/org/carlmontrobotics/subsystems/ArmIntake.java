@@ -67,15 +67,15 @@ public class ArmIntake extends SubsystemBase {
   }
 
   public void raiseIntakeFullyUp() {
-    armPID.setSetpoint(INTAKE_ARM_UP_POSITION, ControlType.kPosition);
+    armPID.setSetpoint(ARM_kStowedAngle, ControlType.kPosition);
   }
 
   public void raiseIntakeToBump() {
-    armPID.setSetpoint(INTAKE_ARM_BUMP_UP_POSITION - 10, ControlType.kPosition); //-10 degrees to clear the level by 10 
+    armPID.setSetpoint(ARM_kClearanceBumpAngle - 10, ControlType.kPosition); //-10 degrees to clear the level by 10 
   }
 
   public void deployIntake(){
-    armPID.setSetpoint(INTAKE_ARM_DOWN_POSITION, ControlType.kPosition);
+    armPID.setSetpoint(ARM_kDeployedAngle, ControlType.kPosition);
   }
 
   public void setPosManual(double pos) {
@@ -83,15 +83,15 @@ public class ArmIntake extends SubsystemBase {
   }
 
   public boolean isIntakeDown(){
-    return Math.abs(INTAKE_ARM_DOWN_POSITION - intakeArmEncoder.getPosition()) < ARM_SMALL_ESTIMATE_OFFSET;
+    return Math.abs(ARM_kDeployedAngle - intakeArmEncoder.getPosition()) < ARM_SMALL_ESTIMATE_OFFSET;
   }
 
   public boolean isIntakeFullyUp(){
-    return Math.abs(INTAKE_ARM_UP_POSITION - intakeArmEncoder.getPosition()) < ARM_SMALL_ESTIMATE_OFFSET;
+    return Math.abs(ARM_kStowedAngle - intakeArmEncoder.getPosition()) < ARM_SMALL_ESTIMATE_OFFSET;
   }
 
   public boolean isIntakeBumpUp() {
-    return intakeArmEncoder.getPosition() < INTAKE_ARM_BUMP_UP_POSITION; //Assuming that when fully collapsed is 0 and goes +
+    return intakeArmEncoder.getPosition() < ARM_kClearanceBumpAngle; //Assuming that when fully collapsed is 0 and goes +
   }
 
   public double getIntakeArmPosition(){
@@ -100,6 +100,10 @@ public class ArmIntake extends SubsystemBase {
 
   public double getIntakeArmSetpoint() {
     return armPID.getSetpoint();
+  }
+
+  public boolean isIntakeAtPos() {
+    return Math.abs(getIntakeArmSetpoint() - intakeArmEncoder.getPosition()) < ARM_SMALL_ESTIMATE_OFFSET;
   }
 
   //For in case something happened with motor and we just want it work as a passive intake

@@ -6,7 +6,7 @@ package org.carlmontrobotics.commands.ManipulatorCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-import static org.carlmontrobotics.Constants.IntakeC.NewIntakeC.ArmC.INTAKE_ARM_UP_POSITION;
+import static org.carlmontrobotics.Constants.IntakeC.NewIntakeC.ArmC.ARM_kStowedAngle;
 import static org.carlmontrobotics.Constants.IntakeC.NewIntakeC.RollerC.INTAKE_SPEED;
 
 import org.carlmontrobotics.Constants.IntakeC;

@@ -40,8 +40,11 @@ public final class Constants {
 		public static final class Driver {
 			public static final int port = 0;
 
-			public static final int slowDriveButton = Button.kLeftBumper.value;
-			public static final int resetFieldOrientationButton = Button.kRightBumper.value;
+			public static final int SLOW_DRIVE_BUTTON = Button.kLeftBumper.value;
+			public static final int RESET_FIELD_ORIENTATION_BUTTON = Button.kRightBumper.value;
+
+			public static final int LOCK_WHEELS_BUTTON = Button.kLeftStick.value;
+
 			public static final Axis RIGHT_TRIGGER_BUTTON = Axis.kRightTrigger;
 			public static final Axis LEFT_TRIGGER_BUTTON = Axis.kLeftTrigger;
 
@@ -64,6 +67,8 @@ public final class Constants {
 
 			public static final int INTAKE_CONVEYOR_BUTTON = Button.kB.value;
 			public static final int REPEL_BALLS_BUTTON = Button.kA.value;
+
+			public static final int TESTING = Button.kX.value;
 
 
 			public static final int OUTTAKE_FEEDER_BUTTON = Button.kY.value;
@@ -291,11 +296,17 @@ public final class Constants {
 		public static final class NewIntakeC {
 			public static final class ArmC {
 				public static final int INTAKE_ARM_MOTOR_ID = 43;
-				public static final double INTAKE_ARM_UP_POSITION = 0; //TODO
-				public static final double INTAKE_ARM_BUMP_UP_POSITION = 105; //TODO
-				public static final double INTAKE_ARM_DOWN_POSITION = 136.747; //TODO
-				public static final double ARM_BIG_ESTIMATE_OFFSET = 0; //TODO
-				public static final double ARM_SMALL_ESTIMATE_OFFSET = 0; //TODO
+				public static final double ARM_kClearanceBumpAngle = 105;
+				public static final double ARM_kDeployedAngle = 136.747;
+				public static final double ARM_kLessPartialIn = 111.747; //For using intake to shove balls down the feeder
+				public static final double ARM_kPartialIn = 86.747;
+				public static final double ARM_kMorePartialIn = 56.747;
+				public static final double ARM_kStowedAngle = 0;
+
+				public static final double ARM_timeToStartContract = 0.75;
+
+				public static final double ARM_BIG_ESTIMATE_OFFSET = 12; //TODO
+				public static final double ARM_SMALL_ESTIMATE_OFFSET = 5; //TODO
 				public static final double kP = 0; //TODO
 				public static final double kI = 0;
 				public static final double kD = 0;
@@ -334,6 +345,14 @@ public final class Constants {
 		public static final double kV = 0.0018;
 		public static final double OUTTAKE_FEEDER_VOLT_PERC = 1;
 		public static final double OUTTAKE_ESTIMATE_OFFSET = 100; //+- range for atGoal
+	}
+	public static final class EyeballAutoC {
+		public static final double endShoot = 2;
+		public static final double endStrafe = 1;
+		public static final double endFastDrive = 2.4;
+		public static final double endSlowDrive = 0.1;
+		public static final double endRotation = 0.6;
+		public static final double endStrafeDrive = 5;
 	}
 }
 //#endregion

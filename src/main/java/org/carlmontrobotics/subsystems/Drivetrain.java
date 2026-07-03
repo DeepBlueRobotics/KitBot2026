@@ -1301,4 +1301,16 @@ public class Drivetrain extends SubsystemBase {
     public double getGyroRate() {
         return gyro.getRate();
     }
+
+    /**
+    * Sets all swerve modules to X formation to prevent robot movement.
+     * FL and BR point at 45°, FR and BL point at -45° (inward cross pattern).
+     */
+    public void setX() {
+        modules[0].move(0, 45);   // FL - points toward center-right
+        modules[1].move(0, -45);  // FR - points toward center-left
+        modules[2].move(0, -45);  // BL - points toward center-right
+        modules[3].move(0, 45);   // BR - points toward center-left
+    }
+
 }

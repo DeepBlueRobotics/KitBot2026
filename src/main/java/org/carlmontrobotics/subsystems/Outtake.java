@@ -65,7 +65,7 @@ public class Outtake extends SubsystemBase {
    * 
    * @param input RPM
    */
-  public void spinOuttake(double input) {
+  public void setRPM(double input) {
     pidController.setSetpoint(input, ControlType.kVelocity);
   }
 
@@ -97,7 +97,7 @@ public class Outtake extends SubsystemBase {
     super.initSendable(builder);
     builder.addDoubleProperty("Shooter Input percentage", () -> outtakeMaster.getAppliedOutput(), null);
     builder.addDoubleProperty("Outtake master Velocity", () -> outtakeMasterEncoder.getVelocity(), null);
-    builder.addDoubleProperty("Outtake master setpoint", () -> pidController.getSetpoint(), this::spinOuttake);
+    builder.addDoubleProperty("Outtake master setpoint", () -> pidController.getSetpoint(), this::setRPM);
 
     builder.addDoubleProperty("Feeder Input percentage", () -> outtakeFeeder.getAppliedOutput(), this::spinOuttakeFeeder);
     builder.addDoubleProperty("Feeder Velocity (balls/second)", this::feedingSpeed, null);

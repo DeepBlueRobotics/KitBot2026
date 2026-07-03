@@ -25,7 +25,7 @@ public class ShootBalls extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    outtake.spinOuttake(OUTTAKE_SHOOTING_RPM);
+    outtake.setRPM(OUTTAKE_SHOOTING_RPM);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
