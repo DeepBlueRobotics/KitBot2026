@@ -5,6 +5,7 @@
 package org.carlmontrobotics.commands.ManipulatorCommands;
 
 import static org.carlmontrobotics.Constants.ConveyorC.CONVEYOR_SPEED;
+import static org.carlmontrobotics.Constants.IntakeC.NewIntakeC.ArmC.ARM_kDeployedAngle;
 import static org.carlmontrobotics.Constants.IntakeC.NewIntakeC.RollerC.INTAKE_SPEED;
 
 import org.carlmontrobotics.subsystems.ArmIntake;
@@ -47,8 +48,13 @@ public class EjectBalls extends Command {
   @Override
   public void end(boolean interrupted) {
     conveyor.stop();
-    intake.stop();
     arm.setPosManual(oldPos);
+    if (oldPos == ARM_kDeployedAngle) {
+      intake.setRPM(INTAKE_SPEED);
+    }
+    else {
+      intake.stop();
+    }
   }
 
   // Returns true when the command should end.
