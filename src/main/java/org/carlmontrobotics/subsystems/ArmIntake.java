@@ -40,6 +40,10 @@ public class ArmIntake extends SubsystemBase {
     intakeArmConfig.encoder
                     .positionConversionFactor(40) //converts to degs for ARM not motor 
                     .velocityConversionFactor(40.0/60); //converts to deg/s
+    intakeArmConfig.softLimit.forwardSoftLimit(ARM_kDeployedAngle)
+                              .forwardSoftLimitEnabled(true)
+                              .reverseSoftLimit(ARM_kStowedAngle)
+                              .reverseSoftLimitEnabled(true);
     intakeArmMotor = MotorControllerFactory.createSpark(INTAKE_ARM_MOTOR_ID, MotorConfig.NEO_VORTEX, intakeArmConfig);
     intakeArmEncoder = intakeArmMotor.getEncoder();
     armPID = intakeArmMotor.getClosedLoopController();
@@ -61,12 +65,22 @@ public class ArmIntake extends SubsystemBase {
     builder.addBooleanProperty("is Collapsed", this::isIntakeCollapsed, null);
     builder.addBooleanProperty("Clearance for BUMP", this::isIntakeBumpUp, null);
     builder.addBooleanProperty("BrakeMode", () -> isBrake, this::setIdleMode);
+    builder.addBooleanProperty("Reset Arm To Stow", () -> false, i -> {
+      if (i) {
+        resetArmPosition(ARM_kStowedAngle);
+      }
+    });
+    builder.addBooleanProperty("Reset Arm to Deploy", () -> false, i -> {
+      if (i) {
+        resetArmPosition(ARM_kDeployedAngle);
+      }
+    });
   }
 
   /**
    * Cancels any setpoint set, stops the motor in place
    */
-  public void stopIntakeArm(){
+  public void stop(){
     armPID.setSetpoint(0, ControlType.kDutyCycle);
   }
 
@@ -155,5 +169,10 @@ public class ArmIntake extends SubsystemBase {
     }
     isBrake = idleMode;
     intakeArmMotor.configure(intakeArmConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+  }
+
+  public void resetArmPosition(double angle) {
+    intakeArmEncoder.setPosition(angle);
+    stop();
   }
 }
