@@ -148,6 +148,12 @@ public class RobotContainer implements Sendable {
         new JoystickButton(driverController, Driver.LOCK_WHEELS_BUTTON)
         .onTrue(new RunCommand(drivetrain::setX, drivetrain)
         .until(() -> ((TeleopDrive) drivetrain.getDefaultCommand()).hasDriverInput()));
+
+        new POVButton(driverController, Manipulator.COLLAPSE_INTAKE_POV)
+      .onTrue(new RaiseIntakeFullyUp(intake, arm));
+
+      new POVButton(driverController, Manipulator.DEPLOY_INTAKE_POV)
+      .onTrue(new DeployIntake(intake, arm));
   }
 
     private void setBindingsManipulator() {

@@ -34,12 +34,12 @@ public class ArmIntake extends SubsystemBase {
   public ArmIntake() {
     intakeArmConfig = MotorControllerFactory.sparkConfig(MotorConfig.NEO_VORTEX);
     intakeArmConfig.smartCurrentLimit(40) //might wanna lower this even more
-                    .inverted(true) //Don't know yet but I think its true
+                    .inverted(false) //Don't know yet but I think its true
                     .idleMode(IdleMode.kBrake)
                     .closedLoop.pid(kP, kI, kD);
     intakeArmConfig.encoder
-                    .positionConversionFactor(40) //converts to degs for ARM not motor 
-                    .velocityConversionFactor(40.0/60); //converts to deg/s
+                    .positionConversionFactor(360/75.0) //converts to degs for ARM not motor 
+                    .velocityConversionFactor(60/75.0); //converts to deg/s
     intakeArmConfig.softLimit.forwardSoftLimit(ARM_kDeployedAngle)
                               .forwardSoftLimitEnabled(true)
                               .reverseSoftLimit(ARM_kStowedAngle)

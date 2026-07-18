@@ -30,7 +30,7 @@ public class Intake extends SubsystemBase {
     public Intake() {
       SparkBaseConfig intakeConfig = MotorControllerFactory.sparkConfig(MotorConfig.NEO_VORTEX);
       intakeConfig.smartCurrentLimit(smartCurrentLimit)
-                    .inverted(true)
+                    .inverted(false)
                     .closedLoop.pid(kP, kI, kD);
       SparkBaseConfig intakeFollowerConfig = MotorControllerFactory.sparkConfig(MotorConfig.NEO_VORTEX);
       intakeFollowerConfig.apply(intakeConfig)
