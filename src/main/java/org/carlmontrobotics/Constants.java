@@ -62,10 +62,10 @@ public final class Constants {
 			public static final int COLLAPSE_INTAKE_POV = 0;
 
 			public static final int RAISE_INTAKE_BUMP_TOGGLE_BUTTON = Button.kLeftBumper.value;
-			public static final int PREPARE_SHOOTER_BUTTON = Button.kRightBumper.value;
+			public static final int PREPARE_SHOOTER_BUTTON = Button.kA.value; 
 
 			public static final int INTAKE_CONVEYOR_BUTTON = Button.kB.value;
-			public static final int REPEL_BALLS_BUTTON = Button.kA.value;
+			public static final int REPEL_BALLS_BUTTON = Button.kRightBumper.value;
 
 			public static final int TESTING = Button.kX.value;
 
