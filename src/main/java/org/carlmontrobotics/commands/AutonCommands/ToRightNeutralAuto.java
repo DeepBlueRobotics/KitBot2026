@@ -49,8 +49,10 @@ public class ToRightNeutralAuto extends SequentialCommandGroup {
               new WaitCommand(endSlowDrive),
               new InstantCommand(() -> drivetrain.drive(2,0,4)), //Turn 90* while edging a bit more forward getting extra depth into the middle
               new WaitCommand(endRotation),
-              new InstantCommand(() -> drivetrain.drive(0,-1,0)), //Go across filling up hopper
+              new InstantCommand(() -> drivetrain.drive(0,-2,0)), //Go across filling up hopper
               new WaitCommand(endStrafeDrive),
+              new InstantCommand(() -> drivetrain.drive(0,0,4)),
+              new WaitCommand(endRotation),
               new InstantCommand(() -> { //Stop, keep intake on just incase :)
                 outtake.stopOuttake();
                 outtake.spinOuttakeFeeder(0);

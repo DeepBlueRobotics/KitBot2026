@@ -351,7 +351,7 @@ public final class Constants {
 		public static final double endFastDrive = 2.4;
 		public static final double endSlowDrive = 0.1;
 		public static final double endRotation = 0.6;
-		public static final double endStrafeDrive = 5;
+		public static final double endStrafeDrive = 2.5;
 	}
 }
 //#endregion
