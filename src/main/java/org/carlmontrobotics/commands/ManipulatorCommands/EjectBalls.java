@@ -11,6 +11,7 @@ import static org.carlmontrobotics.Constants.IntakeC.NewIntakeC.RollerC.INTAKE_S
 import org.carlmontrobotics.subsystems.ArmIntake;
 import org.carlmontrobotics.subsystems.Conveyor;
 import org.carlmontrobotics.subsystems.Intake;
+import org.carlmontrobotics.subsystems.Outtake;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -19,23 +20,24 @@ public class EjectBalls extends Command {
   private final Intake intake;
   private final Conveyor conveyor;
   private final ArmIntake arm;
-  private double oldPos;
+  private final Outtake outtake;
 
   /** Creates a new EjectBalls. */
-  public EjectBalls(Intake intake, Conveyor conveyor, ArmIntake arm) {
+  public EjectBalls(Intake intake, Conveyor conveyor, ArmIntake arm, Outtake outtake) {
     this.intake = intake;
     this.conveyor = conveyor;
     this.arm = arm;
-    addRequirements(intake, conveyor, arm);
+    this.outtake = outtake;
+    addRequirements(intake, conveyor, arm, outtake);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    oldPos = arm.getIntakeArmSetpoint();
     conveyor.setThrottle(-CONVEYOR_SPEED);
-    intake.setRPM(-INTAKE_SPEED);
+    intake.setRPM(-2*INTAKE_SPEED);
     arm.deploy();
+    outtake.spinOuttakeFeeder(-0.5);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -48,13 +50,7 @@ public class EjectBalls extends Command {
   @Override
   public void end(boolean interrupted) {
     conveyor.stop();
-    arm.setPosManual(oldPos);
-    if (oldPos == ARM_kDeployedAngle) {
-      intake.setRPM(INTAKE_SPEED);
-    }
-    else {
-      intake.stop();
-    }
+    intake.setRPM(INTAKE_SPEED);
   }
 
   // Returns true when the command should end.

@@ -140,7 +140,7 @@ public class RobotContainer implements Sendable {
             .onTrue(new InstantCommand(drivetrain::resetFieldOrientation));
 
         new JoystickButton(driverController, Manipulator.REPEL_BALLS_BUTTON)
-          .whileTrue(new EjectBalls(intake, conveyor, arm));
+          .whileTrue(new EjectBalls(intake, conveyor, arm, outtake));
 
         axisTrigger(driverController, Manipulator.SMART_SHOOT_CLOSE_AXIS, OI.JOY_THRESH)
           .whileTrue(new SmartShoot(outtake, intake, conveyor, arm, OUTTAKE_SHOOTING_RPM));
@@ -176,7 +176,7 @@ public class RobotContainer implements Sendable {
       .whileTrue(new RunConveyor(conveyor));
 
       new JoystickButton(manipulatorController, Manipulator.REPEL_BALLS_BUTTON)
-      .whileTrue(new EjectBalls(intake, conveyor, arm));  
+      .whileTrue(new EjectBalls(intake, conveyor, arm, outtake));  
 
       new POVButton(manipulatorController, Manipulator.COLLAPSE_INTAKE_POV)
       .onTrue(new RaiseIntakeFullyUp(intake, arm));
@@ -233,7 +233,7 @@ public class RobotContainer implements Sendable {
     private void RegisterAutoCommands() {
       NamedCommands.registerCommand("Shoot", new SmartShoot(outtake, intake, conveyor, arm, OUTTAKE_SHOOTING_RPM));
       NamedCommands.registerCommand("Pass", new SmartShoot(outtake, intake, conveyor, arm, OUTTAKE_PASSING_RPM));
-      NamedCommands.registerCommand("Eject", new EjectBalls(intake, conveyor, arm));
+      NamedCommands.registerCommand("Eject", new EjectBalls(intake, conveyor, arm, outtake));
     }
 
 
@@ -241,7 +241,7 @@ public class RobotContainer implements Sendable {
       autoChooser.addOption("Center to Left Neutral", new CenterToLeftNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
       autoChooser.addOption("Center to Right Neutral", new CenterToRightNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
       autoChooser.addOption("At Bump to Left Neutral Auto", new ToLeftNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
-      autoChooser.addOption("At Bump to RightNeutral Auto", new ToRightNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
+      autoChooser.addOption("At Bump to Right Neutral Auto", new ToRightNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
       autoChooser.setDefaultOption("Center Auto NO MOVE", new CenterAutoNoMove(outtake, conveyor, arm, intake)); 
     }
     //#endregion
