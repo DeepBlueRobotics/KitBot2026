@@ -7,6 +7,8 @@ package org.carlmontrobotics;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -18,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
+  private final Timer idlingTimer;
 
   private final RobotContainer m_robotContainer;
   private final boolean atComp = true;
@@ -30,6 +33,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    idlingTimer = new Timer();
     //SmartDashboard.putData(()-> m_robotContainer.drivetrain.getBusVoltage());
   }
 
@@ -51,14 +55,57 @@ public class Robot extends TimedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    idlingTimer.restart();
+    m_robotContainer.drivetrain.setDrivingIdleMode(false);
+
+  }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    if (DriverStation.isFMSAttached()) {
+      if (idlingTimer.get() * 10 % 10 <= 3) {
+        var location = DriverStation.getLocation(); 
+        if (location.isPresent()){
+          int station = location.getAsInt();
+          switch (station) {
+            case 1:
+              m_robotContainer.driverController.setRumble(RumbleType.kRightRumble, 0.2);
+               m_robotContainer.manipulatorController.setRumble(RumbleType.kLeftRumble, 0.2);
+              break;
+          
+            case 2:
+              m_robotContainer.driverController.setRumble(RumbleType.kLeftRumble, 0.2);
+              m_robotContainer.manipulatorController.setRumble(RumbleType.kRightRumble, 0.2);
+              break;
+
+            case 3:
+              m_robotContainer.driverController.setRumble(RumbleType.kRightRumble, 0.2);
+              m_robotContainer.manipulatorController.setRumble(RumbleType.kLeftRumble, 0.2);
+              break;
+          }
+        }
+        else {
+          m_robotContainer.driverController.setRumble(RumbleType.kBothRumble, 0.2);
+          m_robotContainer.manipulatorController.setRumble(RumbleType.kBothRumble, 0.2);     
+        }
+      }
+      else {
+        m_robotContainer.driverController.setRumble(RumbleType.kBothRumble, 0);
+        m_robotContainer.manipulatorController.setRumble(RumbleType.kBothRumble, 0);      
+      }
+    }
+    else {
+      m_robotContainer.driverController.setRumble(RumbleType.kBothRumble, 0);
+      m_robotContainer.manipulatorController.setRumble(RumbleType.kBothRumble, 0);     
+    }
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    m_robotContainer.driverController.setRumble(RumbleType.kBothRumble, 0);
+    m_robotContainer.manipulatorController.setRumble(RumbleType.kBothRumble, 0);     
     m_robotContainer.drivetrain.setFieldOriented(false);
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
@@ -75,6 +122,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    m_robotContainer.driverController.setRumble(RumbleType.kBothRumble, 0);
+    m_robotContainer.manipulatorController.setRumble(RumbleType.kBothRumble, 0);     
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
@@ -83,7 +132,7 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
     m_robotContainer.drivetrain.setFieldOriented(true);
-    m_robotContainer.drivetrain.setDrivingIdleMode(false);
+    m_robotContainer.drivetrain.setDrivingIdleMode(true);
 
     if (!atComp) {
       m_robotContainer.drivetrain.resetFieldOrientation();
