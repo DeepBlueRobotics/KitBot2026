@@ -296,7 +296,7 @@ public final class Constants {
 			public static final class ArmC {
 				public static final int INTAKE_ARM_MOTOR_ID = 43;
 				public static final double ARM_kClearanceBumpAngle = 105;
-				public static final double ARM_kDeployedAngle = 136;
+				public static final double ARM_kDeployedAngle = 144;
 				public static final double ARM_kLessPartialIn = 111.747; //For using intake to shove balls down the feeder
 				public static final double ARM_kPartialIn = 86.747;
 				public static final double ARM_kMorePartialIn = 56.747;
@@ -306,7 +306,7 @@ public final class Constants {
 
 				public static final double ARM_BIG_ESTIMATE_OFFSET = 12; //TODO
 				public static final double ARM_SMALL_ESTIMATE_OFFSET = 5; //TODO
-				public static final double kP = 0.012; //TODO
+				public static final double kP = 0.016; //TODO
 				public static final double kI = 0;
 				public static final double kD = 0;
 			}

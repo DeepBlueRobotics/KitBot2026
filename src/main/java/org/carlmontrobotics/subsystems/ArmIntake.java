@@ -72,7 +72,7 @@ public class ArmIntake extends SubsystemBase {
     });
     builder.addBooleanProperty("Reset Arm to Deploy", () -> false, i -> {
       if (i) {
-        resetArmPosition(ARM_kDeployedAngle);
+        resetArmPosition(136);
       }
     });
   }
