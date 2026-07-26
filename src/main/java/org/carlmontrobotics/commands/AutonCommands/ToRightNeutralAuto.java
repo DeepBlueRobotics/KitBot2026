@@ -4,69 +4,110 @@
 
 package org.carlmontrobotics.commands.AutonCommands;
 
+import static org.carlmontrobotics.Constants.ConveyorC.CONVEYOR_SPEED;
+import static org.carlmontrobotics.Constants.IntakeC.NewIntakeC.RollerC.INTAKE_SPEED;
+import static org.carlmontrobotics.Constants.OuttakeC.OUTTAKE_SHOOTING_RPM;
+
 import org.carlmontrobotics.subsystems.ArmIntake;
 import org.carlmontrobotics.subsystems.Conveyor;
 import org.carlmontrobotics.subsystems.Drivetrain;
 import org.carlmontrobotics.subsystems.Intake;
 import org.carlmontrobotics.subsystems.Outtake;
 
-import static org.carlmontrobotics.Constants.IntakeC.NewIntakeC.RollerC.*;
-import static org.carlmontrobotics.Constants.IntakeC.NewIntakeC.ArmC.*;
-import static org.carlmontrobotics.Constants.ConveyorC.*;
-import static org.carlmontrobotics.Constants.OuttakeC.*;
-import static org.carlmontrobotics.Constants.EyeballAutoC.*;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
+public class ToRightNeutralAuto extends Command {
+  private final Drivetrain dt;
+  private final Outtake shooter;
+  private final Intake intake;
+  private final Conveyor conveyor;
+  private final ArmIntake arm;
+  private final Timer timer;
 
-// NOTE:  Consider using this command inline, rather than writing a subclass.  For more
-// information, see:
-// https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class ToRightNeutralAuto extends SequentialCommandGroup {
+  private double startShoot = 0.0;
+  private double endshoot = 4;
+  private double endStrafe = 1;
+  private double endFastDrive = 1.5;
+  private double endSlowDrive = 2;
+  private double endRotation = 0.5;
+  private double endStrafeDrive = 2.5;
 
-  public ToRightNeutralAuto(Drivetrain drivetrain, Outtake outtake, Intake intake, Conveyor conveyor, ArmIntake arm) {
-    // Add your commands in the addCommands() call, e.g.
-    // addCommands(new FooCommand(), new BarCommand());
-    addCommands(
-      new InstantCommand(() -> { // Intialize
-            drivetrain.resetFieldOrientation();
-            drivetrain.setFieldOriented(true);
-            arm.collapse();
-            intake.stop();
-          }),
-          new InstantCommand(() -> drivetrain.drive(3, 0, 0)), //Go over bump quick!
-          new ParallelCommandGroup( //Slow down as approaching balls, but before that lower down the intake
-            new SequentialCommandGroup(
-              new WaitCommand(endFastDrive),
-              new InstantCommand(() -> {
-                drivetrain.drive(2,0,0);
-              }),
-              new WaitCommand(endSlowDrive),
-              new InstantCommand(() -> drivetrain.drive(2,0,4)), //Turn 90* while edging a bit more forward getting extra depth into the middle
-              new WaitCommand(endRotation),
-              new InstantCommand(() -> drivetrain.drive(0,-2,0)), //Go across filling up hopper
-              new WaitCommand(endStrafeDrive),
-              new InstantCommand(() -> drivetrain.drive(0,0,4)),
-              new WaitCommand(endRotation),
-              new InstantCommand(() -> { //Stop, keep intake on just incase :)
-                outtake.stopOuttake();
-                outtake.spinOuttakeFeeder(0);
-                conveyor.stop();
-                drivetrain.setX();
-              })
-            ),
-            new SequentialCommandGroup(
-              new WaitCommand(1.5),
-              new InstantCommand(arm::deploy),
-              new WaitUntilCommand(arm::isIntakeDown),
-              new InstantCommand(() -> intake.setRPM(INTAKE_SPEED))
-            )
-          )
-      );
+  /** Creates a new SimpleShootAuton. */
+  public ToRightNeutralAuto(Drivetrain dt, Outtake shooter, Intake intake, Conveyor conveyor, ArmIntake arm) {
+    this.shooter = shooter;
+    this.intake = intake;
+    this.dt = dt;
+    this.conveyor = conveyor;
+    this.arm = arm;
+    timer = new Timer();
+    addRequirements(shooter, intake, dt, arm, conveyor);
+    // SmartDashboard.putNumber("startShoot", startShoot);
+    // SmartDashboard.putNumber("endshoot", endshoot);
+    // SmartDashboard.putNumber("endStrafe", endStrafe);
+    // SmartDashboard.putNumber("endFastDrive", endFastDrive);
+    // SmartDashboard.putNumber("endSlowDrive", endSlowDrive);
+    // SmartDashboard.putNumber("endRotation", endRotation);
+    // SmartDashboard.putNumber("endStrafeDrive", endStrafeDrive);
+    // Use addRequirements() here to declare subsystem dependencies.
+  }
+
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {
+    dt.resetFieldOrientation();
+    dt.setFieldOriented(true);
+    timer.restart();
+    arm.collapse();
+    intake.stop();
+  //   startShoot = SmartDashboard.getNumber("startShoot", startShoot);
+  //   endshoot = SmartDashboard.getNumber("endshoot", endshoot);
+  //  endStrafe =  SmartDashboard.getNumber("endStrafe", endStrafe);
+  //   endFastDrive = SmartDashboard.getNumber("endFastDrive", endFastDrive);
+  //   endSlowDrive = SmartDashboard.getNumber("endSlowDrive", endSlowDrive);
+  //   endRotation = SmartDashboard.getNumber("endRotation", endRotation);
+  //   endStrafeDrive= SmartDashboard.getNumber("endStrafeDrive", endStrafeDrive);
+  }
+
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
+    double currentTime = timer.get();
+    if (currentTime > endFastDrive+endSlowDrive+endRotation+endStrafeDrive) {
+      dt.drive(0,0,0);
+    }
+    else if (currentTime > endFastDrive+endSlowDrive+endRotation) {
+      dt.drive(0,-2,0);
+    }
+    else if (currentTime > endFastDrive+endSlowDrive) {
+      dt.drive(0,0,3.4);
+    }
+    else if (currentTime > endFastDrive) {
+      dt.drive(1.3,0,0);
+    }
+    else if (currentTime > 0.5) {
+      arm.deploy();
+      intake.setRPM(INTAKE_SPEED);
+    }
+    else {
+      dt.drive(3, 0, 0);
+    }
+  }
+
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {
+    shooter.stopOuttake();
+    shooter.spinOuttakeFeeder(0);
+    conveyor.stop();
+    dt.stop();
+    //intake.stopIntake();
+  }
+
+  // Returns true when the command should end.
+  @Override
+  public boolean isFinished() {
+    return false;
   }
 }

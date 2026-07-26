@@ -313,7 +313,7 @@ public final class Constants {
 			public static final class RollerC {
 				public static final int INTAKE_ID = 41;
 				public static final int INTAKE_FOLLOWER_ID = 42;
-				public static final double INTAKE_SPEED = 2500; //TODO
+				public static final double INTAKE_SPEED = 2600; //TODO
 				public static final double kP = 0.0002; //TODO
 				public static final double kI = 0;
 				public static final double kD = 0;
@@ -335,7 +335,7 @@ public final class Constants {
 		public static final MotorConfig OUTTAKE_FOLLOWER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 		public static final MotorConfig OUTTAKE_FEEDER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 
-		public static final double OUTTAKE_SHOOTING_RPM = 2450; //TODO
+		public static final double OUTTAKE_SHOOTING_RPM =3500; //TODO
 		public static final double OUTTAKE_PASSING_RPM = 5000; //TODO
 		
 		public static final double kP = 0.0004;

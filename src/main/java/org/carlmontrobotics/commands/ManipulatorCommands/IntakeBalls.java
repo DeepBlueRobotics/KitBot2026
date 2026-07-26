@@ -6,6 +6,7 @@ package org.carlmontrobotics.commands.ManipulatorCommands;
 
 import static org.carlmontrobotics.Constants.IntakeC.NewIntakeC.RollerC.*;
 
+import org.carlmontrobotics.subsystems.ArmIntake;
 import org.carlmontrobotics.subsystems.Intake;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -15,12 +16,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class IntakeBalls extends Command {
   Intake intake;
+  ArmIntake arm;
   GenericHID manipulatorRumble;
 
   /** Creates a new IntakeBalls. */
-  public IntakeBalls(Intake intake, GenericHID manipulatorRumble) {
+  public IntakeBalls(Intake intake, GenericHID manipulatorRumble, ArmIntake arm) {
     this.intake = intake;
     this.manipulatorRumble = manipulatorRumble;
+    this.arm = arm;
     addRequirements(intake);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -28,7 +31,9 @@ public class IntakeBalls extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-
+    if (arm.isIntakeDown()) {
+      intake.setRPM(INTAKE_SPEED);
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.

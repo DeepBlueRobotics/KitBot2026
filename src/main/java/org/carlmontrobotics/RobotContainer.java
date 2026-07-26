@@ -8,12 +8,13 @@ package org.carlmontrobotics;
 //199 files
 import org.carlmontrobotics.subsystems.*;
 import org.carlmontrobotics.commands.AutonCommands.CenterAutoNoMove;
-import org.carlmontrobotics.commands.AutonCommands.CenterToLeftNeutralAuto;
+import org.carlmontrobotics.commands.AutonCommands.CenterLeftNeutralAuto;
 import org.carlmontrobotics.commands.AutonCommands.CenterToRightNeutralAuto;
 
 import org.carlmontrobotics.commands.AutonCommands.ToLeftNeutralAuto;
 import org.carlmontrobotics.commands.AutonCommands.ToRightNeutralAuto;
 import org.carlmontrobotics.commands.DriveCommands.TeleopDrive;
+import org.carlmontrobotics.commands.DriveCommands.Xdrive;
 import org.carlmontrobotics.commands.ManipulatorCommands.EjectBalls;
 import org.carlmontrobotics.commands.ManipulatorCommands.IntakeBalls;
 import org.carlmontrobotics.commands.ManipulatorCommands.RunConveyor;
@@ -55,7 +56,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.XboxController.Button;
-
+import edu.wpi.first.wpilibj.event.EventLoop;
 //commands
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -145,12 +146,10 @@ public class RobotContainer implements Sendable {
         axisTrigger(driverController, Manipulator.SMART_SHOOT_CLOSE_AXIS, OI.JOY_THRESH)
           .whileTrue(new SmartShoot(outtake, intake, conveyor, arm, OUTTAKE_SHOOTING_RPM));
 
-        new JoystickButton(driverController, Driver.LOCK_WHEELS_BUTTON)
-        .onTrue(new RunCommand(drivetrain::setX, drivetrain)
-        .until(() -> ((TeleopDrive) drivetrain.getDefaultCommand()).hasDriverInput()));
+        new JoystickButton(driverController, 3).whileTrue(new Xdrive(drivetrain));
 
         new POVButton(driverController, Manipulator.COLLAPSE_INTAKE_POV)
-      .onTrue(new RaiseIntakeFullyUp(intake, arm));
+          .onTrue(new RaiseIntakeFullyUp(intake, arm));
 
       new POVButton(driverController, Manipulator.DEPLOY_INTAKE_POV)
       .onTrue(new DeployIntake(intake, arm));
@@ -238,10 +237,10 @@ public class RobotContainer implements Sendable {
 
 
     private void RegisterCustomAutos(){
-      autoChooser.addOption("Center to Left Neutral", new CenterToLeftNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
-      autoChooser.addOption("Center to Right Neutral", new CenterToRightNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
-      autoChooser.addOption("At Bump to Left Neutral Auto", new ToLeftNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
-      autoChooser.addOption("At Bump to Right Neutral Auto", new ToRightNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
+      autoChooser.addOption("CenterLeft Neutral", new CenterLeftNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
+      autoChooser.addOption("Center Right Neutral", new CenterToRightNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
+      autoChooser.addOption("Bump to Left Neutral Auto", new ToLeftNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
+      autoChooser.addOption("Bump to Right Neutral Auto", new ToRightNeutralAuto(drivetrain, outtake, intake, conveyor, arm));
       autoChooser.setDefaultOption("Center Auto NO MOVE", new CenterAutoNoMove(outtake, conveyor, arm, intake)); 
     }
     //#endregion
@@ -258,7 +257,7 @@ public class RobotContainer implements Sendable {
       () -> SmartDashboard.getBoolean("Baby Mode", Config.CONFIG.isBabyMode())
       ));
 
-      intake.setDefaultCommand(new IntakeBalls(intake, manipulatorController));
+      intake.setDefaultCommand(new IntakeBalls(intake, manipulatorController, arm));
     }
   //#endregion
   //#region getAutoCommand

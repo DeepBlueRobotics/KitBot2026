@@ -70,24 +70,24 @@ public class Robot extends TimedRobot {
           int station = location.getAsInt();
           switch (station) {
             case 1:
-              m_robotContainer.driverController.setRumble(RumbleType.kRightRumble, 0.2);
-               m_robotContainer.manipulatorController.setRumble(RumbleType.kLeftRumble, 0.2);
+              m_robotContainer.driverController.setRumble(RumbleType.kRightRumble, 0.4);
+               m_robotContainer.manipulatorController.setRumble(RumbleType.kLeftRumble, 0.4);
               break;
           
             case 2:
-              m_robotContainer.driverController.setRumble(RumbleType.kLeftRumble, 0.2);
-              m_robotContainer.manipulatorController.setRumble(RumbleType.kRightRumble, 0.2);
+              m_robotContainer.driverController.setRumble(RumbleType.kLeftRumble, 0.4);
+              m_robotContainer.manipulatorController.setRumble(RumbleType.kRightRumble, 0.4);
               break;
 
             case 3:
-              m_robotContainer.driverController.setRumble(RumbleType.kRightRumble, 0.2);
-              m_robotContainer.manipulatorController.setRumble(RumbleType.kLeftRumble, 0.2);
+              m_robotContainer.driverController.setRumble(RumbleType.kRightRumble, 0.4);
+              m_robotContainer.manipulatorController.setRumble(RumbleType.kLeftRumble, 0.4);
               break;
           }
         }
         else {
-          m_robotContainer.driverController.setRumble(RumbleType.kBothRumble, 0.2);
-          m_robotContainer.manipulatorController.setRumble(RumbleType.kBothRumble, 0.2);     
+          m_robotContainer.driverController.setRumble(RumbleType.kBothRumble, 0.4);
+          m_robotContainer.manipulatorController.setRumble(RumbleType.kBothRumble, 0.4);     
         }
       }
       else {

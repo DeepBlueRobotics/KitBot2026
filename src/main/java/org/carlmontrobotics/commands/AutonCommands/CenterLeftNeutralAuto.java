@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class CenterToRightNeutralAuto extends Command {
+public class CenterLeftNeutralAuto extends Command {
   private final Drivetrain dt;
   private final Outtake shooter;
   private final Intake intake;
@@ -27,7 +27,7 @@ public class CenterToRightNeutralAuto extends Command {
   private final Timer timer;
 
   private double startShoot = 0.0;
-  private double endshoot = 6;
+  private double endshoot = 4;
   private double endStrafe = 1;
   private double endFastDrive = 1.5;
   private double endSlowDrive = 2;
@@ -35,7 +35,7 @@ public class CenterToRightNeutralAuto extends Command {
   private double endStrafeDrive = 2.5;
 
   /** Creates a new SimpleShootAuton. */
-  public CenterToRightNeutralAuto(Drivetrain dt, Outtake shooter, Intake intake, Conveyor conveyor, ArmIntake arm) {
+  public CenterLeftNeutralAuto(Drivetrain dt, Outtake shooter, Intake intake, Conveyor conveyor, ArmIntake arm) {
     this.shooter = shooter;
     this.intake = intake;
     this.dt = dt;
@@ -78,10 +78,10 @@ public class CenterToRightNeutralAuto extends Command {
       dt.drive(0,0,0);
     }
     else if (currentTime > startShoot+endshoot+endStrafe+endFastDrive+endSlowDrive+endRotation) {
-      dt.drive(0,-2,0);
+      dt.drive(0,2,0);
     }
     else if (currentTime > startShoot+endshoot+endStrafe+endFastDrive+endSlowDrive) {
-      dt.drive(0,0,3.4);
+      dt.drive(0,0,-3.4);
     }
     else if (currentTime > startShoot+endshoot+endStrafe+endFastDrive) {
       dt.drive(1.3,0,0);
@@ -97,7 +97,7 @@ public class CenterToRightNeutralAuto extends Command {
       shooter.stopOuttake();
       shooter.spinOuttakeFeeder(0);
       conveyor.stop();
-      dt.drive(-0.2, 2, 0);
+      dt.drive(-0.2, -2, 0);
     }
     else if (currentTime > startShoot) {
       shooter.spinOuttakeFeeder(0.7);
