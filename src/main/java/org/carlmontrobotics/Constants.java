@@ -66,6 +66,7 @@ public final class Constants {
 
 			public static final int INTAKE_CONVEYOR_BUTTON = Button.kB.value;
 			public static final int REPEL_BALLS_BUTTON = Button.kRightBumper.value;
+			public static final int REPEL_BALLS_BUTTON_DRIVER = Button.kA.value;
 
 			public static final int TESTING = Button.kX.value;
 
@@ -120,8 +121,8 @@ public final class Constants {
 		// public static final boolean[] reversed = {true, true, true, true};
 		// Determine correct turnZero constants (FL, FR, BL, BR)
 		public static final double[] turnZeroDeg = RobotBase.isSimulation() ? new double[] {-90.0, -90.0, -90.0, -90.0 }
-		: (CONFIG.isHammerHead() ? new double[] { 85.7812, 85.0782, -96.9433, -162.9492 }
-			: new double[] {-37.08984375, -156.708984375,-135.263671875, 81.474609375});/* real values here */
+		: (CONFIG.isHammerHead() ? new double[] { 85.7812, 85.0782, -96.9433, -162.9492 } //85.7812, 85.0782, -96.9433, -162.9492
+			: new double[] {-38.49609375, -156.708984375,-101.69921875, 81.474609375});/* real values here */
 			
 
 		// kP, kI, and kD constants for turn motor controllers in the order of
@@ -335,7 +336,7 @@ public final class Constants {
 		public static final MotorConfig OUTTAKE_FOLLOWER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 		public static final MotorConfig OUTTAKE_FEEDER_MOTOR_CONFIG = MotorConfig.NEO_VORTEX;
 
-		public static final double OUTTAKE_SHOOTING_RPM =3500; //TODO
+		public static final double OUTTAKE_SHOOTING_RPM =3400; //TODO
 		public static final double OUTTAKE_PASSING_RPM = 5000; //TODO
 		
 		public static final double kP = 0.0004;

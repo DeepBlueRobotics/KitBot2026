@@ -31,7 +31,7 @@ public abstract class Config implements Sendable {
                                                        // Note: disables joystick control of arm and
                                                        // outtake command if
                                                        // using SmartDashboard
-    protected boolean babyMode = false;
+    protected boolean babyMode = true;
 
     // ...a public getter starting with "is" for booleans or "get" for other types.
     // Do NOT remove this example. It is used by unit tests.

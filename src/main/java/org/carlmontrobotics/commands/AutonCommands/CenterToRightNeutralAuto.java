@@ -27,7 +27,7 @@ public class CenterToRightNeutralAuto extends Command {
   private final Timer timer;
 
   private double startShoot = 0.0;
-  private double endshoot = 6;
+  private double endshoot = 4;
   private double endStrafe = 1;
   private double endFastDrive = 1.5;
   private double endSlowDrive = 2;

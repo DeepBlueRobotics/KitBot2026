@@ -95,7 +95,7 @@ public class ArmIntake extends SubsystemBase {
    * Raises arm 10 degrees above the clearance angle of 25 degrees
    */
   public void raiseIntakeToBump() {
-    armPID.setSetpoint(ARM_kClearanceBumpAngle - 10, ControlType.kPosition); //-10 degrees to clear the level by 10 
+    armPID.setSetpoint(ARM_kClearanceBumpAngle, ControlType.kPosition); //-10 degrees to clear the level by 10 
   }
 
   /**

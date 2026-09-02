@@ -4,6 +4,7 @@
 
 package org.carlmontrobotics.commands.ManipulatorCommands;
 
+import static org.carlmontrobotics.Constants.IntakeC.NewIntakeC.ArmC.ARM_kDeployedAngle;
 import static org.carlmontrobotics.Constants.IntakeC.NewIntakeC.RollerC.*;
 
 import org.carlmontrobotics.subsystems.ArmIntake;
@@ -31,9 +32,6 @@ public class IntakeBalls extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if (arm.isIntakeDown()) {
-      intake.setRPM(INTAKE_SPEED);
-    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -47,6 +45,13 @@ public class IntakeBalls extends Command {
       SmartDashboard.putBoolean("IntakeJammed", true);
       manipulatorRumble.setRumble(RumbleType.kRightRumble, 0);
     }
+    if (arm.isIntakeDown()) {
+      intake.setRPM(INTAKE_SPEED);
+    }
+    else {
+      intake.stop();
+    }
+
   }
 
   // Called once the command ends or is interrupted.

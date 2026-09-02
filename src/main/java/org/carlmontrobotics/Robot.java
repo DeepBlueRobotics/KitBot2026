@@ -23,7 +23,7 @@ public class Robot extends TimedRobot {
   private final Timer idlingTimer;
 
   private final RobotContainer m_robotContainer;
-  private final boolean atComp = true;
+  private final boolean atComp = false;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -35,6 +35,11 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
     idlingTimer = new Timer();
     //SmartDashboard.putData(()-> m_robotContainer.drivetrain.getBusVoltage());
+  }
+
+  @Override
+  public void robotInit() {
+    System.out.println("Deployed");
   }
 
   /**

@@ -140,8 +140,9 @@ public class RobotContainer implements Sendable {
         new JoystickButton(driverController, Driver.RESET_FIELD_ORIENTATION_BUTTON)
             .onTrue(new InstantCommand(drivetrain::resetFieldOrientation));
 
-        new JoystickButton(driverController, Manipulator.REPEL_BALLS_BUTTON)
-          .whileTrue(new EjectBalls(intake, conveyor, arm, outtake));
+        new JoystickButton(driverController, Manipulator.REPEL_BALLS_BUTTON_DRIVER)
+          // .whileTrue(new EjectBalls(intake, conveyor, arm, outtake));
+          .onTrue(new InstantCommand(arm::raiseIntakeToBump));
 
         axisTrigger(driverController, Manipulator.SMART_SHOOT_CLOSE_AXIS, OI.JOY_THRESH)
           .whileTrue(new SmartShoot(outtake, intake, conveyor, arm, OUTTAKE_SHOOTING_RPM));
